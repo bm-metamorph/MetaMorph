@@ -3,7 +3,7 @@ WORKDIR /go/src/github.com/metamorph
 COPY . .
 RUN go build -o build/_output/bin/metamorph cmd/manager/main.go
 
-FROM quay.io/metalkube/base-image
+FROM ubuntu:18.04
 
 COPY --from=builder /go/src/github.com/metamorph/build/_output/bin/metamorph /
 
