@@ -120,19 +120,20 @@ func init() {
 }
 
 var fileDescriptor_c42ee4f417cf2fce = []byte{
-	// 184 bytes of a gzipped FileDescriptorProto
+	// 207 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x2d, 0x28, 0xca, 0x2f,
 	0xc9, 0xd7, 0xcf, 0x4d, 0x2d, 0x49, 0xcc, 0xcd, 0x2f, 0x2a, 0xc8, 0xd0, 0x03, 0xf3, 0x85, 0x58,
 	0xc1, 0x94, 0x92, 0x2d, 0x17, 0x7b, 0x50, 0x6a, 0x61, 0x69, 0x6a, 0x71, 0x89, 0x90, 0x18, 0x17,
 	0x9b, 0x5f, 0x7e, 0x4a, 0xaa, 0xa7, 0x8b, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0x67, 0x10, 0x94, 0x27,
 	0x24, 0xc5, 0xc5, 0x01, 0x62, 0x05, 0x17, 0xa4, 0x26, 0x4b, 0x30, 0x29, 0x30, 0x6a, 0xf0, 0x04,
 	0xc1, 0xf9, 0x4a, 0x4a, 0x5c, 0x1c, 0x41, 0xa9, 0xc5, 0x05, 0xf9, 0x79, 0xc5, 0xa9, 0x20, 0xfd,
-	0x45, 0xa9, 0xc5, 0xa5, 0x39, 0x25, 0x30, 0xfd, 0x10, 0x9e, 0xd1, 0x04, 0x46, 0x2e, 0x6e, 0xb0,
-	0x86, 0xd4, 0xa2, 0xb2, 0xcc, 0xe4, 0x54, 0x21, 0x4d, 0x2e, 0x36, 0xe7, 0xa2, 0xd4, 0xc4, 0x92,
-	0x54, 0x21, 0x3e, 0x88, 0x5b, 0xf4, 0xa0, 0x2e, 0x90, 0xe2, 0x87, 0xf3, 0xa1, 0x46, 0x6a, 0x73,
-	0x71, 0xb8, 0xa4, 0x16, 0x27, 0x17, 0x65, 0x26, 0x11, 0xa1, 0x58, 0x93, 0x8b, 0xcd, 0x25, 0xb5,
-	0x20, 0x27, 0xbf, 0x92, 0xa0, 0xd2, 0x24, 0x36, 0x30, 0xdf, 0x18, 0x10, 0x00, 0x00, 0xff, 0xff,
-	0xe4, 0xeb, 0x66, 0xeb, 0x1c, 0x01, 0x00, 0x00,
+	0x45, 0xa9, 0xc5, 0xa5, 0x39, 0x25, 0x30, 0xfd, 0x10, 0x9e, 0x51, 0x3f, 0x13, 0x17, 0x37, 0x58,
+	0x43, 0x6a, 0x51, 0x59, 0x66, 0x72, 0xaa, 0x90, 0x26, 0x17, 0x9b, 0x73, 0x51, 0x6a, 0x62, 0x49,
+	0xaa, 0x10, 0x1f, 0xc4, 0x2d, 0x7a, 0x50, 0x17, 0x48, 0xf1, 0xc3, 0xf9, 0x50, 0x23, 0xb5, 0xb9,
+	0x38, 0x5c, 0x52, 0x8b, 0x93, 0x8b, 0x32, 0x93, 0x88, 0x50, 0xac, 0xc9, 0xc5, 0x16, 0x5a, 0x90,
+	0x42, 0x94, 0xb9, 0x9a, 0x5c, 0x6c, 0x2e, 0xa9, 0x39, 0xa9, 0xc4, 0x28, 0x55, 0xe7, 0x62, 0xf1,
+	0xc9, 0x2c, 0x2e, 0x21, 0xd2, 0xcc, 0x82, 0x9c, 0xfc, 0x4a, 0x82, 0x4a, 0x93, 0xd8, 0xc0, 0x7c,
+	0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0xc2, 0xe0, 0x43, 0xbc, 0x9b, 0x01, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -149,9 +150,9 @@ const _ = grpc.SupportPackageIsVersion6
 type NodeServiceClient interface {
 	Create(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	Describe(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
-	//rpc Update(Request) returns (Response);
-	//rpc Delete(Request) returns (Response);
-	//rpc List(Request) returns (Response);
+	Update(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	Delete(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	List(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	Deploy(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 }
 
@@ -181,6 +182,33 @@ func (c *nodeServiceClient) Describe(ctx context.Context, in *Request, opts ...g
 	return out, nil
 }
 
+func (c *nodeServiceClient) Update(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/proto.NodeService/Update", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) Delete(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/proto.NodeService/Delete", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) List(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/proto.NodeService/List", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *nodeServiceClient) Deploy(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
 	out := new(Response)
 	err := c.cc.Invoke(ctx, "/proto.NodeService/Deploy", in, out, opts...)
@@ -194,9 +222,9 @@ func (c *nodeServiceClient) Deploy(ctx context.Context, in *Request, opts ...grp
 type NodeServiceServer interface {
 	Create(context.Context, *Request) (*Response, error)
 	Describe(context.Context, *Request) (*Response, error)
-	//rpc Update(Request) returns (Response);
-	//rpc Delete(Request) returns (Response);
-	//rpc List(Request) returns (Response);
+	Update(context.Context, *Request) (*Response, error)
+	Delete(context.Context, *Request) (*Response, error)
+	List(context.Context, *Request) (*Response, error)
 	Deploy(context.Context, *Request) (*Response, error)
 }
 
@@ -209,6 +237,15 @@ func (*UnimplementedNodeServiceServer) Create(ctx context.Context, req *Request)
 }
 func (*UnimplementedNodeServiceServer) Describe(ctx context.Context, req *Request) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Describe not implemented")
+}
+func (*UnimplementedNodeServiceServer) Update(ctx context.Context, req *Request) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (*UnimplementedNodeServiceServer) Delete(ctx context.Context, req *Request) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (*UnimplementedNodeServiceServer) List(ctx context.Context, req *Request) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
 func (*UnimplementedNodeServiceServer) Deploy(ctx context.Context, req *Request) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Deploy not implemented")
@@ -254,6 +291,60 @@ func _NodeService_Describe_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NodeService_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).Update(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.NodeService/Update",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).Update(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.NodeService/Delete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).Delete(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).List(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.NodeService/List",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).List(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _NodeService_Deploy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
@@ -283,6 +374,18 @@ var _NodeService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Describe",
 			Handler:    _NodeService_Describe_Handler,
+		},
+		{
+			MethodName: "Update",
+			Handler:    _NodeService_Update_Handler,
+		},
+		{
+			MethodName: "Delete",
+			Handler:    _NodeService_Delete_Handler,
+		},
+		{
+			MethodName: "List",
+			Handler:    _NodeService_List_Handler,
 		},
 		{
 			MethodName: "Deploy",
