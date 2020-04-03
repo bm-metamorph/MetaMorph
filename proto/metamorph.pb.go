@@ -24,43 +24,51 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type NodeID struct {
+type Request struct {
 	NodeID               string   `protobuf:"bytes,1,opt,name=NodeID,proto3" json:"NodeID,omitempty"`
+	NodeSpec             []byte   `protobuf:"bytes,2,opt,name=NodeSpec,proto3" json:"NodeSpec,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *NodeID) Reset()         { *m = NodeID{} }
-func (m *NodeID) String() string { return proto.CompactTextString(m) }
-func (*NodeID) ProtoMessage()    {}
-func (*NodeID) Descriptor() ([]byte, []int) {
+func (m *Request) Reset()         { *m = Request{} }
+func (m *Request) String() string { return proto.CompactTextString(m) }
+func (*Request) ProtoMessage()    {}
+func (*Request) Descriptor() ([]byte, []int) {
 	return fileDescriptor_c42ee4f417cf2fce, []int{0}
 }
 
-func (m *NodeID) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_NodeID.Unmarshal(m, b)
+func (m *Request) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Request.Unmarshal(m, b)
 }
-func (m *NodeID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_NodeID.Marshal(b, m, deterministic)
+func (m *Request) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Request.Marshal(b, m, deterministic)
 }
-func (m *NodeID) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_NodeID.Merge(m, src)
+func (m *Request) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Request.Merge(m, src)
 }
-func (m *NodeID) XXX_Size() int {
-	return xxx_messageInfo_NodeID.Size(m)
+func (m *Request) XXX_Size() int {
+	return xxx_messageInfo_Request.Size(m)
 }
-func (m *NodeID) XXX_DiscardUnknown() {
-	xxx_messageInfo_NodeID.DiscardUnknown(m)
+func (m *Request) XXX_DiscardUnknown() {
+	xxx_messageInfo_Request.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_NodeID proto.InternalMessageInfo
+var xxx_messageInfo_Request proto.InternalMessageInfo
 
-func (m *NodeID) GetNodeID() string {
+func (m *Request) GetNodeID() string {
 	if m != nil {
 		return m.NodeID
 	}
 	return ""
+}
+
+func (m *Request) GetNodeSpec() []byte {
+	if m != nil {
+		return m.NodeSpec
+	}
+	return nil
 }
 
 type Response struct {
@@ -103,7 +111,7 @@ func (m *Response) GetResult() string {
 }
 
 func init() {
-	proto.RegisterType((*NodeID)(nil), "proto.NodeID")
+	proto.RegisterType((*Request)(nil), "proto.Request")
 	proto.RegisterType((*Response)(nil), "proto.Response")
 }
 
@@ -112,16 +120,20 @@ func init() {
 }
 
 var fileDescriptor_c42ee4f417cf2fce = []byte{
-	// 137 bytes of a gzipped FileDescriptorProto
+	// 207 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x2d, 0x28, 0xca, 0x2f,
 	0xc9, 0xd7, 0xcf, 0x4d, 0x2d, 0x49, 0xcc, 0xcd, 0x2f, 0x2a, 0xc8, 0xd0, 0x03, 0xf3, 0x85, 0x58,
-	0xc1, 0x94, 0x92, 0x02, 0x17, 0x9b, 0x5f, 0x7e, 0x4a, 0xaa, 0xa7, 0x8b, 0x90, 0x18, 0x8c, 0x25,
-	0xc1, 0xa8, 0xc0, 0xa8, 0xc1, 0x19, 0x04, 0xe5, 0x29, 0x29, 0x71, 0x71, 0x04, 0xa5, 0x16, 0x17,
-	0xe4, 0xe7, 0x15, 0xa7, 0x82, 0xd4, 0x14, 0xa5, 0x16, 0x97, 0xe6, 0x94, 0xc0, 0xd4, 0x40, 0x78,
-	0x46, 0x96, 0x5c, 0xdc, 0x20, 0xd5, 0xc1, 0xa9, 0x45, 0x65, 0x99, 0xc9, 0xa9, 0x42, 0x5a, 0x5c,
-	0x1c, 0x2e, 0xa9, 0xc5, 0xc9, 0x45, 0x99, 0x49, 0xa9, 0x42, 0xbc, 0x10, 0xfb, 0xf4, 0x20, 0xa6,
-	0x49, 0xf1, 0x43, 0xb9, 0x30, 0x23, 0x93, 0xd8, 0xc0, 0x7c, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff,
-	0xff, 0xa0, 0x77, 0xfc, 0x79, 0xa7, 0x00, 0x00, 0x00,
+	0xc1, 0x94, 0x92, 0x2d, 0x17, 0x7b, 0x50, 0x6a, 0x61, 0x69, 0x6a, 0x71, 0x89, 0x90, 0x18, 0x17,
+	0x9b, 0x5f, 0x7e, 0x4a, 0xaa, 0xa7, 0x8b, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0x67, 0x10, 0x94, 0x27,
+	0x24, 0xc5, 0xc5, 0x01, 0x62, 0x05, 0x17, 0xa4, 0x26, 0x4b, 0x30, 0x29, 0x30, 0x6a, 0xf0, 0x04,
+	0xc1, 0xf9, 0x4a, 0x4a, 0x5c, 0x1c, 0x41, 0xa9, 0xc5, 0x05, 0xf9, 0x79, 0xc5, 0xa9, 0x20, 0xfd,
+	0x45, 0xa9, 0xc5, 0xa5, 0x39, 0x25, 0x30, 0xfd, 0x10, 0x9e, 0x51, 0x3f, 0x13, 0x17, 0x37, 0x58,
+	0x43, 0x6a, 0x51, 0x59, 0x66, 0x72, 0xaa, 0x90, 0x26, 0x17, 0x9b, 0x73, 0x51, 0x6a, 0x62, 0x49,
+	0xaa, 0x10, 0x1f, 0xc4, 0x2d, 0x7a, 0x50, 0x17, 0x48, 0xf1, 0xc3, 0xf9, 0x50, 0x23, 0xb5, 0xb9,
+	0x38, 0x5c, 0x52, 0x8b, 0x93, 0x8b, 0x32, 0x93, 0x88, 0x50, 0xac, 0xc9, 0xc5, 0x16, 0x5a, 0x90,
+	0x42, 0x94, 0xb9, 0x9a, 0x5c, 0x6c, 0x2e, 0xa9, 0x39, 0xa9, 0xc4, 0x28, 0x55, 0xe7, 0x62, 0xf1,
+	0xc9, 0x2c, 0x2e, 0x21, 0xd2, 0xcc, 0x82, 0x9c, 0xfc, 0x4a, 0x82, 0x4a, 0x93, 0xd8, 0xc0, 0x7c,
+	0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0xc2, 0xe0, 0x43, 0xbc, 0x9b, 0x01, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -136,8 +148,12 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type NodeServiceClient interface {
-	//rpc Create(Request) returns (Response);
-	Describe(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*Response, error)
+	Create(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	Describe(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	Update(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	Delete(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	List(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	Deploy(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 }
 
 type nodeServiceClient struct {
@@ -148,7 +164,16 @@ func NewNodeServiceClient(cc grpc.ClientConnInterface) NodeServiceClient {
 	return &nodeServiceClient{cc}
 }
 
-func (c *nodeServiceClient) Describe(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*Response, error) {
+func (c *nodeServiceClient) Create(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/proto.NodeService/Create", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) Describe(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
 	out := new(Response)
 	err := c.cc.Invoke(ctx, "/proto.NodeService/Describe", in, out, opts...)
 	if err != nil {
@@ -157,26 +182,99 @@ func (c *nodeServiceClient) Describe(ctx context.Context, in *NodeID, opts ...gr
 	return out, nil
 }
 
+func (c *nodeServiceClient) Update(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/proto.NodeService/Update", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) Delete(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/proto.NodeService/Delete", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) List(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/proto.NodeService/List", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) Deploy(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/proto.NodeService/Deploy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NodeServiceServer is the server API for NodeService service.
 type NodeServiceServer interface {
-	//rpc Create(Request) returns (Response);
-	Describe(context.Context, *NodeID) (*Response, error)
+	Create(context.Context, *Request) (*Response, error)
+	Describe(context.Context, *Request) (*Response, error)
+	Update(context.Context, *Request) (*Response, error)
+	Delete(context.Context, *Request) (*Response, error)
+	List(context.Context, *Request) (*Response, error)
+	Deploy(context.Context, *Request) (*Response, error)
 }
 
 // UnimplementedNodeServiceServer can be embedded to have forward compatible implementations.
 type UnimplementedNodeServiceServer struct {
 }
 
-func (*UnimplementedNodeServiceServer) Describe(ctx context.Context, req *NodeID) (*Response, error) {
+func (*UnimplementedNodeServiceServer) Create(ctx context.Context, req *Request) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (*UnimplementedNodeServiceServer) Describe(ctx context.Context, req *Request) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Describe not implemented")
+}
+func (*UnimplementedNodeServiceServer) Update(ctx context.Context, req *Request) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (*UnimplementedNodeServiceServer) Delete(ctx context.Context, req *Request) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (*UnimplementedNodeServiceServer) List(ctx context.Context, req *Request) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (*UnimplementedNodeServiceServer) Deploy(ctx context.Context, req *Request) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Deploy not implemented")
 }
 
 func RegisterNodeServiceServer(s *grpc.Server, srv NodeServiceServer) {
 	s.RegisterService(&_NodeService_serviceDesc, srv)
 }
 
+func _NodeService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).Create(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.NodeService/Create",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).Create(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _NodeService_Describe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NodeID)
+	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -188,7 +286,79 @@ func _NodeService_Describe_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: "/proto.NodeService/Describe",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NodeServiceServer).Describe(ctx, req.(*NodeID))
+		return srv.(NodeServiceServer).Describe(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).Update(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.NodeService/Update",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).Update(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.NodeService/Delete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).Delete(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).List(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.NodeService/List",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).List(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_Deploy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).Deploy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.NodeService/Deploy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).Deploy(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -198,8 +368,28 @@ var _NodeService_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*NodeServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "Create",
+			Handler:    _NodeService_Create_Handler,
+		},
+		{
 			MethodName: "Describe",
 			Handler:    _NodeService_Describe_Handler,
+		},
+		{
+			MethodName: "Update",
+			Handler:    _NodeService_Update_Handler,
+		},
+		{
+			MethodName: "Delete",
+			Handler:    _NodeService_Delete_Handler,
+		},
+		{
+			MethodName: "List",
+			Handler:    _NodeService_List_Handler,
+		},
+		{
+			MethodName: "Deploy",
+			Handler:    _NodeService_Deploy_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
