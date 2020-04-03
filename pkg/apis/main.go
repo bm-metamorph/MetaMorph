@@ -1,68 +1,75 @@
 package main
 
-import (
-	 "github.com/gin-gonic/gin"
-	 "fmt"
+import(
+	"fmt"
+	"bitbucket.com/metamorph/proto"
+	"github.com/gin-gonic/gin"
+	"net/http"
+	"log"
+	"google.golang.org/grpc"
 )
 
+func main() {
 
-func createNode(c *gin.Context){
-
-	c.JSON(200, gin.H{
-		"message": "Created node",
-	})
-}
-
-func updateNode(c *gin.Context){
-
-	c.JSON(200, gin.H{
-		"message": "Updated node",
-	})
-}
-
-
-func describeNode(c *gin.Context){
-	nodeID := c.Param("node_id")
-	result := fmt.Sprintf("Describe  node %s", nodeID)
-	c.JSON(200, gin.H{
-		"message": result,
-	})
-}
-
-
-func deleteNode(c *gin.Context){
-
-	c.JSON(200, gin.H{
-		"message": "deleted node",
-	})
-}
-
-
-func deployNode(c *gin.Context){
-
-	c.JSON(200, gin.H{
-		"message": "deployed node",
-	})
-}
-
-
-func main(){
-	r := gin.Default()
-
-	node := r.Group("/node")
-	{
-		node.POST("/", createNode)
-		node.GET("/:node_id", describeNode)
-		node.PUT("/", updateNode)
-		node.DELETE("/", deleteNode)
-		node.POST("/deploy/:node_id", deployNode)
+	conn, err := grpc.Dial( "localhost:4040", grpc.WithInsecure() )
+	if err != nil {
+		panic(err)
 	}
 
-	r.GET("/nodes", func(c *gin.Context){
+	client := proto.NewNodeServiceClient(conn) 
+	g :=  gin.Default()
 
-		c.JSON(200, gin.H{
-			"message": "Node list",
-		})
+	g.POST("/node", func(ctx *gin.Context){
+
+		data,_ := ctx.GetRawData()
+		req := &proto.Request{NodeSpec: data }
+		if response, err := client.Create(ctx, req); err == nil {
+			ctx.JSON(http.StatusOK, gin.H{
+				"result": fmt.Sprint(response.Result),
+			})
+		} else {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+		}
 	})
-	r.Run()
+
+	g.GET("/node/:node_id", func(ctx *gin.Context){
+		node_id := ctx.Param("node_id")
+		fmt.Println(node_id)
+		req := &proto.Request{NodeID: string(node_id)}
+		if response, err := client.Describe(ctx, req); err == nil {
+			ctx.JSON(http.StatusOK, gin.H{
+				"result": fmt.Sprint(response.Result),
+			})
+		} else {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+		}
+
+	})
+
+
+	g.POST("/node/deploy/:node_id", func(ctx *gin.Context){
+		node_id := ctx.Param("node_id")
+		//fmt.Println(node_id)
+		req := &proto.Request{NodeID: string(node_id)}
+		if response, err := client.Deploy(ctx, req); err == nil {
+			ctx.JSON(http.StatusOK, gin.H{
+				"result": fmt.Sprintf("Node %s deployed", response.Result),
+			})
+		} else {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+		}
+
+	})
+
+	if err := g.Run(":8080"); err != nil {
+		log.Fatalf("Failed to Run server: %v ", err)
+	}
+
 }
+

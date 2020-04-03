@@ -8,8 +8,9 @@ package proto;
 //     int64 b = 2;
 // }
 
-message NodeID {
+message Request {
     string NodeID = 1;
+    bytes NodeSpec = 2;
     
 }
 
@@ -20,11 +21,11 @@ message Response {
 
 service NodeService {
 
-    //rpc Create(Request) returns (Response);
-    rpc Describe(NodeID) returns (Response);
+    rpc Create(Request) returns (Response);
+    rpc Describe(Request) returns (Response);
     //rpc Update(Request) returns (Response);
     //rpc Delete(Request) returns (Response);
     //rpc List(Request) returns (Response);
-    //rpc Deploy(Request) returns (Response);
+    rpc Deploy(Request) returns (Response);
 
 }
