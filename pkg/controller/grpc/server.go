@@ -1,4 +1,4 @@
-package main
+package controller
 
 import(
 	"context"
@@ -13,7 +13,7 @@ import(
 
 type server struct{}
 
-func main() {
+func Serve() {
 
 	listner, err := net.Listen("tcp", ":4040")
 	if err != nil {

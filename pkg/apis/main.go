@@ -1,4 +1,4 @@
-package main
+package api
 
 import(
 	"fmt"
@@ -109,8 +109,7 @@ func listNodes(ctx *gin.Context){
 }
 
 
-func main() {
-
+func Serve() {
 
 	r :=  gin.Default()
 
@@ -123,7 +122,6 @@ func main() {
 		node.DELETE("/:node_id", deleteNode)
 		node.POST("/deploy/:node_id", deployNode)
 	}
-
 
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("Failed to Run server: %v ", err)
