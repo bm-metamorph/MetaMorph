@@ -3,6 +3,7 @@ package controller
 import(
 	"context"
 	"bitbucket.com/metamorph/proto"
+	"bitbucket.com/metamorph/pkg/db/models/node"
 	"net"
 	"fmt"
 
@@ -33,9 +34,11 @@ func Serve() {
 func (s *server) Describe( ctx context.Context, request *proto.Request ) ( *proto.Response, error) {
 
 	nodeId:= request.GetNodeID()
-	fmt.Println(nodeId)
-	result := nodeId
-	return &proto.Response{Result: result}, nil
+	result, err := node.Describe(nodeId)
+	if err != nil {
+		return &proto.Response{Res: nil}, err
+	}
+	return &proto.Response{Res: result}, nil
 }
 
 func (s *server) Deploy( ctx context.Context, request *proto.Request ) ( *proto.Response, error) {
@@ -51,6 +54,10 @@ func (s *server) Create( ctx context.Context, request *proto.Request ) ( *proto.
 	NodeSpec:= request.GetNodeSpec()
 	fmt.Println(string(NodeSpec))
 	result := "Creating node"
+	result, err := node.Create(NodeSpec)
+	if err != nil {
+		return &proto.Response{Result: ""}, err
+	}
 	return &proto.Response{Result: result}, nil
 }
 

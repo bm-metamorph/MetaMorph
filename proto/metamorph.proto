@@ -10,6 +10,7 @@ message Request {
 
 message Response {
     string result = 1;
+    bytes res = 2;
 }
 
 service NodeService {
