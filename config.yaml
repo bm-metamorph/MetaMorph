@@ -1,0 +1,11 @@
+---
+database:
+    type: sqlite
+    path: "/tmp/db/metamorph.db"
+
+
+controller:
+    port : 8080
+
+logger:
+    path: /tmp/metamorph.log

@@ -37,9 +37,7 @@ func describeNode(ctx *gin.Context){
 	fmt.Println(node_id)
 	req := &proto.Request{NodeID: string(node_id)}
 	if response, err := client.Describe(ctx, req); err == nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"result": fmt.Sprint(response.Result),
-		})
+		ctx.Data(http.StatusOK, gin.MIMEJSON, response.Res)
 	} else {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
