@@ -14,7 +14,7 @@ type Node struct {
 	ImageURL             string
 	OamIP                string
 	OamGateway           string
-	NameServers          []NameServer
+	NameServers          []NameServer `json:"NameServers"`
 	OsDisk               string
 	Partitions           []Partition
 	GrubConfig           string
@@ -30,7 +30,8 @@ type Node struct {
 	CPLDFirmwareVersion  string
 	RAIDFirmwareVersion  string
 	FirmwareVersion      string
-	VirtualDisks        []VirtualDisk
+	VirtualDisks         []VirtualDisk
+	State                string
   
   }
   
@@ -38,7 +39,7 @@ type Node struct {
   type NameServer struct {
 	gorm.Model
 	NodeID      uint
-	NameServer  string
+	NameServer  string `json:"NameServer"`
   }
   
   type Partition struct {

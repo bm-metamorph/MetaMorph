@@ -33,6 +33,117 @@ func getDB() *gorm.DB {
 	return db
 }
 
+// Only for Controller, Internal
+//Functions. Will return all Details
+//About node. Including Credentials
+func GetNodes() ([]Node, error) {
+
+	nodes := []Node{}
+	db := getDB()
+	defer db.Close()
+	//db.Find(&nodes)
+	db.Not("state", []string{"failed", "in-transition"}).Find(&nodes)
+    if len(nodes)  > 0 {
+		return nodes, nil
+	} else {
+		return nil, errors.New("Nodes not found")
+	}
+}
+
+func GetNameServers(node_uuid string) ([]NameServer, error){
+	node := Node{}
+	nameservers := []NameServer{}
+	db := getDB()
+	defer db.Close()
+	node_uuid1 ,_ := uuid.Parse(node_uuid)
+	db.Where("node_uuid = ?", node_uuid1).First(&node)
+	db.Model(&node).Related(&nameservers)
+	if len(nameservers) > 0 {
+		return nameservers, nil
+	} else {
+		return nil, errors.New(" No record Found")
+	}
+}
+
+
+func GetPartitions(node_uuid string) ([]Partition, error){
+	node := Node{}
+	partitions := []Partition{}
+	db := getDB()
+	defer db.Close()
+	node_uuid1 ,_ := uuid.Parse(node_uuid)
+	db.Where("node_uuid = ?", node_uuid1).First(&node)
+	db.Model(&node).Related(&partitions)
+	if len(partitions) > 0 {
+		return partitions, nil
+	} else {
+		return nil, errors.New(" No record Found")
+	}
+}
+
+
+func GetSSHPubKeys(node_uuid string) ([]SSHPubKey, error){
+	node := Node{}
+	sshPubKeys := []SSHPubKey{}
+	db := getDB()
+	defer db.Close()
+	node_uuid1 ,_ := uuid.Parse(node_uuid)
+	db.Where("node_uuid = ?", node_uuid1).First(&node)
+	db.Model(&node).Related(&sshPubKeys)
+	if len(sshPubKeys) > 0 {
+		return sshPubKeys, nil
+	} else {
+		return nil, errors.New(" No record Found")
+	}
+}
+
+func GetBondInterfaces(node_uuid string) ([]BondInterface, error){
+	node := Node{}
+	bondInterfaces := []BondInterface{}
+	db := getDB()
+	defer db.Close()
+	node_uuid1 ,_ := uuid.Parse(node_uuid)
+	db.Where("node_uuid = ?", node_uuid1).First(&node)
+	db.Model(&node).Related(&bondInterfaces)
+	if len(bondInterfaces) > 0 {
+		return bondInterfaces, nil
+	} else {
+		return nil, errors.New("No record Found")
+	}
+}
+
+//VirtualDisk
+
+func GetVirtualDisks(node_uuid string) ([]VirtualDisk, error){
+	node := Node{}
+	virtualdisks := []VirtualDisk{}
+	db := getDB()
+	defer db.Close()
+	node_uuid1 ,_ := uuid.Parse(node_uuid)
+	db.Where("node_uuid = ?", node_uuid1).First(&node)
+	db.Model(&node).Related(&virtualdisks)
+	if len(virtualdisks) > 0 {
+		return virtualdisks, nil
+	} else {
+		return nil, errors.New(" No record Found")
+	}
+}
+
+func GetPhysicalDisks(virtualDiskID uint) ([]PhysicalDisk, error) {
+	 
+	   vdisk := VirtualDisk{}
+	   physcical_disks := []PhysicalDisk{}
+	   db := getDB()
+	   defer db.Close()
+	   db.Where("id = ?", virtualDiskID).First(&vdisk)
+	   db.Model(&vdisk).Related(&physcical_disks)
+	   if len(physcical_disks) > 0 {
+		return physcical_disks, nil
+	} else {
+		return nil, errors.New(" No record Found")
+	}
+}
+
 
 func Describe(node_uuid string) ([]byte, error) {
 	node := Node{}
