@@ -23,7 +23,7 @@ func TestMetamorphFSM(t *testing.T) {
 			{Name: "node3", NodeUUID: uuid.New(), State: SETUPREADY},
 			{Name: "node4", NodeUUID: uuid.New(), State: DEPLOYED},
 			//		{Name: "node5", NodeUUID: uuid.New(), State: FAILED},
-		}, nil).WaitUntil(time.After(5 * time.Second))
+		}, nil).Once()
 
 	handler := &DBHandler{db: nodeDB}
 
