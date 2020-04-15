@@ -11,6 +11,18 @@ import (
 
 type BMNode node.Node
 
+type nodedb interface {
+	GetNodes() ([]node.Node, error)
+}
+
+type DBHandler struct {
+	db nodedb
+}
+
+func (db *DBHandler) GetNodes() ([]node.Node, error) {
+	return node.GetNodes()
+}
+
 const (
 	NEW          = "new"
 	READY        = "ready"
@@ -25,7 +37,7 @@ type NodeStatus struct {
 	Status   bool
 }
 
-func StartMetamorphFSM() {
+func (h *DBHandler) StartMetamorphFSM(runOnce bool) {
 
 	fmt.Println("Starting Metamorph FSM")
 
@@ -43,7 +55,8 @@ func StartMetamorphFSM() {
 
 	for {
 
-		nodelist, err := node.GetNodes()
+		//nodelist, err := node.GetNodes()
+		nodelist, err := h.db.GetNodes()
 
 		if err != nil {
 			fmt.Println("Failed to get nodelist")
@@ -57,7 +70,13 @@ func StartMetamorphFSM() {
 
 			}
 		}
-		time.Sleep(10 * time.Millisecond) // sllep for 10 ms before the start of the next cycle
+		// set the array to nil for the next cycle
+		nodelist = nil
+
+		time.Sleep(10 * time.Millisecond) // sleep for 10 ms before the start of the next cycle
+		if runOnce == true {              // for testing purpose only.
+			break
+		}
 	}
 	fmt.Println("Number of Go Routines", runtime.NumGoroutine())
 
@@ -85,22 +104,19 @@ func serviceRequest(requestsChan chan BMNode, nodeStatusChan chan<- NodeStatus, 
 
 	for bmnode := range requestsChan {
 
-		//ctx, cancel := context.WithCancel(context.Background())
-		//defer cancel()
-
 		switch bmnode.State {
 		case NEW:
 			fmt.Printf("[%v] Transition to Ready State\n", bmnode.Name)
 			wg.Add(1)
-			go bmnode.ReadystateHandler(nodeStatusChan, wg)
+			go ReadystateHandler(bmnode, nodeStatusChan, wg)
 		case READY:
 			fmt.Printf("[%v] Transitioning to SetupReady\n", bmnode.Name)
 			wg.Add(1)
-			go bmnode.SetupreadyHandler(nodeStatusChan, wg)
+			go SetupreadyHandler(bmnode, nodeStatusChan, wg)
 		case SETUPREADY:
 			fmt.Printf("[%v] Transitioning to Deployed State\n", bmnode.Name)
 			wg.Add(1)
-			go bmnode.DeployedHandler(nodeStatusChan, wg)
+			go DeployedHandler(bmnode, nodeStatusChan, wg)
 		default:
 			fmt.Printf("[%v] State not defined\n", bmnode.Name)
 			//nodestatus := NodeStatus { NodeUUID: node.NodeUUID, Status: false }
@@ -115,17 +131,21 @@ func serviceRequest(requestsChan chan BMNode, nodeStatusChan chan<- NodeStatus, 
 
 }
 
-func (bmnode *BMNode) ReadystateHandler(nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
+func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
 	fmt.Printf("[%v] Entering Ready State Handler\n", bmnode.Name)
 	bmnode.State = INTRANSITION
 	fmt.Printf("[%v] - NodeUUID - %v\n", bmnode.Name, bmnode.NodeUUID)
 
 	var testNode bool = true
+	var nodestatus NodeStatus
 	if testNode {
 		fmt.Printf("[%v] Error condition\n", bmnode.Name)
-		nodestatus := NodeStatus{NodeUUID: bmnode.NodeUUID, Status: false}
-		nodeStatusChan <- nodestatus
+		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: false}
+	}else {
+		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
 	}
+	nodeStatusChan <- nodestatus
+
 	wg.Done()
 
 	//Do Ready Check verification
@@ -133,7 +153,7 @@ func (bmnode *BMNode) ReadystateHandler(nodeStatusChan chan<- NodeStatus, wg *sy
 
 }
 
-func (bmnode *BMNode) SetupreadyHandler(nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
+func SetupreadyHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
 	fmt.Printf("[%v] Entering Setup Ready State Handler\n", bmnode.Name)
 	bmnode.State = INTRANSITION
 	fmt.Println(bmnode.NodeUUID)
@@ -143,7 +163,7 @@ func (bmnode *BMNode) SetupreadyHandler(nodeStatusChan chan<- NodeStatus, wg *sy
 	//Do Ready Check verification
 	//Update database accordingly
 }
-func (bmnode *BMNode) DeployedHandler(nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
+func DeployedHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
 	fmt.Printf("[%v] Entering Deployed State Handler\n", bmnode.Name)
 	bmnode.State = INTRANSITION
 	fmt.Println(bmnode.NodeUUID)

@@ -20,7 +20,7 @@ import (
 
 	"github.com/spf13/cobra"
 	ctrlgRPCServer "bitbucket.com/metamorph/pkg/controller/grpc"
-	ctrlgFSMServer "bitbucket.com/metamorph/pkg/controller/statemachine"
+//	ctrlgFSMServer "bitbucket.com/metamorph/pkg/controller/statemachine"
 )
 
 // controllerCmd represents the controller command
@@ -32,7 +32,7 @@ var controllerCmd = &cobra.Command{
 		fmt.Println("controller called")
 		ctrlgRPCServer.Serve()
 		fmt.Println("Starting metamorph FSM")
-     	go ctrlgFSMServer.StartMetamorphFSM() //check if this causes crash in case DB is not setup yet.
+     //	go ctrlgFSMServer.StartMetamorphFSM() //check if this causes crash in case DB is not setup yet.
 	},
 }
 
