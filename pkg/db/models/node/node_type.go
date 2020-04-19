@@ -22,6 +22,7 @@ type Node struct {
 	SSHPubKeys           []SSHPubKey
 	BondInterfaces       []BondInterface
 	BondParameters       BondParameters
+	IPMIIP               string
 	IPMIUser             string
 	IPMIPassword         string
 	Vendor               string
@@ -89,7 +90,7 @@ type Node struct {
 	gorm.Model
 	NodeID         uint
 	DiskName       string
-	raidType        int
+	RaidType        int
 	PhysicalDisks []PhysicalDisk
   }
   

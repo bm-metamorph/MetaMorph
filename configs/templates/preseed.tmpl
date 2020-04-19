@@ -1,0 +1,106 @@
+# Suggest LVM by default.
+#d-i    partman-auto/init_automatically_partition       string some_device_lvm
+#d-i    partman-auto/init_automatically_partition       seen false
+# Install the Ubuntu Server seed.
+tasksel tasksel/force-tasks     string server
+# Only install basic language packs. Let tasksel ask about tasks.
+d-i     pkgsel/language-pack-patterns   string
+# No language support packages.
+d-i     pkgsel/install-language-support boolean false
+# Only ask the UTC question if there are other operating systems installed.
+d-i     clock-setup/utc-auto    boolean true
+# Verbose output and no boot splash screen.
+d-i     debian-installer/quiet  boolean false
+d-i     debian-installer/splash boolean false
+
+d-i console-setup/ask_detect boolean false
+d-i keyboard-configuration/layout select English (US)
+d-i keyboard-configuration/layoutcode string us
+d-i keyboard-configuration/variant select English (US)
+
+d-i netcfg/get_hostname string {{ .Storage.Hostname }}
+d-i netcfg/get_domain string local
+d-i netcfg/hostname string {{ .Storage.Hostname }}
+
+d-i mirror/https/proxy string
+d-i mirror/http/proxy string
+
+#d-i passwd/root-login boolean true
+#d-i passwd/root-password password password
+#d-i passwd/root-password-again password password
+
+d-i time/zone string US/Eastern
+
+
+d-i netcfg/enable boolean false
+
+#d-i netcfg/choose_interface select auto
+d-i netcfg/get_hostname string {{ .Storage.Hostname }}
+d-i netcfg/get_domain string local
+d-i netcfg/hostname string {{ .Storage.Hostname }}
+
+
+d-i passwd/user-fullname string Ubuntu User
+d-i passwd/username string ubuntu
+# Normal user's password, either in clear text
+d-i passwd/user-password-crypted password $6$.PZU3w0ytYgYd$MW.u5ASn8xCqVbB7T8uhLuw6bGRI7uuogVfj.1CEUMAIHyQOW.9nP3rBmAZZVJL23DyuP6P1YNL.FYCi5tVqa/
+#d-i passwd/user-password password password
+#d-i passwd/user-password-again password password
+d-i user-setup/allow-password-weak boolean true
+
+d-i partman-auto/disk string {{ .Storage.OSDisk }}
+
+{{ $lenOfPartitions :=  .Storage.NoOfPartitions }}{{if ne $lenOfPartitions  0 }}
+d-i partman-auto/method string regular
+d-i partman-lvm/device_remove_lvm boolean true
+d-i partman-md/device_remove_md boolean true
+d-i partman-auto/expert_recipe string                       \
+     boot-root ::                                            \{{range .Storage.PhysicalDevices }}{{range .Partitions }}
+              {{printf "%v" .Size }}  0  {{printf "%v" .MaxSize}}  {{ .FileSystem.FsType }}      \{{if  .Primary }}{{printf "\n              $primary{ }" }}{{end}}{{if .Bootable }} $bootable{ } \{{end}}
+                     method{ format } format{ }              \
+                     use_filesystem{ } filesystem{ {{ .FileSystem.FsType }} }    \
+                     mountpoint{ {{ .FileSystem.MountPoint  }} }                      \
+             .                                                      \{{end -}}{{end -}}
+{{else -}}
+d-i partman-auto/method string lvm
+d-i partman-lvm/confirm boolean true
+d-i partman-lvm/confirm_nooverwrite boolean true
+d-i partman-auto-lvm/guided_size string max
+d-i partman-auto/choose_recipe select atomic
+{{end }}
+
+
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+
+d-i pkgsel/upgrade select none
+d-i pkgsel/update-policy select none
+d-i pkgsel/include string openssh-server
+
+
+d-i grub-installer grub-installer/only_debian boolean true
+d-i grub-installer/with_other_os boolean true
+d-i grub-installer/bootdev  string {{ .Storage.OSDisk }}
+
+
+d-i cdrom-detect/eject boolean true
+d-i finish-install/reboot_in_progress note
+
+
+# Install the debconf oem-config frontend (if in OEM mode).
+d-i     oem-config-udeb/frontend        string debconf
+# Wait for two seconds in grub
+d-i     grub-installer/timeout  string 2
+# Add the network and tasks oem-config steps by default.
+oem-config      oem-config/steps        multiselect language, timezone, keyboard, user, network, tasks
+d-i  base-installer/kernel/altmeta   string hwe-18.04
+d-i preseed/late_command string cp /cdrom/setup/install/init.sh  /target/root/ \
+  && cp /cdrom/setup/install/50-cloud-init.yaml  /target/etc/netplan/50-cloud-init.yaml \
+  && cp /cdrom/setup/install/metamorph-client.service  /target/etc/systemd/system/metamorph-client.service \
+  && cp /cdrom/setup/install/grub.conf  /target/etc/default/grub \
+  && chmod u+x /target/root/init.sh \
+  && in-target /usr/sbin/netplan apply \
+  && in-target grub-mkconfig -o /boot/grub/grub.cfg \
+  && in-target /bin/systemctl enable  metamorph-client.service  

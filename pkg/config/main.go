@@ -1,14 +1,21 @@
 package config
 
-import "fmt"
-import "github.com/spf13/viper"
+import (  
+	"fmt"
+	"github.com/spf13/viper"
+	"os"
+)
 
 var Config string
 
 func init() {
 	fmt.Println("Init Func")
+	configPath := os.Getenv("METAMORPH_CONFIGPATH")
+	if configPath == ""{
+		panic(fmt.Errorf("Fatal erro Config file path not found. Set METAMORPH_CONFIGPATH environment variable"))
+	}
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
+	viper.AddConfigPath(configPath)
 	viper.SetEnvPrefix("metamorph")
 	viper.AutomaticEnv()
 	err := viper.ReadInConfig() 

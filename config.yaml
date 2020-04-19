@@ -9,3 +9,9 @@ controller:
 
 logger:
     path: /tmp/metamorph.log
+
+
+idrac:
+    systemID: "System.Embedded.1"
+    managerID: "iDRAC.Embedded.1"
+    controllerID: "RAID.Slot.6-1"
