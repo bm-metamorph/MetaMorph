@@ -1,4 +1,4 @@
-package preseed
+package isogen
 
 import (
 	"fmt"
@@ -6,8 +6,6 @@ import (
 	"testing"
 )
 
-var PathofTmplfile =  "../../../../../pkg/provisioner/redfish/templates/preseed.tmpl"
-var PathofGrubTmplfile =  "../../../../../pkg/provisioner/redfish/templates/grub.tmpl"
 
 func TestCreatePreseedfileLVM(t *testing.T) {
 	storageYaml, _ := ioutil.ReadFile("hostProfileLVM.yaml")

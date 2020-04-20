@@ -1,7 +1,6 @@
-package preseed
+package isogen
 
 import (
-  // "github.com/imroc/req"
   "net/http"
   "fmt"
   "os"
@@ -14,7 +13,6 @@ import (
   "crypto/md5"
   "path/filepath"
   "html/template"
-  //preseed "github.com/redfishProvisioner/utils/preseed"
 )
 
 func CalculateChecksum(file string) string {

@@ -12,6 +12,7 @@ type Node struct {
 	NodeUUID             uuid.UUID
 	Name                 string
 	ImageURL             string
+	ImageReadilyAvailable bool
 	OamIP                string
 	OamGateway           string
 	NameServers          []NameServer `json:"NameServers"`

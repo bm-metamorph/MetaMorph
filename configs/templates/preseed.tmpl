@@ -35,9 +35,9 @@ d-i time/zone string US/Eastern
 d-i netcfg/enable boolean false
 
 #d-i netcfg/choose_interface select auto
-d-i netcfg/get_hostname string {{ .Storage.Hostname }}
+d-i netcfg/get_hostname string {{ .Name }}
 d-i netcfg/get_domain string local
-d-i netcfg/hostname string {{ .Storage.Hostname }}
+d-i netcfg/hostname string {{ .Name }}
 
 
 d-i passwd/user-fullname string Ubuntu User
@@ -48,19 +48,19 @@ d-i passwd/user-password-crypted password $6$.PZU3w0ytYgYd$MW.u5ASn8xCqVbB7T8uhL
 #d-i passwd/user-password-again password password
 d-i user-setup/allow-password-weak boolean true
 
-d-i partman-auto/disk string {{ .Storage.OSDisk }}
+d-i partman-auto/disk string {{ .OsDisk }}
 
-{{ $lenOfPartitions :=  .Storage.NoOfPartitions }}{{if ne $lenOfPartitions  0 }}
+{{ $lenOfPartitions :=  len(Partitions }}{{if ne $lenOfPartitions  0 }}
 d-i partman-auto/method string regular
 d-i partman-lvm/device_remove_lvm boolean true
 d-i partman-md/device_remove_md boolean true
 d-i partman-auto/expert_recipe string                       \
-     boot-root ::                                            \{{range .Storage.PhysicalDevices }}{{range .Partitions }}
+     boot-root ::                                            \{{range .Partitions }}
               {{printf "%v" .Size }}  0  {{printf "%v" .MaxSize}}  {{ .FileSystem.FsType }}      \{{if  .Primary }}{{printf "\n              $primary{ }" }}{{end}}{{if .Bootable }} $bootable{ } \{{end}}
                      method{ format } format{ }              \
                      use_filesystem{ } filesystem{ {{ .FileSystem.FsType }} }    \
                      mountpoint{ {{ .FileSystem.MountPoint  }} }                      \
-             .                                                      \{{end -}}{{end -}}
+             .                                                      \{{end -}}
 {{else -}}
 d-i partman-auto/method string lvm
 d-i partman-lvm/confirm boolean true
@@ -82,7 +82,7 @@ d-i pkgsel/include string openssh-server
 
 d-i grub-installer grub-installer/only_debian boolean true
 d-i grub-installer/with_other_os boolean true
-d-i grub-installer/bootdev  string {{ .Storage.OSDisk }}
+d-i grub-installer/bootdev  string {{ .OsDisk }}
 
 
 d-i cdrom-detect/eject boolean true
