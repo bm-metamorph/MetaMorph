@@ -28,10 +28,11 @@ func TestgetDiskSpaceinMB(t *testing.T) {
 
 func TestCreateGrubfile(t *testing.T){
 	bmhnode  := createTestNode()
-	bmhnode.CreateFileFromTemplate("grub")
+	bmhnode.CreateFileFromTemplate("/tmp","grub")
+
 }
 
 func TestCreatePreseedfile(t *testing.T){
 	bmhnode  := createTestNode()
-	bmhnode.CreateFileFromTemplate("preseed")
+	bmhnode.CreateFileFromTemplate("/tmp","preseed")
 }

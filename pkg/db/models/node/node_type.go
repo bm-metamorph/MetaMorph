@@ -34,7 +34,9 @@ type Node struct {
 	FirmwareVersion      string
 	VirtualDisks         []VirtualDisk
 	State                string
-  
+	ProvisioningIP       string
+	ProvisionerPort      int
+	HTTPPort             int 
   }
   
   

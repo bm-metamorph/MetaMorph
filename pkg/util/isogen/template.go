@@ -15,7 +15,7 @@ import (
 
 type BMHNode node.Node
 
-func (bmhnode *BMHNode) CreateFileFromTemplate(modulename string) error {
+func (bmhnode *BMHNode) CreateFileFromTemplate(outputdir string , modulename string) error {
 
 	var err error
 
@@ -24,31 +24,26 @@ func (bmhnode *BMHNode) CreateFileFromTemplate(modulename string) error {
 	metamorph_root := config.Get("metamorph-root").(string)
 
 	templatepath := config.Get("templates." + modulename + ".config").(string)
-	outputfilepath := config.Get("templates." + modulename + ".filepath").(string)
+	filepath := config.Get("templates." + modulename + ".filepath").(string)
 
 	templatepathAbsolute := path.Join(metamorph_root, templatepath)
+	outputfilepathAbsolute := path.Join(outputdir,filepath)
 
 	if _, err = os.Stat(templatepathAbsolute); os.IsNotExist(err) {
 		fmt.Printf("Template file for "+modulename+"does not exist : %v\n", err)
 		return err
 	}
-	if _, err = os.Stat(path.Dir(outputfilepath)); os.IsNotExist(err) {
-		fmt.Printf("Output file for "+modulename+"does not exist : %v\n", err)
+	if _, err = os.Stat(path.Dir(outputfilepathAbsolute)); os.IsNotExist(err) {
+		fmt.Printf("Output file directory for "+modulename+"does not exist : %v\n", err)
 		return err
 	}
-/*
-	tmpl := template.New(modulename).Funcs(template.FuncMap{
-		"GetDiskSizeMB":    GetDiskSizeMB,
-		"GetMaxDiskSizeMB": GetMaxDiskSizeMB,
-	})
-*/	
 	tmpl, err  := template.ParseFiles(templatepathAbsolute)
 
 	if err != nil {
 		return err
 	}
 
-	f, err := os.Create(outputfilepath)
+	f, err := os.Create(outputfilepathAbsolute)
 	if err != nil {
 		fmt.Printf("Failed to create file: %v\n", err)
 		return err
@@ -60,29 +55,6 @@ func (bmhnode *BMHNode) CreateFileFromTemplate(modulename string) error {
 
 }
 
-/*
-
-func (bmhnode *BMHNode) CreatePreseedfile(templatepath string, preeseedpath string) (err error) {
-
-	fmt.Println("Inside CreateaPreseeedfile()")
-
-	//TODO : Check file path vaiidity
-
-	tmpl, err := template.ParseFiles(templatepath)
-	if err != nil {
-		return err
-	}
-
-	f, err := os.Create(preeseedpath)
-	if err != nil {
-		fmt.Println("Failed to create file: ")
-		return err
-	}
-	err = tmpl.Execute(f, bmhnode)
-
-	return err
-}
-*/
 func (bmhnode *BMHNode)GetDiskSizeMB(diskspace string) (string, error) {
 	disksizeMB, _, err := getDiskSpaceinMB(diskspace)
 	return disksizeMB, err

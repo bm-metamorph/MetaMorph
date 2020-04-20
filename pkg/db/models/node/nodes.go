@@ -167,6 +167,7 @@ func Create(data []byte) ( string, error) {
 
 	var node Node
 	UUID, err := uuid.NewRandom()
+	//TODO : Get UUID using Redfish Library.
 	err = json.Unmarshal(data, &node)
 	node.NodeUUID = UUID
 	err = db.Create(&node).Error

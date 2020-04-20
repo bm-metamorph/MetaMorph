@@ -1,38 +1,44 @@
 package isogen
 
 import (
-  "net/http"
-  "fmt"
-  "os"
-  "os/exec"
- // "gopkg.in/yaml.v2"
-  "log"
-  //"strings"
-  "io/ioutil"
-  "io"
-  "crypto/md5"
-  "path/filepath"
-  //"html/template"
-)
+	"fmt"
+	"net/http"
+	"os"
+	"os/exec"
 
+	// "gopkg.in/yaml.v2"
+	"log"
+	//"strings"
+	"crypto/md5"
+	"io"
+	"io/ioutil"
+
+	//"html/template"
+	"path"
+	"strings"
+
+	config "bitbucket.com/metamorph/pkg/config"
+)
+/*
 func CalculateChecksum(file string) string {
 	f, err := os.Open(file)
 	if err != nil {
-			log.Fatal(err)
+		log.Fatal(err)
 	}
 	defer f.Close()
 	h := md5.New()
 	if _, err := io.Copy(h, f); err != nil {
-			log.Fatal(err)
+		log.Fatal(err)
 	}
 	checksum := fmt.Sprintf("%x", h.Sum(nil))
 	return checksum
 }
+*/
 
 func CreateDirectory(directoryPath string) error {
-	pathErr := os.MkdirAll(directoryPath,0777)
+	pathErr := os.MkdirAll(directoryPath, 0777)
 	if pathErr != nil {
-			return pathErr
+		return pathErr
 	}
 	return nil
 }
@@ -61,7 +67,7 @@ func ExtractIso(iso, target string) error {
 	cmd := exec.Command("mount", "-r", "-o", "loop", iso, target)
 	err := cmd.Run()
 	if err != nil {
-		  log.Fatal(err)
+		log.Fatal(err)
 	}
 	return err
 }
@@ -69,204 +75,233 @@ func ExtractIso(iso, target string) error {
 func Checksum(file string) string {
 	f, err := os.Open(file)
 	if err != nil {
-			log.Fatal(err)
+		log.Fatal(err)
 	}
 	defer f.Close()
 	h := md5.New()
 	if _, err := io.Copy(h, f); err != nil {
-			log.Fatal(err)
+		log.Fatal(err)
 	}
 	checksum := fmt.Sprintf("%x", h.Sum(nil))
 	return checksum
 }
 
+func CopyfileToDestination(sourcefilepath string, destinationfilepath string) error {
 
-func CreateISOLinuxConfig(isoinux_txt_cfg_path string) {
-
-	isoinux_txt_cfg_file, _ := filepath.Abs("./pkg/provisioner/redfish/templates/hwe_kernel/isolinux_txt.cfg")
-	input, err := ioutil.ReadFile(isoinux_txt_cfg_file)
+	input, err := ioutil.ReadFile(sourcefilepath)
 	if err != nil {
-			fmt.Println(err)
-			//return false, err
+		return fmt.Errorf("Failed to open file %v with error : %v", sourcefilepath, destinationfilepath)
 	}
-
-	err = ioutil.WriteFile(isoinux_txt_cfg_path, input, 0644)
+	err = ioutil.WriteFile(destinationfilepath, input, 0644)
 	if err != nil {
-			fmt.Println("Error creating", isoinux_txt_cfg_path )
-			fmt.Println(err)
-			//return false, err
+		return fmt.Errorf("Failed to write %v to destination %v with error %v", sourcefilepath, destinationfilepath, err)
 	}
+	return nil
 }
 
-/*
-// func PrepareISO (iso_url string, iso_checksum_url string, user_data string, node *node, storageConfig string, platformConfig string) (){
-func PrepareISO (iso_url string, iso_checksum_url string, user_data string, node *node, hp string) (){
+func (bmhnode *BMHNode) PrepareISO() error {
+	//check if ISO generation if required at all
 
-	//Check whether Download is needed
-		// If needed download, Verify Checksum, Mount and copy
-		   // Contents to new temp location
-		iso_url_parts := strings.Split(iso_url,"/")
-		iso_name := iso_url_parts[ len(iso_url_parts) -1 ]
-		//Final Customized ISO
-		iso_dest_path := ISORootPath + "/" + iso_name
+	var err error
+	if bmhnode.ImageReadilyAvailable {
 
-		//Where to Download ISO
-		iso_path :=  ISORootPath + "/isos/" + iso_name
-		os.MkdirAll(ISORootPath + "/isos/", os.ModePerm)
+		return fmt.Errorf("Customised ISO already available. No need to prepare custom ISO")
+	}
 
-	if _, err := os.Stat(iso_path); os.IsNotExist(err) {
+	iso_rootpath := config.Get("iso.rootpath").(string)
+	iso_urlpath := config.Get("image.url").(string)
+	iso_checksum := config.Get("image.checksum").(string)
 
-      fmt.Println("ISO does not exists")
-			DownloadUrl(iso_path, iso_url)
-			resp, err := http.Get(iso_checksum_url)
-			if err != nil {
-				fmt.Println(err)
-			}
-			defer resp.Body.Close()
-			body, err := ioutil.ReadAll(resp.Body)
-			iso_check_sum := strings.TrimSuffix(string(body), "\n")
-			calculated_iso_check_sum := Checksum(iso_path)
-      if iso_check_sum == calculated_iso_check_sum {
-            fmt.Println("Checksum verification Successfull")
-      } else {
-          fmt.Println("Checksum verification failed")
-        }
-      }
-		  fmt.Println("Iso Exisis")
-		//CreateDirectory(mount_path)
+	iso_name_parts := strings.Split(iso_urlpath, "/")
+	iso_name := iso_name_parts[len(iso_name_parts)-1]
 
-  		mount_path, err := ioutil.TempDir("/opt", "iso-")
-  		if err != nil {
-  			fmt.Println(err)
-  		}
-  		defer os.RemoveAll(mount_path)
+	if _, err := os.Stat(iso_rootpath); os.IsNotExist(err) {
+		return fmt.Errorf("ISO root directory not found : %v\n", err)
+	}
 
-  		CreateDirectory(iso_dest_path)
-  		ExtractIso(iso_path, mount_path)
-  		fmt.Println("Copying extracted ISO to: " + iso_dest_path)
-  		cmd := exec.Command("rsync", "-a", mount_path + "/", iso_dest_path + "/")
-  		cmd.Run()
-  		cmd = exec.Command("umount",  mount_path)
-  		err = cmd.Run()
-  		if err != nil {
-  			  log.Fatal(err)
-  		}
+	//Get temporary directory for copying ISO
 
-  	// If not needed, Start editing the files in ISO temp Location
+	iso_tempdir := config.Get("iso.tempdir").(string)
 
-      hostProf := preseed.New(hp)
+	iso_DownloadFullpath := path.Join(iso_tempdir, iso_name)
+	iso_DestinationFullpath := path.Join(iso_rootpath, iso_name)
 
-    	iso_custom_scripts_path := iso_dest_path + "/setup/install/"
-    	os.MkdirAll(iso_custom_scripts_path, os.ModePerm)
-    	preseed_file_path :=  iso_dest_path + "/preseed/hwe-ubuntu-server.seed"
-    	preseed_template_path := "./templates/preseed.tmpl"
-    	err = hostProf.CreatePreseedfile(node.Name, storageConfig,  preseed_template_path, preseed_file_path )
-    	if err != nil {
-    		fmt.Println("Error in Creating preseed file")
-    		log.Fatal(err)
-    	  }
-    	  grub_file_path := iso_custom_scripts_path + "grub.conf"
-    	  grub_template_path := "./pkg/provisioner/redfish/templates/grub.tmpl"
-    	  err = hostProf.CreateGrubfile(platformConfig, grub_file_path, grub_template_path )
-    	  if err != nil {
-    		  fmt.Println("Error in Creating grub file")
-    		  log.Fatal(err)
-    		}
+	if _, err := os.Stat(iso_DownloadFullpath); os.IsNotExist(err) {
+		err = DownloadUrl(iso_DownloadFullpath, iso_urlpath)
+		if err != nil {
+			return fmt.Errorf("Failed to download ISO Image : %v", err)
+		}
 
-    	isoinux_txt_cfg_path := iso_dest_path + "/isolinux/txt.cfg"
-    	CreateISOLinuxConfig(isoinux_txt_cfg_path)
+	} else {
+		fmt.Printf("ISO vanilla Image already downloaded \n")
+	}
 
-    	ud := UserData{}
-    	err = yaml.Unmarshal([]byte(user_data), &ud)
-    	if err != nil {
-    		fmt.Println("Error in Creating isolinux config")
-    		log.Fatalf("error: %v", err)
-    	}
+	err = validateChecksum(iso_checksum, iso_DownloadFullpath)
 
-    	network_file_name_parts := strings.Split(ud.Write_files[0].Path, "/")
-    	network_file_name  := network_file_name_parts[len(network_file_name_parts)-1]
-    	network_data := ud.Write_files[0].Content
+	if err != nil {
+		return fmt.Errorf("Failed to validate checksum. Error : %v", err)
+	}
 
-    	err = ioutil.WriteFile(iso_custom_scripts_path + network_file_name , []byte(network_data), 0644)
-    	if err != nil {
-    		//return false, err
-    		fmt.Println("Error in Creatinng network config file")
-    		fmt.Println(err)
-    	}
+	err = ExtractAndCopyISO(iso_DownloadFullpath, iso_DestinationFullpath)
 
-    	metamorph_client_service_file, _ := filepath.Abs("./pkg/provisioner/redfish/templates/metamorph-client.service")
-    	input, err := ioutil.ReadFile(metamorph_client_service_file)
-    	if err != nil {
-    			fmt.Println(err)
-    			fmt.Println("Error in creating MetaMorph client service file")
-    			//return false, err
-    	}
-    	err = ioutil.WriteFile(iso_custom_scripts_path + "metamorph-client.service", input, 0644)
-    	if err != nil {
-    			fmt.Println("Error creating", iso_custom_scripts_path + "metamorph-client.service")
-    			fmt.Println(err)
-    			//return false, err
-    	}
+	if err != nil {
+		return fmt.Errorf("Failed to Extract and Copy ISO file. Error %v", err)
+	}
 
-    	//os.Getenv("PROVISIONING_IP") + ":" + os.Getenv("PROVISIONER_PORT")
+	//Add Preseed
+	err = bmhnode.CreateFileFromTemplate(iso_DestinationFullpath, "preseed")
 
-    	config := map[string]string{
-    		"NodeUuid"  :         node.UUID,
-    		"ProvisioningIP" :    os.Getenv("PROVISIONING_IP"),
-    		"ProvisionerPort" :   os.Getenv("PROVISIONER_PORT"),
-    		"HttpPort"        :   os.Getenv("HTTP_PORT"),
-    	}
+	if err != nil {
+		return fmt.Errorf("Failed to create Preseed file with error %v", err)
+	}
 
-    	init_sh_file, _ := filepath.Abs("./pkg/provisioner/redfish/templates/init.sh")
-    	t, err := template.ParseFiles(init_sh_file)
-    	if err != nil {
-    			fmt.Println(err)
-    			fmt.Println("Error in parsing init.sh  template file ")
-    			//return false, err
-    	}
-    	dest_file, err := os.Create(iso_custom_scripts_path + "init.sh")
-    	err = t.Execute(dest_file, config)
-    	if err != nil {
-    		log.Print("execute: ", err)
-    		fmt.Println("Error in Creating init.sh file ")
-    		//return false, err
-    	}
-    	dest_file.Close()
+	//Add Grub Config
 
-    	// Repack ISO
-    	// Calculate Image Serve URL and update node details
-    	image_name := node.UUID + "-ubuntu.iso"
-    	cmd = exec.Command(
-    		"mkisofs",
-    		"-r",
-    		"-V",
-    		"Custom Ubuntu Install CD",
-    		"-cache-inodes",
-    		"-J",
-    		"-l",
-    		"-b",
-    		"isolinux/isolinux.bin",
-    		"-c",
-    		"isolinux/boot.cat",
-    		"-no-emul-boot",
-    		"-boot-load-size",
-    		"4",
-    		"-boot-info-table",
-    		"-o",
-    	 HTTPRootPath + "/" + image_name,
-         iso_dest_path,
-    	)
-    	fmt.Println(cmd)
-    	if err := cmd.Run(); err != nil {
-    		fmt.Println(err)
-    		fmt.Println("Error in Creating ISO")
-    		//return false, fmt.Errorf("error creating configdrive iso: %s", err.Error())
-    	}
+	iso_custom_scripts_path := path.Join(iso_DestinationFullpath, "/setup/install/")
 
-        node.ImageURL = "http://" + os.Getenv("PROVISIONING_IP") + ":" + os.Getenv("HTTP_PORT") + "/" + image_name
-    	//fmt.Println(node)
-    	UpdateNode(node)
+	err = os.MkdirAll(iso_custom_scripts_path, os.ModePerm)
 
-	//return true, nil
+	if err != nil {
+		return fmt.Errorf("Failed to create directory %v with error %v", iso_custom_scripts_path, err)
+	}
+
+	err = bmhnode.CreateFileFromTemplate(iso_custom_scripts_path, "grub")
+
+	if err != nil {
+		return fmt.Errorf("Failed to create Grub file with error %v", err)
+	}
+
+	isolinux_cfg_destpath := iso_DestinationFullpath + "/isolinux/txt.cfg"
+
+	isolinux_cfg_sourcepath := config.Get("isolinux.config").(string)
+
+	err = CopyfileToDestination(isolinux_cfg_sourcepath, isolinux_cfg_destpath)
+
+	if err != nil {
+		return fmt.Errorf("Failed to copy isolinux cfg file with error %v", err)
+	}
+
+	err = bmhnode.CreateFileFromTemplate(iso_custom_scripts_path, "netplan")
+
+	if err != nil {
+		return fmt.Errorf("Failed to create Netplan file with error %v", err)
+	}
+
+	metamorph_servicefilesourepath := config.Get("service.config").(string)
+	metamorph_service_filename := config.Get("service.filepath").(string)
+	metamorph_servicefileDestpath   := path.Join(iso_custom_scripts_path,metamorph_service_filename)
+
+	err = CopyfileToDestination(metamorph_servicefilesourepath, metamorph_servicefileDestpath)
+
+	if err != nil {
+		return fmt.Errorf("Failed to copy metamorph service file with error %v", err)
+	}
+
+	//metamorph-client.service
+	bmhnode.ProvisioningIP = config.Get("provisioning.ip").(string)
+	bmhnode.ProvisionerPort = config.Get("provisioning.port").(int)
+	bmhnode.HTTPPort = config.Get("provisioning.httpport").(int)
+
+	err = bmhnode.CreateFileFromTemplate(iso_custom_scripts_path, "init")
+
+	if err != nil {
+		return fmt.Errorf("Failed to create init file with error %v", err)
+	}
+
+	err = bmhnode.RepackageISO(iso_DestinationFullpath)
+
+	return err
+
 }
-*/
+
+func validateChecksum(checksumURL string, iso_path string) error {
+	resp, err := http.Get(checksumURL)
+	if err != nil {
+		return fmt.Errorf("Failed to retrieve checksum URL %v. Failed with error %v", checksumURL, err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	iso_checksum := strings.TrimSuffix(string(body), "\n")
+
+	calculated_iso_checksum := Checksum(iso_path)
+
+	if iso_checksum != calculated_iso_checksum {
+		return fmt.Errorf("Checksum validation failed. Expected checksum : %v , Calculated checksum : %v",
+			iso_checksum, calculated_iso_checksum)
+	}
+	fmt.Println("Checksum validation successful")
+
+	return nil
+
+}
+
+func ExtractAndCopyISO(iso_DownloadFullpath string, iso_DestinationFullpath string) error {
+
+	mount_path, err := ioutil.TempDir("/opt", "iso-")
+
+	if err != nil {
+		return fmt.Errorf("Failed to create temp directory with error : %v", err)
+	}
+	defer os.RemoveAll(mount_path)
+
+	err = CreateDirectory(iso_DestinationFullpath)
+
+	if err != nil {
+		return fmt.Errorf("Failed to create destination directory %v with error : %v", iso_DestinationFullpath, err)
+	}
+
+	err = ExtractIso(iso_DownloadFullpath, mount_path)
+	if err != nil {
+		return fmt.Errorf("Failed to extract %v with error : %v", iso_DestinationFullpath, err)
+	}
+
+	cmd := exec.Command("rsync", "-a", mount_path+"/", iso_DestinationFullpath+"/")
+	err = cmd.Run()
+	if err != nil {
+		return fmt.Errorf("Faild to copy iso to %v. Error : %v", iso_DestinationFullpath, err)
+	}
+
+	cmd = exec.Command("umount", mount_path)
+	err = cmd.Run()
+	if err != nil {
+		fmt.Errorf("Failed to Unmount %v. Ignoring error", mount_path)
+	}
+	return nil
+}
+
+func (bmhnode *BMHNode) RepackageISO(iso_DestinationFullpath string) error {
+
+	image_name := bmhnode.NodeUUID + "-ubuntu.iso"
+
+	HTTPRootPath := config.Get("http.rootpath").(string)
+	cmd := exec.Command(
+		"mkisofs",
+		"-r",
+		"-V",
+		"Custom Ubuntu Install CD",
+		"-cache-inodes",
+		"-J",
+		"-l",
+		"-b",
+		"isolinux/isolinux.bin",
+		"-c",
+		"isolinux/boot.cat",
+		"-no-emul-boot",
+		"-boot-load-size",
+		"4",
+		"-boot-info-table",
+		"-o",
+		HTTPRootPath+"/"+image_name,
+		iso_DestinationFullpath,
+	)
+	fmt.Println(cmd)
+	if err := cmd.Run(); err != nil {
+		fmt.Println("Error in Creating ISO")
+		return fmt.Errorf("Failed creating iso image with error : %v", err)
+	}
+
+	bmhnode.ImageURL = "http://" + os.Getenv("PROVISIONING_IP") + ":" + os.Getenv("HTTP_PORT") + "/" + image_name
+	// TODO : bmhnode.UpdateNode(node)
+	// TODO : PROVISIONING IP etc moved to config ?
+	return nil
+}
