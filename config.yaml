@@ -1,4 +1,6 @@
 ---
+metamorph-root: /home/ekuamaj/go/src/bitbucket.com/metamorph
+
 database:
     type: sqlite
     path: "/tmp/db/metamorph.db"
@@ -19,19 +21,19 @@ idrac:
 templates:
     preseed:
         config:  configs/templates/preseed.tmpl
-        filepath:
+        filepath: "/tmp/preseed.conf"
     grub:
         config:  configs/templates/grub.tmpl
-        filepath: 
+        filepath: "/tmp/grub.conf"
     isolinux:
         config: configs/templates/hwe_kernel/isolinux_txt.cfg
-        filepath:
+        filepath: "/tmp/isolinux.cfg"
     init:
         config: configs/templates/init.sh
-        filepath:
+        filepath: /tmp/init.sh
     service:
         config: configs/templates/metamorph-client.service
-        filepath:
+        filepath: /tmp/metamorph-client.service
 
 iso:
   rootpath: /opt/iso_root
@@ -43,3 +45,6 @@ http:
 image:
     url: "http://32.68.49.133:31180/ubuntu-18.04.3-server-amd64.iso"
     checksum: "http://32.68.49.133:31180/ubuntu-18.04.3-server-amd64.iso.md5sum"
+
+testing:
+    inputfile: "/home/ekuamaj/workspace/input.json"

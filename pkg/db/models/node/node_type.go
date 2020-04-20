@@ -49,6 +49,8 @@ type Node struct {
 	NodeID      uint
 	Name        string
 	Size        string
+	Bootable    bool
+	Primary     bool
 	Filesystem Filesystem
   }
   

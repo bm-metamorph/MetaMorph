@@ -5,14 +5,14 @@ import (
   "fmt"
   "os"
   "os/exec"
-  "gopkg.in/yaml.v2"
+ // "gopkg.in/yaml.v2"
   "log"
-  "strings"
+  //"strings"
   "io/ioutil"
   "io"
   "crypto/md5"
   "path/filepath"
-  "html/template"
+  //"html/template"
 )
 
 func CalculateChecksum(file string) string {
@@ -98,7 +98,7 @@ func CreateISOLinuxConfig(isoinux_txt_cfg_path string) {
 	}
 }
 
-
+/*
 // func PrepareISO (iso_url string, iso_checksum_url string, user_data string, node *node, storageConfig string, platformConfig string) (){
 func PrepareISO (iso_url string, iso_checksum_url string, user_data string, node *node, hp string) (){
 
@@ -269,3 +269,4 @@ func PrepareISO (iso_url string, iso_checksum_url string, user_data string, node
 
 	//return true, nil
 }
+*/

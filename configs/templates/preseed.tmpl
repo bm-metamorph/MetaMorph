@@ -18,9 +18,9 @@ d-i keyboard-configuration/layout select English (US)
 d-i keyboard-configuration/layoutcode string us
 d-i keyboard-configuration/variant select English (US)
 
-d-i netcfg/get_hostname string {{ .Storage.Hostname }}
+d-i netcfg/get_hostname string {{ .Name }}
 d-i netcfg/get_domain string local
-d-i netcfg/hostname string {{ .Storage.Hostname }}
+d-i netcfg/hostname string {{ .Name }}
 
 d-i mirror/https/proxy string
 d-i mirror/http/proxy string
@@ -50,16 +50,16 @@ d-i user-setup/allow-password-weak boolean true
 
 d-i partman-auto/disk string {{ .OsDisk }}
 
-{{ $lenOfPartitions :=  len(Partitions }}{{if ne $lenOfPartitions  0 }}
+{{ $lenOfPartitions :=  len .Partitions }}{{if ne $lenOfPartitions  0 }}
 d-i partman-auto/method string regular
 d-i partman-lvm/device_remove_lvm boolean true
 d-i partman-md/device_remove_md boolean true
 d-i partman-auto/expert_recipe string                       \
      boot-root ::                                            \{{range .Partitions }}
-              {{printf "%v" .Size }}  0  {{printf "%v" .MaxSize}}  {{ .FileSystem.FsType }}      \{{if  .Primary }}{{printf "\n              $primary{ }" }}{{end}}{{if .Bootable }} $bootable{ } \{{end}}
+              {{ $Size := $.GetDiskSizeMB .Size }} {{printf "%v" $Size }}  0  {{ $MaxSize := $.GetMaxDiskSizeMB .Size }}{{printf "%v" $MaxSize }}  {{ .Filesystem.Fstype }}      \{{if  .Primary }}{{printf "\n              $primary{ }" }}{{end}}{{if .Bootable }} $bootable{ } \{{end}}
                      method{ format } format{ }              \
-                     use_filesystem{ } filesystem{ {{ .FileSystem.FsType }} }    \
-                     mountpoint{ {{ .FileSystem.MountPoint  }} }                      \
+                     use_filesystem{ } filesystem{ {{ .Filesystem.Fstype }} }    \
+                     mountpoint{ {{ .Filesystem.Mountpoint  }} }                      \
              .                                                      \{{end -}}
 {{else -}}
 d-i partman-auto/method string lvm
