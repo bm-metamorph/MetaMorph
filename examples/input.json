@@ -1,0 +1,102 @@
+{
+  "name": "mtn52r07c001",
+	"imageURL": "http://32.68.49.133:31180/ubuntu-18.04.3-server-amd64.iso",
+	"OamIP": "32.68.220.14",
+	"OamGateway": "32.68.220.1",
+	"NameServers": [
+		{"Nameserver": "150.234.210.5"},
+ 		{"Nameserver": "150.234.210.205"},
+ 		{"Nameserver": "135.188.34.124"}],
+  "OsDisk": "/dev/sda",
+  "Partitions": [
+          {
+            "partitionName": "root",
+            "size": "30g",
+            "filesystem": {
+              "mountpoint": "/",
+              "fstype": "ext4",
+              "mount-options": "defaults"
+            }
+          },
+          {
+            "name": "boot",
+            "size": "1g",
+            "bootable": true,
+            "primary": true,
+            "filesystem": {
+              "mountpoint": "/boot",
+              "fstype": "ext4",
+              "mount-options": "defaults"
+            }
+          },
+          {
+            "name": "var-log",
+            "size": "100g",
+            "filesystem": {
+              "mountpoint": "/var/log",
+              "fstype": "ext4",
+              "mount-options": "defaults"
+            }
+          },
+          {
+            "name": "var",
+            "size": ">300g",
+            "filesystem": {
+              "mountpoint": "/var",
+              "fstype": "ext4",
+              "mount-options": "defaults"
+            }
+          }
+        ],
+    "grubConfig": "image=bionic isolcpus=0-3,44-47 amd_iommu=on kernel_package=linux-image-5.0.0-23-generic kernel=hwe-18.04 hugepagesz=1G hugepages=160 intel_iommu=on console=ttyS1,115200n8 transparent_hugepage=never",
+    "kvmPolicy": {
+      "cpuAllocation": "1:1",
+      "cpuPinning": "enabled",
+      "cpuHyperthreading": "enabled"
+    },
+		"SSHPubKeys": [
+			"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCurXRaUe/ukR84FRseqnrNdDLg6zS4qtJi8e8o4VCNxbV0Jsu5iw17ZBF1B1uF8+Bdhz9eiYIkokxaiVkHHqOpRzF5v4phRK+k4MugjT3OAR78cEdg8MR2om5IIMbYYhVyjY1IyZOZv9PQ1noqzyR2Glo6q7AHPadVY2emk16VmmcVJc/z+6awZXitwdamFDRZ9HK+xoRCd6WDIIphJbI6nnFw2ytokgfpqptkwNGQ/2q8/skvRBaB78byIMU70O1q0fQEbm9VhbjmIE/qwNYEsVMAdHE6EYYyW1YnC3VqhBGlBqF/KPxTX/uQksOmvXoydbnvtaTRG0qq/AAvdJw5 root@mtn52r07c001",
+			"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtIbTb2c33GhoprVOdZB5EvuCs7JOo5dgq8z3aOpJO/7efCF3Wft/Q0ve8ndRNVNt30KxpK7ro5ad31yloVQqj/MhYvI/fPMsyocCyPo+fJOf/8+u2TEMJUaDjwTRCnsPSu8fendpNt9HdreZcUT5R/foN3dpPfUiAPREgpvMqVfE7rtSyGs8ZRRTVYIohBwOVemCrdIGjjIzbGVLQfRWHkuJpl6Js2kHlO6trsE7aEiEqkaGEaJGCyGOlSS119lBsvsiEc4ExNczKAduMYY86xSxGo7zpf2R6mQTOmCHVSSwSfy0UHIgDVFPIVgyZSI27F2NLYnJeAmRqN9PNitPp ae196e@att.com"
+		],
+		"BondInterfaces": [
+                 { "BondInterface": "enp135s0f0"},
+                 { "BondInterface": "enp94s0f1"} ],
+		"BondParameters": {
+			"mode": "802.3ad",
+			"lacpRate": "fast"
+		},
+
+	"IPMIUser":	"root",
+  "IPMIPassword":	"password",
+  "IPMIIP": "32.68.220.135",
+
+	"vendor":	"Dell",
+	"Model": "Gen9",
+	"biosVersion": "2.0.0",
+	"CPLDFirmwareVersion": "3.43.4",
+	"RAIDFirmwareVersion": "4.5.6",
+	"FirmwareVersion": "32.32.32",
+
+
+
+  "virtualDisks": [
+    {
+      "DiskName": "osdisk",
+      "raiType": 1,
+			"RaidController": "RAID.Slot.6-1",
+      "Physicaldisks": [
+        "Disk.Bay.0:Enclosure.Internal.0-1:RAID.Slot.6-1",
+        "Disk.Bay.1:Enclosure.Internal.0-1:RAID.Slot.6-1"
+      ]
+    },
+    {
+      "name": "ephemeral",
+      "raidType": 1,
+			"RaidController": "RAID.Slot.6-1",
+      "PhysicalDisks": [
+        "Disk.Bay.4:Enclosure.Internal.0-1:RAID.Slot.6-1",
+        "Disk.Bay.5:Enclosure.Internal.0-1:RAID.Slot.6-1"
+      ]
+    }
+  ]
+}

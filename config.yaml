@@ -57,4 +57,4 @@ provisioning:
 
 
 testing:
-    inputfile: "/home/ekuamaj/workspace/input.json"
+    inputfile: "/home/ekuamaj/go/src/bitbucket.com/metamorph/examples/input.json"

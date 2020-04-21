@@ -2,7 +2,7 @@ network:
   version: 2
   renderer: networkd 
   ethernets:{{range .BondInterfaces}} 
-    {{ .BondInterface}}
+    {{ .BondInterface}}:
         dhcp4: no
         dhcp6: True{{end}}
   bonds:
