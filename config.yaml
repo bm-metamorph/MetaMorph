@@ -38,11 +38,11 @@ templates:
         filepath: 50-cloud-init.yaml
 
 iso:
-  rootpath: /opt/iso_root
-  tempdir: /opt/iso_root/isos
+  rootpath: /tmp/iso_root
+  tempdir: /tmp/iso_root/isos
 
 http:
-  rootpath: /opt/http_root
+  rootpath: /tmp/http_root
 
 
 image:

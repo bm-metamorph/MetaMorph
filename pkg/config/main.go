@@ -10,6 +10,8 @@ var Config string
 
 func init() {
 	fmt.Println("Init Func")
+	//Temporary measure as debug test are not able to run
+	os.Setenv("METAMORPH_CONFIGPATH", "/home/ekuamaj/go/src/bitbucket.com/metamorph" )
 	configPath := os.Getenv("METAMORPH_CONFIGPATH")
 	if configPath == ""{
 		panic(fmt.Errorf("Fatal erro Config file path not found. Set METAMORPH_CONFIGPATH environment variable"))

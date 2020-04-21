@@ -19,21 +19,6 @@ import (
 
 	config "bitbucket.com/metamorph/pkg/config"
 )
-/*
-func CalculateChecksum(file string) string {
-	f, err := os.Open(file)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-	h := md5.New()
-	if _, err := io.Copy(h, f); err != nil {
-		log.Fatal(err)
-	}
-	checksum := fmt.Sprintf("%x", h.Sum(nil))
-	return checksum
-}
-*/
 
 func CreateDirectory(directoryPath string) error {
 	pathErr := os.MkdirAll(directoryPath, 0777)
@@ -67,7 +52,7 @@ func ExtractIso(iso, target string) error {
 	cmd := exec.Command("mount", "-r", "-o", "loop", iso, target)
 	err := cmd.Run()
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("Failed to run mount command %v", err)
 	}
 	return err
 }
@@ -136,7 +121,7 @@ func (bmhnode *BMHNode) PrepareISO() error {
 		fmt.Printf("ISO vanilla Image already downloaded \n")
 	}
 
-	err = validateChecksum(iso_checksum, iso_DownloadFullpath)
+	err = ValidateChecksum(iso_checksum, iso_DownloadFullpath)
 
 	if err != nil {
 		return fmt.Errorf("Failed to validate checksum. Error : %v", err)
@@ -214,7 +199,7 @@ func (bmhnode *BMHNode) PrepareISO() error {
 
 }
 
-func validateChecksum(checksumURL string, iso_path string) error {
+func ValidateChecksum(checksumURL string, iso_path string) error {
 	resp, err := http.Get(checksumURL)
 	if err != nil {
 		return fmt.Errorf("Failed to retrieve checksum URL %v. Failed with error %v", checksumURL, err)
@@ -237,7 +222,8 @@ func validateChecksum(checksumURL string, iso_path string) error {
 
 func ExtractAndCopyISO(iso_DownloadFullpath string, iso_DestinationFullpath string) error {
 
-	mount_path, err := ioutil.TempDir("/opt", "iso-")
+	//TODO : Where should the temp directories be created ?
+	mount_path, err := ioutil.TempDir("/tmp", "iso-")
 
 	if err != nil {
 		return fmt.Errorf("Failed to create temp directory with error : %v", err)
@@ -271,7 +257,7 @@ func ExtractAndCopyISO(iso_DownloadFullpath string, iso_DestinationFullpath stri
 
 func (bmhnode *BMHNode) RepackageISO(iso_DestinationFullpath string) error {
 
-	image_name := bmhnode.NodeUUID + "-ubuntu.iso"
+	image_name := bmhnode.NodeUUID.String() + "-ubuntu.iso"
 
 	HTTPRootPath := config.Get("http.rootpath").(string)
 	cmd := exec.Command(

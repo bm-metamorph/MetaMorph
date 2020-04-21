@@ -8,6 +8,7 @@ import (
 //	"bitbucket.com/metamorph/pkg/db/models/node"
 	"encoding/json"
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 
 )
 
@@ -29,10 +30,12 @@ func TestgetDiskSpaceinMB(t *testing.T) {
 func TestCreateGrubfile(t *testing.T){
 	bmhnode  := createTestNode()
 	bmhnode.CreateFileFromTemplate("/tmp","grub")
+	assert.FileExists(t,"/tmp/grub.conf","")
 
 }
 
 func TestCreatePreseedfile(t *testing.T){
 	bmhnode  := createTestNode()
 	bmhnode.CreateFileFromTemplate("/tmp","preseed")
+	assert.FileExists(t,"/tmp/preseed/hwe-ubuntu-server.seed","")
 }
