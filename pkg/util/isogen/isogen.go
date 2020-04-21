@@ -158,7 +158,12 @@ func (bmhnode *BMHNode) PrepareISO() error {
 
 	isolinux_cfg_destpath := iso_DestinationFullpath + "/isolinux/txt.cfg"
 
-	isolinux_cfg_sourcepath := config.Get("isolinux.config").(string)
+	metamorph_root := config.Get("metamorph-root").(string)
+
+	isolinuxtemplatepath := config.Get("templates.isolinux.config").(string)
+
+
+	isolinux_cfg_sourcepath := path.Join(metamorph_root,isolinuxtemplatepath) 
 
 	err = CopyfileToDestination(isolinux_cfg_sourcepath, isolinux_cfg_destpath)
 
@@ -172,8 +177,11 @@ func (bmhnode *BMHNode) PrepareISO() error {
 		return fmt.Errorf("Failed to create Netplan file with error %v", err)
 	}
 
-	metamorph_servicefilesourepath := config.Get("service.config").(string)
-	metamorph_service_filename := config.Get("service.filepath").(string)
+	metamorph_servicetemplatepath := config.Get("templates.service.config").(string)
+	
+	metamorph_servicefilesourepath := path.Join(metamorph_root,metamorph_servicetemplatepath ) 
+
+	metamorph_service_filename := config.Get("templates.service.filepath").(string)
 	metamorph_servicefileDestpath   := path.Join(iso_custom_scripts_path,metamorph_service_filename)
 
 	err = CopyfileToDestination(metamorph_servicefilesourepath, metamorph_servicefileDestpath)

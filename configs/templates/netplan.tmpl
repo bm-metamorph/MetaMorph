@@ -1,27 +1,25 @@
 network:
   version: 2
-  renderer: networkd
-{{range .BondInterfaces}}
-  ethernets:
-    {{ .BondInterface}}:
-      dhcp4: no
-      dhcp6: True{{end -}}
+  renderer: networkd 
+  ethernets:{{range .BondInterfaces}} 
+    {{ .BondInterface}}
+        dhcp4: no
+        dhcp6: True{{end}}
   bonds:
     bond0:
       dhcp4: no
       dhcp6: no
-      interfaces:
-      {{range .BondInterfaces}}
-      - {{.BondInterface}}{{end -}}
+      interfaces: {{range .BondInterfaces}}
+      - {{.BondInterface}}{{end }}
       parameters:
-      {{.BondParameters.Mode}}
-      {{.BondParameters.LacpRate}}
+        {{.BondParameters.Mode}}
+        {{.BondParameters.LacpRate}}
   vlans:
     bond0.41:
       id: 41
       link: bond0
       dhcp6: True
-      addresses: [{{OamIP}}/25, ]
-      gateway4: {{OamGateway}}
+      addresses: [{{.OamIP}}/25, ]
+      gateway4: {{.OamGateway}}
       nameservers:
         addresses: [{{range .NameServers}}{{.NameServer}}, {{end -}} ]

@@ -39,3 +39,14 @@ func TestCreatePreseedfile(t *testing.T){
 	bmhnode.CreateFileFromTemplate("/tmp","preseed")
 	assert.FileExists(t,"/tmp/preseed/hwe-ubuntu-server.seed","")
 }
+
+func TestCreateNetplanfile(t *testing.T){
+	bmhnode  := createTestNode()
+	bmhnode.CreateFileFromTemplate("/tmp","netplan")
+	assert.FileExists(t,"/tmp/50-cloud-init.yaml")
+}
+func TestCreateInitfile(t *testing.T){
+	bmhnode  := createTestNode()
+	bmhnode.CreateFileFromTemplate("/tmp","init")
+	assert.FileExists(t,"init")
+}
