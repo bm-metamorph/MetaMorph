@@ -3,23 +3,24 @@ package config
 import (  
 	"fmt"
 	"github.com/spf13/viper"
-	"os"
+	"path"
 )
 
 var Config string
 
 func init() {
 	fmt.Println("Init Func")
-	//Temporary measure as debug test are not able to run
-	os.Setenv("METAMORPH_CONFIGPATH", "/home/ekuamaj/go/src/bitbucket.com/metamorph" )
-	configPath := os.Getenv("METAMORPH_CONFIGPATH")
-	if configPath == ""{
-		panic(fmt.Errorf("Fatal erro Config file path not found. Set METAMORPH_CONFIGPATH environment variable"))
+	viper.AutomaticEnv()
+	configPath := viper.GetString("METAMORPH_CONFIGPATH")
+
+	if configPath == "" {
+		gopathenv := viper.GetString("GOPATH")
+		configPath = path.Join(gopathenv,"src/bitbucket.com/metamorph")
 	}
+	
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(configPath)
 	viper.SetEnvPrefix("metamorph")
-	viper.AutomaticEnv()
 	err := viper.ReadInConfig() 
 	if err != nil { 
 	  panic(fmt.Errorf("Fatal error config file: %s \n", err))
