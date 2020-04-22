@@ -94,6 +94,8 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	}
 
 	iso_rootpath := config.Get("iso.rootpath").(string)
+	HTTPRootPath := config.Get("http.rootpath").(string)
+
 	iso_urlpath := config.Get("image.url").(string)
 	iso_checksum := config.Get("image.checksum").(string)
 
@@ -104,6 +106,9 @@ func (bmhnode *BMHNode) PrepareISO() error {
 		return fmt.Errorf("ISO root directory not found : %v\n", err)
 	}
 
+	if _, err := os.Stat(HTTPRootPath); os.IsNotExist(err) {
+		return fmt.Errorf("HTTP root directory not found : %v\n", err)
+	}
 	//Get temporary directory for copying ISO
 
 	iso_tempdir := config.Get("iso.tempdir").(string)
@@ -112,6 +117,10 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	iso_DestinationFullpath := path.Join(iso_rootpath, iso_name)
 
 	if _, err := os.Stat(iso_DownloadFullpath); os.IsNotExist(err) {
+		err = os.MkdirAll(iso_tempdir,os.ModePerm)
+		if err != nil {
+			return fmt.Errorf("Failed to create dir %v with error  %v", iso_tempdir, err)
+		}
 		err = DownloadUrl(iso_DownloadFullpath, iso_urlpath)
 		if err != nil {
 			return fmt.Errorf("Failed to download ISO Image : %v", err)
@@ -158,7 +167,7 @@ func (bmhnode *BMHNode) PrepareISO() error {
 
 	isolinux_cfg_destpath := iso_DestinationFullpath + "/isolinux/txt.cfg"
 
-	metamorph_root := config.Get("metamorph-root").(string)
+	metamorph_root := config.Get("templates.rootdir").(string)
 
 	isolinuxtemplatepath := config.Get("templates.isolinux.config").(string)
 

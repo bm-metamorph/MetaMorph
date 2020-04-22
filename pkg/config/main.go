@@ -16,6 +16,7 @@ func init() {
 	if configPath == "" {
 		gopathenv := viper.GetString("GOPATH")
 		configPath = path.Join(gopathenv,"src/bitbucket.com/metamorph")
+		viper.BindEnv("METAMORPH_CONFIGPATH",configPath)
 	}
 	
 	viper.SetConfigType("yaml")

@@ -21,12 +21,12 @@ func (bmhnode *BMHNode) CreateFileFromTemplate(outputdir string , modulename str
 
 	fmt.Println("Creating " + modulename + " from Template")
 
-	metamorph_root := config.Get("metamorph-root").(string)
+	template_rootpath := config.Get("templates.rootdir").(string)
 
 	templatepath := config.Get("templates." + modulename + ".config").(string)
 	filepath := config.Get("templates." + modulename + ".filepath").(string)
 
-	templatepathAbsolute := path.Join(metamorph_root, templatepath)
+	templatepathAbsolute := path.Join(template_rootpath, templatepath)
 	outputfilepathAbsolute := path.Join(outputdir,filepath)
 
 	if _, err = os.Stat(templatepathAbsolute); os.IsNotExist(err) {

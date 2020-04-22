@@ -65,5 +65,7 @@ func TestValidateChecksum(t *testing.T){
 
 func TestPrepareISO(t *testing.T){
     bmhnode := createTestNode()
-    bmhnode.PrepareISO()
+    err := bmhnode.PrepareISO()
+    t.Logf("%v", err)
+    assert.IsType(t, err,nil)
 }

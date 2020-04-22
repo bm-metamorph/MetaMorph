@@ -1,5 +1,4 @@
 ---
-metamorph-root: /home/ekuamaj/go/src/bitbucket.com/metamorph
 
 database:
     type: sqlite
