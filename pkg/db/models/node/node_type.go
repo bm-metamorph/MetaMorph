@@ -96,11 +96,12 @@ type Node struct {
 	NodeID         uint
 	DiskName       string
 	RaidType        int
+	RaidController string
 	PhysicalDisks []PhysicalDisk
   }
   
   type PhysicalDisk struct {
 	gorm.Model
-	VirtualDiskID uint
+//	VirtualDiskID uint
 	PhysicalDisk  string
   }

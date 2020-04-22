@@ -4,7 +4,7 @@ import (
 	config "bitbucket.com/metamorph/pkg/config"
 	"bitbucket.com/metamorph/pkg/db/models/node"
 	"fmt"
-	client "github.com/manojkva/go-redfish-API-Wrapper/pkg/redfishwrap/idrac"
+	client "github.com/manojkva/go-redfish-api-wrapper/pkg/redfishwrap/idrac"
 )
 
 type BMHNode node.Node
@@ -29,10 +29,11 @@ func getRedfishClient(bmhnode *BMHNode) client.IdracRedfishClient {
 
 }
 
-func (bmhnode *BMHNode) cleanVirtualDIskIfEExists() bool {
+func (bmhnode *BMHNode) CleanVirtualDIskIfEExists() bool {
 	redfishClient := getRedfishClient(bmhnode)
 	result := redfishClient.CleanVirtualDisksIfAny(config.Get("idrac.systemID").(string),
-		config.Get("idrac.controllerID").(string))
+	config.Get("idrac.controllerID").(string))
+        
 	return result
 }
 
@@ -40,7 +41,7 @@ func (bmhnode *BMHNode) CreateVirtualDisks() bool {
 
 	var result bool
 
-	if !bmhnode.cleanVirtualDIskIfEExists() {
+	if !bmhnode.CleanVirtualDIskIfEExists() {
 		return false
 	}
 

@@ -84,9 +84,9 @@
       "DiskName": "osdisk",
       "raiType": 1,
 			"RaidController": "RAID.Slot.6-1",
-      "Physicaldisks": [
-        "Disk.Bay.0:Enclosure.Internal.0-1:RAID.Slot.6-1",
-        "Disk.Bay.1:Enclosure.Internal.0-1:RAID.Slot.6-1"
+      "PhysicalDisks": [
+       { "PhysicalDisk" : "Disk.Bay.0:Enclosure.Internal.0-1:RAID.Slot.6-1" },
+       { "PhysicalDisk" : "Disk.Bay.1:Enclosure.Internal.0-1:RAID.Slot.6-1" }
       ]
     },
     {
@@ -94,8 +94,8 @@
       "raidType": 1,
 			"RaidController": "RAID.Slot.6-1",
       "PhysicalDisks": [
-        "Disk.Bay.4:Enclosure.Internal.0-1:RAID.Slot.6-1",
-        "Disk.Bay.5:Enclosure.Internal.0-1:RAID.Slot.6-1"
+        { "PhysicalDisk" : "Disk.Bay.4:Enclosure.Internal.0-1:RAID.Slot.6-1" },
+        { "PhysicalDisk" : "Disk.Bay.5:Enclosure.Internal.0-1:RAID.Slot.6-1" }
       ]
     }
   ]
