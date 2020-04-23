@@ -2,6 +2,7 @@ package controller
 
 import (
 	"bitbucket.com/metamorph/pkg/db/models/node"
+	"bitbucket.com/metamorph/pkg/drivers/redfish"
 	"fmt"
 	"github.com/google/uuid"
 	"runtime"
@@ -9,7 +10,9 @@ import (
 	"time"
 )
 
-type BMNode node.Node
+type BMNode struct {
+	*node.Node
+}
 
 type nodedb interface {
 	GetNodes() ([]node.Node, error)
@@ -66,7 +69,7 @@ func (h *DBHandler) StartMetamorphFSM(runOnce bool) {
 			for _, bmnode := range nodelist {
 				// What about nodes that are already in transistions.. should there be a transition state.
 				fmt.Printf("[%v] - Starting Processing\n", bmnode.Name)
-				requestsChan <- BMNode(bmnode)
+				requestsChan <- BMNode{&bmnode}
 
 			}
 		}
@@ -134,22 +137,37 @@ func serviceRequest(requestsChan chan BMNode, nodeStatusChan chan<- NodeStatus, 
 func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
 	fmt.Printf("[%v] Entering Ready State Handler\n", bmnode.Name)
 	bmnode.State = INTRANSITION
+	//Update the DB Now
+	node.Update(bmnode.Node)
 	fmt.Printf("[%v] - NodeUUID - %v\n", bmnode.Name, bmnode.NodeUUID)
-
-	var testNode bool = true
 	var nodestatus NodeStatus
-	if testNode {
-		fmt.Printf("[%v] Error condition\n", bmnode.Name)
-		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: false}
+
+	// Check if we could extract UUID from the Node using Redfish
+	redfishClient := &redfish.BMHNode{bmnode.Node}
+	/*
+	//This call should satisfy the following requirements
+	// - Network Connectivity
+	// - working credentials
+	// - Redfish API availability(though ver is not compared yet)
+	*/
+	nodeuuidString, res := redfishClient.GetUUID()
+	var err error
+	if res == true {
+		 bmnode.NodeUUID, err = uuid.Parse(nodeuuidString)
+	}
+	if err != nil || res == false{
+			nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: false}
+		    bmnode.State = FAILED
 	}else {
+		
+		bmnode.State = READY
 		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
 	}
+	//Update the DB Now
+	node.Update(bmnode.Node)
+
 	nodeStatusChan <- nodestatus
-
 	wg.Done()
-
-	//Do Ready Check verification
-	//Update database accordingly
 
 }
 

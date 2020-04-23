@@ -4,6 +4,7 @@ import (
 	"testing"
 	"github.com/stretchr/testify/assert"
     "net/url"
+    "bitbucket.com/metamorph/pkg/db/models/node"
  ///   "errors"
 )
 
@@ -64,7 +65,7 @@ func TestValidateChecksum(t *testing.T){
 }
 
 func TestPrepareISO(t *testing.T){
-    bmhnode := createTestNode()
+	bmhnode := &BMHNode{node.CreateTestNode()}
     err := bmhnode.PrepareISO()
     t.Logf("%v", err)
     assert.IsType(t, err,nil)

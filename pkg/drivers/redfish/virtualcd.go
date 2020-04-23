@@ -42,3 +42,10 @@ func (bmhnode *BMHNode) EjectISO()  bool {
 	return result
 
 }
+
+func (bmhnode *BMHNode) GetUUID()(string, bool) {
+	redfishClient := getRedfishClient(bmhnode)
+	uuid, result := redfishClient.GetNodeUUID(config.Get("idrac.systemID").(string))
+	return uuid,result
+
+}

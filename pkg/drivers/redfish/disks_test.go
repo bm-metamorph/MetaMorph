@@ -2,33 +2,21 @@ package redfish
 
 import (
 	"testing"
-	"io/ioutil"
-	"encoding/json"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"bitbucket.com/metamorph/pkg/config"
+	"bitbucket.com/metamorph/pkg/db/models/node"
 
 )
 
-func createTestNode() *BMHNode{
-	data, _ := ioutil.ReadFile(config.Get("testing.inputfile").(string))
-	var bmhnode *BMHNode  = new(BMHNode)
-	UUID, _ := uuid.NewRandom()
-	_ = json.Unmarshal(data, &bmhnode)
-	bmhnode.NodeUUID = UUID
-	return bmhnode
-
-}
 
 
 func TestCleanVirtualDIskIfEExists(t *testing.T){
-	bmhnode := createTestNode()
+	bmhnode := &BMHNode { node.CreateTestNode()}
 	res := bmhnode.CleanVirtualDIskIfEExists()
     assert.Equal(t, res,true)    
 
 }
 func TestCreateVirtualDIsks(t *testing.T){
-	bmhnode := createTestNode()
+	bmhnode := &BMHNode { node.CreateTestNode()}
 	res := bmhnode.CreateVirtualDisks()
     assert.Equal(t, res,true)    
 

@@ -13,7 +13,9 @@ import (
 	"bitbucket.com/metamorph/pkg/db/models/node"
 )
 
-type BMHNode node.Node
+type BMHNode struct {
+	*node.Node
+}
 
 func (bmhnode *BMHNode) CreateFileFromTemplate(outputdir string , modulename string) error {
 

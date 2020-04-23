@@ -8,6 +8,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"bitbucket.com/metamorph/pkg/config"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"io/ioutil"
 )
 
 
@@ -161,6 +162,13 @@ func Describe(node_uuid string) ([]byte, error) {
 	}
 }
 
+func Update(node *Node)(error){
+	db := getDB()
+	defer db.Close()
+	err := db.Save(node).Error
+	return err
+}
+
 func Create(data []byte) ( string, error) {
 	db := getDB()
 	defer db.Close()
@@ -176,4 +184,15 @@ func Create(data []byte) ( string, error) {
 	} else {
 		return node.NodeUUID.String(), nil
 	}
+}
+
+// For Testing purpose only
+func CreateTestNode() *Node{
+	data, _ := ioutil.ReadFile(config.Get("testing.inputfile").(string))
+	var node = new(Node)
+	UUID, _ := uuid.NewRandom()
+	_ = json.Unmarshal(data, node)
+	node.NodeUUID = UUID
+	return node
+
 }

@@ -7,7 +7,9 @@ import (
 	client "github.com/manojkva/go-redfish-api-wrapper/pkg/redfishwrap/idrac"
 )
 
-type BMHNode node.Node
+type BMHNode struct {
+	*node.Node
+}
 
 func getSupportedRAIDLevels() map[int]string {
 
