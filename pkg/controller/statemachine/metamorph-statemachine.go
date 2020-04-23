@@ -174,16 +174,21 @@ func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 func SetupreadyHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
 	fmt.Printf("[%v] Entering Setup Ready State Handler\n", bmnode.Name)
 	bmnode.State = INTRANSITION
+	//Update the DB Now
+	node.Update(bmnode.Node)
 	fmt.Println(bmnode.NodeUUID)
+
+	//Create iSO
 	nodestatus := NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
+	bmnode.State = SETUPREADY
+	node.Update(bmnode.Node)
 	nodeStatusChan <- nodestatus
 	wg.Done()
-	//Do Ready Check verification
-	//Update database accordingly
 }
 func DeployedHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
 	fmt.Printf("[%v] Entering Deployed State Handler\n", bmnode.Name)
 	bmnode.State = INTRANSITION
+	node.Update(bmnode.Node)
 	fmt.Println(bmnode.NodeUUID)
 	nodestatus := NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
 	nodeStatusChan <- nodestatus

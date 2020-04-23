@@ -49,3 +49,35 @@ func (bmhnode *BMHNode) GetUUID()(string, bool) {
 	return uuid,result
 
 }
+
+func (bmhnode *BMHNode)DeployISO()bool{
+	var result  bool
+	// Setup Raid
+
+	result  = bmhnode.CreateVirtualDisks()
+
+	if result == false {
+		return result
+	}
+	// Redfish steps or installation
+	//Step 1 Eject CD
+	result  = bmhnode.EjectISO()
+	if result != false {
+		//Step 2 Insert Ubuntu ISO
+		result = bmhnode.InsertISO()
+		if result != false {
+			//Step 3 Set Onetime boot to CD ROM
+			result = bmhnode.SetOneTimeBoot()
+			if result != false {
+				//Step 4 Reboot
+
+				result = bmhnode.Reboot()
+
+			}
+		}
+	}
+
+	return result
+
+
+}
