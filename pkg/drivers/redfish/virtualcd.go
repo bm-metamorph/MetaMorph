@@ -38,7 +38,7 @@ func (bhmnode * BMHNode) Reboot() bool {
 
 func (bmhnode *BMHNode) EjectISO()  bool {
 	redfishClient := getRedfishClient(bmhnode)
-	result := redfishClient.EjectISO(config.Get("idrac.systemID").(string),"CD")
+	result := redfishClient.EjectISO(config.Get("idrac.managerID").(string),"CD")
 	return result
 
 }

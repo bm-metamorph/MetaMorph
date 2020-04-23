@@ -67,7 +67,7 @@
 		},
 
 	"IPMIUser":	"root",
-  "IPMIPassword":	"password",
+  "IPMIPassword":	"Abc.1234",
   "IPMIIP": "32.68.220.135",
 
 	"vendor":	"Dell",
@@ -82,7 +82,7 @@
   "virtualDisks": [
     {
       "DiskName": "osdisk",
-      "raiType": 1,
+      "raidType": 1,
 			"RaidController": "RAID.Slot.6-1",
       "PhysicalDisks": [
        { "PhysicalDisk" : "Disk.Bay.0:Enclosure.Internal.0-1:RAID.Slot.6-1" },

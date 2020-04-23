@@ -27,3 +27,9 @@ func TestCleanVirtualDIskIfEExists(t *testing.T){
     assert.Equal(t, res,true)    
 
 }
+func TestCreateVirtualDIsks(t *testing.T){
+	bmhnode := createTestNode()
+	res := bmhnode.CreateVirtualDisks()
+    assert.Equal(t, res,true)    
+
+}

@@ -30,10 +30,13 @@ func getRedfishClient(bmhnode *BMHNode) client.IdracRedfishClient {
 }
 
 func (bmhnode *BMHNode) CleanVirtualDIskIfEExists() bool {
+	var result bool = false
 	redfishClient := getRedfishClient(bmhnode)
-	result := redfishClient.CleanVirtualDisksIfAny(config.Get("idrac.systemID").(string),
-	config.Get("idrac.controllerID").(string))
-        
+	for _, raiddisk := range bmhnode.VirtualDisks {
+
+		result = redfishClient.CleanVirtualDisksIfAny(config.Get("idrac.systemID").(string), raiddisk.RaidController)
+	}
+
 	return result
 }
 
@@ -55,11 +58,18 @@ func (bmhnode *BMHNode) CreateVirtualDisks() bool {
 			diskIDs = append(diskIDs, disk.PhysicalDisk)
 		}
 
+		volumeType := raidLevelMap[vd.RaidType]
+
 		jobId := redfishClient.CreateVirtualDisk(config.Get("idrac.systemID").(string),
-			config.Get("idrac.controllerID").(string), raidLevelMap[vd.RaidType], vd.DiskName, diskIDs)
+			vd.RaidController, volumeType, vd.DiskName, diskIDs)
+			
 		fmt.Printf("Job Id returned is %v\n", jobId)
 		//check Job Status to decide on return value
-		result = true
+        result  = redfishClient.CheckJobStatus(jobId)
+
+		if result != true {
+			return result
+		}
 
 	}
 	return result

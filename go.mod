@@ -9,7 +9,7 @@ require (
 	github.com/golang/protobuf v1.3.5
 	github.com/google/uuid v1.1.1
 	github.com/jinzhu/gorm v1.9.12
-	github.com/manojkva/go-redfish-api-wrapper v0.0.0-20200422170935-4bba49d50579
+	github.com/manojkva/go-redfish-api-wrapper v1.0.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v0.0.7
 	github.com/spf13/viper v1.6.2
