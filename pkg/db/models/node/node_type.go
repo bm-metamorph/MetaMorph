@@ -12,6 +12,7 @@ type Node struct {
 	NodeUUID             uuid.UUID
 	Name                 string
 	ImageURL             string
+	ImageReadilyAvailable bool
 	OamIP                string
 	OamGateway           string
 	NameServers          []NameServer `json:"NameServers"`
@@ -22,6 +23,7 @@ type Node struct {
 	SSHPubKeys           []SSHPubKey
 	BondInterfaces       []BondInterface
 	BondParameters       BondParameters
+	IPMIIP               string
 	IPMIUser             string
 	IPMIPassword         string
 	Vendor               string
@@ -32,7 +34,9 @@ type Node struct {
 	FirmwareVersion      string
 	VirtualDisks         []VirtualDisk
 	State                string
-  
+	ProvisioningIP       string
+	ProvisionerPort      int
+	HTTPPort             int 
   }
   
   
@@ -47,6 +51,8 @@ type Node struct {
 	NodeID      uint
 	Name        string
 	Size        string
+	Bootable    bool
+	Primary     bool
 	Filesystem Filesystem
   }
   
@@ -89,12 +95,13 @@ type Node struct {
 	gorm.Model
 	NodeID         uint
 	DiskName       string
-	raidType        int
+	RaidType        int
+	RaidController string
 	PhysicalDisks []PhysicalDisk
   }
   
   type PhysicalDisk struct {
 	gorm.Model
-	VirtualDiskID uint
+//	VirtualDiskID uint
 	PhysicalDisk  string
   }

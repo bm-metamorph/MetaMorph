@@ -73,7 +73,7 @@ func (h *DBHandler) StartMetamorphFSM(runOnce bool) {
 		// set the array to nil for the next cycle
 		nodelist = nil
 
-		time.Sleep(10 * time.Millisecond) // sleep for 10 ms before the start of the next cycle
+		time.Sleep(10 * time.Second) // sleep for 10 ms before the start of the next cycle
 		if runOnce == true {              // for testing purpose only.
 			break
 		}
