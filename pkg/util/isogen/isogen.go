@@ -267,6 +267,7 @@ func ExtractAndCopyISO(iso_DownloadFullpath string, iso_DestinationFullpath stri
 	cmd = exec.Command("umount", mount_path)
 	err = cmd.Run()
 	if err != nil {
+		//Ignore this error as it is inconsequential
 		fmt.Errorf("Failed to Unmount %v. Ignoring error", mount_path)
 	}
 	return nil
@@ -304,7 +305,7 @@ func (bmhnode *BMHNode) RepackageISO(iso_DestinationFullpath string) error {
 	}
 
 	bmhnode.ImageURL = "http://" + config.Get("provisioning.ip").(string) + ":" +
-	                               config.Get("provisioning.httpport").(string) + "/" + image_name
+	                               string(config.Get("provisioning.httpport").(int)) + "/" + image_name
 
 	// TODO : bmhnode.UpdateNode(node)
 	// TODO : PROVISIONING IP etc moved to config ?
