@@ -14,7 +14,7 @@
             "env": {
                 "METAMORPH_CONFIGPATH" : "/home/ekuamaj/go/src/bitbucket.com/metamorph",
             },
-            "args": []
+            "args": ["controller"]
         }
     ]
 }

@@ -27,6 +27,6 @@ func TestMetamorphFSM(t *testing.T) {
 
 	handler := &DBHandler{db: nodeDB}
 
-	handler.StartMetamorphFSM(true)
+	handler.startFSM(true)
 
 }

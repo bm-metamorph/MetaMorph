@@ -2,6 +2,8 @@ package controller
 
 import (
 	"bitbucket.com/metamorph/pkg/db/models/node"
+	"bitbucket.com/metamorph/pkg/drivers/redfish"
+	"bitbucket.com/metamorph/pkg/util/isogen"
 	"fmt"
 	"github.com/google/uuid"
 	"runtime"
@@ -9,7 +11,9 @@ import (
 	"time"
 )
 
-type BMNode node.Node
+type BMNode struct {
+	*node.Node
+}
 
 type nodedb interface {
 	GetNodes() ([]node.Node, error)
@@ -37,9 +41,16 @@ type NodeStatus struct {
 	Status   bool
 }
 
-func (h *DBHandler) StartMetamorphFSM(runOnce bool) {
-
+func StartMetamorphFSM(runOnce bool) {
 	fmt.Println("Starting Metamorph FSM")
+	dbHandler := new(DBHandler)
+	dbHandler.startFSM(runOnce)
+
+}
+
+func (h *DBHandler) startFSM(runOnce bool) {
+
+	fmt.Println("Starting FSM")
 
 	var wg sync.WaitGroup
 
@@ -55,18 +66,18 @@ func (h *DBHandler) StartMetamorphFSM(runOnce bool) {
 
 	for {
 
-		//nodelist, err := node.GetNodes()
-		nodelist, err := h.db.GetNodes()
+		nodelist, err := node.GetNodes()
+		//nodelist, err := h.db.GetNodes()
 
 		if err != nil {
-			fmt.Println("Failed to get nodelist")
+			fmt.Println("No Nodes to process...")
 
 		} else {
 
 			for _, bmnode := range nodelist {
 				// What about nodes that are already in transistions.. should there be a transition state.
 				fmt.Printf("[%v] - Starting Processing\n", bmnode.Name)
-				requestsChan <- BMNode(bmnode)
+				requestsChan <- BMNode{&bmnode}
 
 			}
 		}
@@ -74,7 +85,7 @@ func (h *DBHandler) StartMetamorphFSM(runOnce bool) {
 		nodelist = nil
 
 		time.Sleep(10 * time.Second) // sleep for 10 ms before the start of the next cycle
-		if runOnce == true {              // for testing purpose only.
+		if runOnce == true {         // for testing purpose only.
 			break
 		}
 	}
@@ -134,42 +145,89 @@ func serviceRequest(requestsChan chan BMNode, nodeStatusChan chan<- NodeStatus, 
 func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
 	fmt.Printf("[%v] Entering Ready State Handler\n", bmnode.Name)
 	bmnode.State = INTRANSITION
+	//Update the DB Now
+	node.Update(bmnode.Node)
 	fmt.Printf("[%v] - NodeUUID - %v\n", bmnode.Name, bmnode.NodeUUID)
-
-	var testNode bool = true
 	var nodestatus NodeStatus
-	if testNode {
-		fmt.Printf("[%v] Error condition\n", bmnode.Name)
+
+	// Check if we could extract UUID from the Node using Redfish
+	redfishClient := &redfish.BMHNode{bmnode.Node}
+	/*
+		//This call should satisfy the following requirements
+		// - Network Connectivity
+		// - working credentials
+		// - Redfish API availability(though ver is not compared yet)
+	*/
+	nodeuuidString, res := redfishClient.GetUUID()
+	var err error
+	if res == true {
+		bmnode.NodeUUID, err = uuid.Parse(nodeuuidString)
+	}
+	if err != nil || res == false {
 		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: false}
-	}else {
+		bmnode.State = FAILED
+	} else {
+
+		bmnode.State = READY
 		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
 	}
+	//Update the DB Now
+	node.Update(bmnode.Node)
+
 	nodeStatusChan <- nodestatus
-
 	wg.Done()
-
-	//Do Ready Check verification
-	//Update database accordingly
 
 }
 
 func SetupreadyHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
 	fmt.Printf("[%v] Entering Setup Ready State Handler\n", bmnode.Name)
+	var nodestatus NodeStatus
+	var err error
+
 	bmnode.State = INTRANSITION
+	//Update the DB Now
+	node.Update(bmnode.Node)
 	fmt.Println(bmnode.NodeUUID)
-	nodestatus := NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
+	isogenClient := &isogen.BMHNode{bmnode.Node}
+
+	//Create iSO
+	err = isogenClient.PrepareISO()
+	if err != nil {
+		fmt.Printf("[%v] failed to create ISO file",bmnode.Name)
+		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: false}
+		bmnode.State = FAILED
+
+	} else {
+
+		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
+		bmnode.State = SETUPREADY
+	}
+	node.Update(bmnode.Node)
 	nodeStatusChan <- nodestatus
 	wg.Done()
-	//Do Ready Check verification
-	//Update database accordingly
 }
 func DeployedHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
 	fmt.Printf("[%v] Entering Deployed State Handler\n", bmnode.Name)
+	var nodestatus NodeStatus
+	var result bool
 	bmnode.State = INTRANSITION
+	node.Update(bmnode.Node)
 	fmt.Println(bmnode.NodeUUID)
-	nodestatus := NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
+	redfishClient := &redfish.BMHNode{bmnode.Node}
+
+
+	result = redfishClient.DeployISO()
+
+	if result == false {
+
+		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: false}
+		bmnode.State = FAILED
+	} else {
+
+		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
+		bmnode.State = DEPLOYED
+	}
+	node.Update(bmnode.Node)
 	nodeStatusChan <- nodestatus
 	wg.Done()
-	//Do Ready Check verification
-	//Update database accordingly
 }
