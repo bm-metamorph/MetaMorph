@@ -35,3 +35,21 @@ func TestISOInstallation(t *testing.T) {
 	}
 	assert.Equal(t, res, true)
 }
+
+func TestISODeploy(t *testing.T){
+	var res bool
+	bmhnode := &BMHNode { node.CreateTestNode()}
+	bmhnode.ImageURL = "http://32.68.220.23:31180/a451dcb7-9a17-45a8-8915-f5ab0a175cf6-ubuntu.iso"
+
+	res = bmhnode.DeployISO()
+	assert.Equal(t,res,true)
+
+
+}
+
+func TestEjectISO(t *testing.T){
+	bmhnode := &BMHNode { node.CreateTestNode()}
+	res  := bmhnode.EjectISO()
+	assert.Equal(t, res,true)
+
+}
