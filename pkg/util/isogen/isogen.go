@@ -186,6 +186,7 @@ func (bmhnode *BMHNode) PrepareISO() error {
 		return fmt.Errorf("Failed to create Netplan file with error %v", err)
 	}
 
+	//metamorph-client.service
 	metamorph_servicetemplatepath := config.Get("templates.service.config").(string)
 	
 	metamorph_servicefilesourepath := path.Join(metamorph_root,metamorph_servicetemplatepath ) 
@@ -198,8 +199,8 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	if err != nil {
 		return fmt.Errorf("Failed to copy metamorph service file with error %v", err)
 	}
+	//init.sh
 
-	//metamorph-client.service
 	bmhnode.ProvisioningIP = config.Get("provisioning.ip").(string)
 	bmhnode.ProvisionerPort = config.Get("provisioning.port").(int)
 	bmhnode.HTTPPort = config.Get("provisioning.httpport").(int)
