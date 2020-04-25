@@ -18,6 +18,7 @@ func (bmhnode *BMHNode) InsertISO() bool {
 	}
 
 	redfishClient := getRedfishClient(bmhnode)
+	fmt.Printf("Image URL to be inserted = %v", bmhnode.ImageURL)
 	result := redfishClient.InsertISO(config.Get("idrac.managerID").(string), "CD", bmhnode.ImageURL)
 	return result
 }

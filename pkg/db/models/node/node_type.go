@@ -102,6 +102,6 @@ type Node struct {
   
   type PhysicalDisk struct {
 	gorm.Model
-//	VirtualDiskID uint
+	VirtualDiskID uint
 	PhysicalDisk  string
   }

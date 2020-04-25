@@ -73,7 +73,13 @@ func (bmhnode *BMHNode) CreateVirtualDisks() bool {
 	for _, vd := range virtualdisklist {
 
 		var diskIDs []string
-		for _, disk := range vd.PhysicalDisks {
+		physicaldisklist, err := node.GetPhysicalDisks(vd.ID)
+
+		if err != nil{
+			fmt.Printf("Failed to retrieve physical disks with error %v", err)
+			return false
+		}
+		for _, disk := range physicaldisklist {
 			diskIDs = append(diskIDs, disk.PhysicalDisk)
 		}
 

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 
 	// "gopkg.in/yaml.v2"
 	"log"
@@ -18,6 +19,7 @@ import (
 	"strings"
 
 	config "bitbucket.com/metamorph/pkg/config"
+	"bitbucket.com/metamorph/pkg/db/models/node"
 )
 
 func CreateDirectory(directoryPath string) error {
@@ -306,9 +308,11 @@ func (bmhnode *BMHNode) RepackageISO(iso_DestinationFullpath string) error {
 	}
 
 	bmhnode.ImageURL = "http://" + config.Get("provisioning.ip").(string) + ":" +
-	                               string(config.Get("provisioning.httpport").(int)) + "/" + image_name
+	                               strconv.Itoa(config.Get("provisioning.httpport").(int)) + "/" + image_name
 
-	// TODO : bmhnode.UpdateNode(node)
+	// Update the DB with ImageURL
+	node.Update(bmhnode.Node)
+
 	// TODO : PROVISIONING IP etc moved to config ?
 	return nil
 }
