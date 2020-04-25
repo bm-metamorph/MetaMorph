@@ -1,11 +1,10 @@
 package isogen
 
 import (
-	"fmt"
-	"testing"
 	"bitbucket.com/metamorph/pkg/db/models/node"
+	"fmt"
 	"github.com/stretchr/testify/assert"
-
+	"testing"
 )
 
 func TestgetDiskSpaceinMB(t *testing.T) {
@@ -13,26 +12,26 @@ func TestgetDiskSpaceinMB(t *testing.T) {
 	fmt.Printf("%s, %s", dspace, maxdspace)
 }
 
-func TestCreateGrubfile(t *testing.T){
+func TestCreateGrubfile(t *testing.T) {
 	bmhnode := &BMHNode{node.CreateTestNode()}
-	bmhnode.CreateFileFromTemplate("/tmp","grub")
-	assert.FileExists(t,"/tmp/grub.conf","")
+	bmhnode.CreateFileFromTemplate("/tmp", "grub")
+	assert.FileExists(t, "/tmp/grub.conf", "")
 
 }
 
-func TestCreatePreseedfile(t *testing.T){
+func TestCreatePreseedfile(t *testing.T) {
 	bmhnode := &BMHNode{node.CreateTestNode()}
-	bmhnode.CreateFileFromTemplate("/tmp","preseed")
-	assert.FileExists(t,"/tmp/preseed/hwe-ubuntu-server.seed","")
+	bmhnode.CreatePressedFileFromTemplate("/tmp", "preseed")
+	assert.FileExists(t, "/tmp/preseed/hwe-ubuntu-server.seed", "")
 }
 
-func TestCreateNetplanfile(t *testing.T){
+func TestCreateNetplanfile(t *testing.T) {
 	bmhnode := &BMHNode{node.CreateTestNode()}
-	bmhnode.CreateFileFromTemplate("/tmp","netplan")
-	assert.FileExists(t,"/tmp/50-cloud-init.yaml")
+	bmhnode.CreateNetplanFileFromTemplate("/tmp", "netplan")
+	assert.FileExists(t, "/tmp/50-cloud-init.yaml")
 }
-func TestCreateInitfile(t *testing.T){
+func TestCreateInitfile(t *testing.T) {
 	bmhnode := &BMHNode{node.CreateTestNode()}
-	bmhnode.CreateFileFromTemplate("/tmp","init")
-	assert.FileExists(t,"init")
+	bmhnode.CreateFileFromTemplate("/tmp", "init")
+	assert.FileExists(t, "/tmp/init.sh")
 }

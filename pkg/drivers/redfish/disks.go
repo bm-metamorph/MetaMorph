@@ -34,15 +34,26 @@ func getRedfishClient(bmhnode *BMHNode) client.IdracRedfishClient {
 func (bmhnode *BMHNode) CleanVirtualDIskIfEExists() bool {
 	var result bool = false
 	redfishClient := getRedfishClient(bmhnode)
-	for _, raiddisk := range bmhnode.VirtualDisks {
+	virtualdisklist, err  := node.GetVirtualDisks(bmhnode.NodeUUID.String())
+	if err != nil {
+		fmt.Printf("Virtual disk list is empty with err %v\n", err)
+		return false
+	}
+	for _, raiddisk := range virtualdisklist {
 
 		result = redfishClient.CleanVirtualDisksIfAny(config.Get("idrac.systemID").(string), raiddisk.RaidController)
+		if result == false {
+			fmt.Printf("Failed to clean up Virtual Disk %v\n", raiddisk)
+			return result
+		}
 	}
 
 	return result
 }
 
 func (bmhnode *BMHNode) CreateVirtualDisks() bool {
+
+	fmt.Printf("Inside Create Virtual Disk function\n")
 
 	var result bool
 
@@ -53,7 +64,13 @@ func (bmhnode *BMHNode) CreateVirtualDisks() bool {
 	redfishClient := getRedfishClient(bmhnode)
 	raidLevelMap := getSupportedRAIDLevels()
 
-	for _, vd := range bmhnode.VirtualDisks {
+	virtualdisklist, err  := node.GetVirtualDisks(bmhnode.NodeUUID.String())
+	if err != nil {
+		fmt.Printf("Virtual disk list is empty with err %v\n", err)
+		return false
+	}
+
+	for _, vd := range virtualdisklist {
 
 		var diskIDs []string
 		for _, disk := range vd.PhysicalDisks {

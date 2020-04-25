@@ -1,17 +1,15 @@
 package node
 
 import (
+	"bitbucket.com/metamorph/pkg/config"
 	"encoding/json"
-	"fmt"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
-	"bitbucket.com/metamorph/pkg/config"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"io/ioutil"
 )
-
-
 
 func getDB() *gorm.DB {
 	dbPath := config.Get("database.path")
@@ -20,8 +18,8 @@ func getDB() *gorm.DB {
 		panic("failed to connect database")
 	}
 	db.AutoMigrate(
-		&Node{}, 
-		&NameServer{}, 
+		&Node{},
+		&NameServer{},
 		&Partition{},
 		&Filesystem{},
 		&KvmPolicy{},
@@ -30,7 +28,7 @@ func getDB() *gorm.DB {
 		&BondParameters{},
 		&VirtualDisk{},
 		&PhysicalDisk{},
-		)
+	)
 	return db
 }
 
@@ -44,19 +42,19 @@ func GetNodes() ([]Node, error) {
 	defer db.Close()
 	//db.Find(&nodes)
 	db.Not("state", []string{"failed", "in-transition"}).Find(&nodes)
-    if len(nodes)  > 0 {
+	if len(nodes) > 0 {
 		return nodes, nil
 	} else {
 		return nil, errors.New("Nodes not found")
 	}
 }
 
-func GetNameServers(node_uuid string) ([]NameServer, error){
+func GetNameServers(node_uuid string) ([]NameServer, error) {
 	node := Node{}
 	nameservers := []NameServer{}
 	db := getDB()
 	defer db.Close()
-	node_uuid1 ,_ := uuid.Parse(node_uuid)
+	node_uuid1, _ := uuid.Parse(node_uuid)
 	db.Where("node_uuid = ?", node_uuid1).First(&node)
 	db.Model(&node).Related(&nameservers)
 	if len(nameservers) > 0 {
@@ -66,13 +64,12 @@ func GetNameServers(node_uuid string) ([]NameServer, error){
 	}
 }
 
-
-func GetPartitions(node_uuid string) ([]Partition, error){
+func GetPartitions(node_uuid string) ([]Partition, error) {
 	node := Node{}
 	partitions := []Partition{}
 	db := getDB()
 	defer db.Close()
-	node_uuid1 ,_ := uuid.Parse(node_uuid)
+	node_uuid1, _ := uuid.Parse(node_uuid)
 	db.Where("node_uuid = ?", node_uuid1).First(&node)
 	db.Model(&node).Related(&partitions)
 	if len(partitions) > 0 {
@@ -82,13 +79,12 @@ func GetPartitions(node_uuid string) ([]Partition, error){
 	}
 }
 
-
-func GetSSHPubKeys(node_uuid string) ([]SSHPubKey, error){
+func GetSSHPubKeys(node_uuid string) ([]SSHPubKey, error) {
 	node := Node{}
 	sshPubKeys := []SSHPubKey{}
 	db := getDB()
 	defer db.Close()
-	node_uuid1 ,_ := uuid.Parse(node_uuid)
+	node_uuid1, _ := uuid.Parse(node_uuid)
 	db.Where("node_uuid = ?", node_uuid1).First(&node)
 	db.Model(&node).Related(&sshPubKeys)
 	if len(sshPubKeys) > 0 {
@@ -98,12 +94,12 @@ func GetSSHPubKeys(node_uuid string) ([]SSHPubKey, error){
 	}
 }
 
-func GetBondInterfaces(node_uuid string) ([]BondInterface, error){
+func GetBondInterfaces(node_uuid string) ([]BondInterface, error) {
 	node := Node{}
 	bondInterfaces := []BondInterface{}
 	db := getDB()
 	defer db.Close()
-	node_uuid1 ,_ := uuid.Parse(node_uuid)
+	node_uuid1, _ := uuid.Parse(node_uuid)
 	db.Where("node_uuid = ?", node_uuid1).First(&node)
 	db.Model(&node).Related(&bondInterfaces)
 	if len(bondInterfaces) > 0 {
@@ -115,12 +111,12 @@ func GetBondInterfaces(node_uuid string) ([]BondInterface, error){
 
 //VirtualDisk
 
-func GetVirtualDisks(node_uuid string) ([]VirtualDisk, error){
+func GetVirtualDisks(node_uuid string) ([]VirtualDisk, error) {
 	node := Node{}
 	virtualdisks := []VirtualDisk{}
 	db := getDB()
 	defer db.Close()
-	node_uuid1 ,_ := uuid.Parse(node_uuid)
+	node_uuid1, _ := uuid.Parse(node_uuid)
 	db.Where("node_uuid = ?", node_uuid1).First(&node)
 	db.Model(&node).Related(&virtualdisks)
 	if len(virtualdisks) > 0 {
@@ -131,45 +127,44 @@ func GetVirtualDisks(node_uuid string) ([]VirtualDisk, error){
 }
 
 func GetPhysicalDisks(virtualDiskID uint) ([]PhysicalDisk, error) {
-	 
-	   vdisk := VirtualDisk{}
-	   physcical_disks := []PhysicalDisk{}
-	   db := getDB()
-	   defer db.Close()
-	   db.Where("id = ?", virtualDiskID).First(&vdisk)
-	   db.Model(&vdisk).Related(&physcical_disks)
-	   if len(physcical_disks) > 0 {
+
+	vdisk := VirtualDisk{}
+	physcical_disks := []PhysicalDisk{}
+	db := getDB()
+	defer db.Close()
+	db.Where("id = ?", virtualDiskID).First(&vdisk)
+	db.Model(&vdisk).Related(&physcical_disks)
+	if len(physcical_disks) > 0 {
 		return physcical_disks, nil
 	} else {
 		return nil, errors.New(" No record Found")
 	}
 }
 
-
 func Describe(node_uuid string) ([]byte, error) {
 	node := Node{}
 	db := getDB()
 	defer db.Close()
 
-	node_uuid1 ,_ := uuid.Parse(node_uuid)
+	node_uuid1, _ := uuid.Parse(node_uuid)
 	db.Where("node_uuid = ?", node_uuid1).First(&node)
 	if node.NodeUUID.String() == node_uuid {
 		fmt.Println(node)
 		res, _ := json.Marshal(node)
 		return res, nil
 	} else {
-		return  nil, errors.New("Node not found")
+		return nil, errors.New("Node not found")
 	}
 }
 
-func Update(node *Node)(error){
+func Update(node *Node) error {
 	db := getDB()
 	defer db.Close()
 	err := db.Save(node).Error
 	return err
 }
 
-func Create(data []byte) ( string, error) {
+func Create(data []byte) (string, error) {
 	db := getDB()
 	defer db.Close()
 
@@ -188,12 +183,17 @@ func Create(data []byte) ( string, error) {
 }
 
 // For Testing purpose only
-func CreateTestNode() *Node{
+func CreateTestNode() *Node {
 	data, _ := ioutil.ReadFile(config.Get("testing.inputfile").(string))
-	var node = new(Node)
-	UUID, _ := uuid.NewRandom()
-	_ = json.Unmarshal(data, node)
-	node.NodeUUID = UUID
-	return node
+	Create(data)
+	nodelist, err := GetNodes()
+	if err != nil {
+		return nil
+	}
+		for _, node := range nodelist {
+			return &node
+		}
+
+	return nil
 
 }

@@ -17,7 +17,37 @@ type BMHNode struct {
 	*node.Node
 }
 
-func (bmhnode *BMHNode) CreateFileFromTemplate(outputdir string , modulename string) error {
+func (bmhnode *BMHNode) CreateNetplanFileFromTemplate(outputdir string, modulename string) error {
+	var err error
+	interfacelist, err := node.GetBondInterfaces(bmhnode.NodeUUID.String())
+	if err != nil {
+		return err
+	}
+	nameserverlist, err := node.GetNameServers(bmhnode.NodeUUID.String())
+	if err != nil {
+		return err
+	}
+
+	bmhnode.BondInterfaces = interfacelist
+	bmhnode.NameServers = nameserverlist
+	err = bmhnode.CreateFileFromTemplate(outputdir, modulename)
+
+	return err
+
+}
+
+func (bmhnode *BMHNode) CreatePressedFileFromTemplate(outputdir string, modulename string) error {
+
+	var err error
+
+	partitionlist, err := node.GetPartitions(bmhnode.NodeUUID.String())
+	if err == nil {
+		bmhnode.Partitions = partitionlist
+		err = bmhnode.CreateFileFromTemplate(outputdir, modulename)
+	}
+	return err
+}
+func (bmhnode *BMHNode) CreateFileFromTemplate(outputdir string, modulename string) error {
 
 	var err error
 
@@ -29,7 +59,7 @@ func (bmhnode *BMHNode) CreateFileFromTemplate(outputdir string , modulename str
 	filepath := config.Get("templates." + modulename + ".filepath").(string)
 
 	templatepathAbsolute := path.Join(template_rootpath, templatepath)
-	outputfilepathAbsolute := path.Join(outputdir,filepath)
+	outputfilepathAbsolute := path.Join(outputdir, filepath)
 
 	if _, err = os.Stat(templatepathAbsolute); os.IsNotExist(err) {
 		fmt.Printf("Template file for "+modulename+"does not exist : %v\n", err)
@@ -39,7 +69,7 @@ func (bmhnode *BMHNode) CreateFileFromTemplate(outputdir string , modulename str
 		fmt.Printf("Output file directory for "+modulename+"does not exist : %v\n", err)
 		return err
 	}
-	tmpl, err  := template.ParseFiles(templatepathAbsolute)
+	tmpl, err := template.ParseFiles(templatepathAbsolute)
 
 	if err != nil {
 		return err
@@ -57,11 +87,11 @@ func (bmhnode *BMHNode) CreateFileFromTemplate(outputdir string , modulename str
 
 }
 
-func (bmhnode *BMHNode)GetDiskSizeMB(diskspace string) (string, error) {
+func (bmhnode *BMHNode) GetDiskSizeMB(diskspace string) (string, error) {
 	disksizeMB, _, err := getDiskSpaceinMB(diskspace)
 	return disksizeMB, err
 }
-func (bmhnode * BMHNode) GetMaxDiskSizeMB(diskspace string) (string, error) {
+func (bmhnode *BMHNode) GetMaxDiskSizeMB(diskspace string) (string, error) {
 	_, maxdiskSizeinMB, err := getDiskSpaceinMB(diskspace)
 	return maxdiskSizeinMB, err
 }
