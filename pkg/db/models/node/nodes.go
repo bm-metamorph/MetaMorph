@@ -141,6 +141,36 @@ func GetPhysicalDisks(virtualDiskID uint) ([]PhysicalDisk, error) {
 	}
 }
 
+func GetBondParameters(node_uuid string)(*BondParameters, error){
+	node := Node{}
+	bondParameters := BondParameters{}
+	db := getDB()
+	defer db.Close()
+	node_uuid1, _ := uuid.Parse(node_uuid)
+	db.Where("node_uuid = ?", node_uuid1).First(&node)
+	db.Model(&node).Related(&bondParameters)
+	if bondParameters == (BondParameters{}){
+		return nil, errors.New(" No record Found")
+	} else {
+		return &bondParameters, nil
+	}
+}
+
+func GetKvmPolicy(node_uuid string)(*KvmPolicy, error){
+	node := Node{}
+	kvmPolicy := KvmPolicy{}
+	db := getDB()
+	defer db.Close()
+	node_uuid1, _ := uuid.Parse(node_uuid)
+	db.Where("node_uuid = ?", node_uuid1).First(&node)
+	db.Model(&node).Related(&kvmPolicy)
+	if kvmPolicy == (KvmPolicy{}){
+		return nil, errors.New(" No record Found")
+	} else {
+		return &kvmPolicy, nil
+	}
+}
+
 func Describe(node_uuid string) ([]byte, error) {
 	node := Node{}
 	db := getDB()

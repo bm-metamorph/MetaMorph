@@ -145,7 +145,7 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	}
 
 	//Add Preseed
-	err = bmhnode.CreateFileFromTemplate(iso_DestinationFullpath, "preseed")
+	err = bmhnode.CreatePressedFileFromTemplate(iso_DestinationFullpath, "preseed")
 
 	if err != nil {
 		return fmt.Errorf("Failed to create Preseed file with error %v", err)
@@ -181,8 +181,8 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	if err != nil {
 		return fmt.Errorf("Failed to copy isolinux cfg file with error %v", err)
 	}
-
-	err = bmhnode.CreateFileFromTemplate(iso_custom_scripts_path, "netplan")
+    //Netplan
+	err = bmhnode.CreateNetplanFileFromTemplate(iso_custom_scripts_path, "netplan")
 
 	if err != nil {
 		return fmt.Errorf("Failed to create Netplan file with error %v", err)

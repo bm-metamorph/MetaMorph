@@ -28,8 +28,17 @@ func (bmhnode *BMHNode) CreateNetplanFileFromTemplate(outputdir string, modulena
 		return err
 	}
 
+	bondParameters,err := node.GetBondParameters(bmhnode.NodeUUID.String())
+	if err != nil {
+		return err
+	}
+
+
 	bmhnode.BondInterfaces = interfacelist
 	bmhnode.NameServers = nameserverlist
+	bmhnode.BondParameters = *bondParameters
+
+
 	err = bmhnode.CreateFileFromTemplate(outputdir, modulename)
 
 	return err
