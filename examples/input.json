@@ -61,11 +61,14 @@
 		"BondInterfaces": [
                  { "BondInterface": "enp135s0f0"},
                  { "BondInterface": "enp94s0f1"} ],
-		"BondParameters": {
-			"mode": "802.3ad",
-			"lacpRate": "fast"
-		},
-
+		"BondParameters": [
+                    { "Key": "down-delay", "Value" : "3000"},
+                    { "Key": "lacp-rate", "Value" : "fast"},
+                    { "Key": "mii-monitor-interval", "Value" : "100"},
+                    { "Key": "mode", "Value" : "802.3ad"},
+                    { "Key": "up-delay", "Value" : "1000"}
+                  ],
+                    
 	"IPMIUser":	"root",
   "IPMIPassword":	"Abc.1234",
   "IPMIIP": "32.68.220.135",

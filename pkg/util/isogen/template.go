@@ -36,7 +36,7 @@ func (bmhnode *BMHNode) CreateNetplanFileFromTemplate(outputdir string, modulena
 
 	bmhnode.BondInterfaces = interfacelist
 	bmhnode.NameServers = nameserverlist
-	bmhnode.BondParameters = *bondParameters
+	bmhnode.BondParameters = bondParameters
 
 
 	err = bmhnode.CreateFileFromTemplate(outputdir, modulename)

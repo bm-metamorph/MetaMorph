@@ -25,7 +25,7 @@ func getDB() *gorm.DB {
 		&KvmPolicy{},
 		&SSHPubKey{},
 		&BondInterface{},
-		&BondParameters{},
+		&BondParameter{},
 		&VirtualDisk{},
 		&PhysicalDisk{},
 	)
@@ -141,18 +141,18 @@ func GetPhysicalDisks(virtualDiskID uint) ([]PhysicalDisk, error) {
 	}
 }
 
-func GetBondParameters(node_uuid string) (*BondParameters, error) {
+func GetBondParameters(node_uuid string) ([]BondParameter, error) {
 	node := Node{}
-	bondParameters := BondParameters{}
+	bondParameters := []BondParameter{}
 	db := getDB()
 	defer db.Close()
 	node_uuid1, _ := uuid.Parse(node_uuid)
 	db.Where("node_uuid = ?", node_uuid1).First(&node)
 	db.Model(&node).Related(&bondParameters)
-	if bondParameters == (BondParameters{}) {
+	if len(bondParameters) == 0 {
 		return nil, errors.New(" No record Found")
 	} else {
-		return &bondParameters, nil
+		return bondParameters, nil
 	}
 }
 

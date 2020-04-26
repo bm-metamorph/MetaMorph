@@ -10,8 +10,7 @@ import (
 func TestGetBondParameters(t *testing.T) {
 	node := CreateTestNode()
 	bondParameters, _ := GetBondParameters(node.NodeUUID.String())
-	assert.Equal(t, bondParameters.Mode, "802.3ad")
-	assert.Equal(t, bondParameters.LacpRate, "fast")
+	assert.Equal(t, len(bondParameters),6)
 }
 func TestGetKvmPolicy(t *testing.T) {
 	node := CreateTestNode()
