@@ -50,8 +50,17 @@ func (bmhnode *BMHNode) CreatePressedFileFromTemplate(outputdir string, modulena
 	var err error
 
 	partitionlist, err := node.GetPartitions(bmhnode.NodeUUID.String())
+	var filesystem *node.Filesystem
 	if err == nil {
+		for index,part := range partitionlist{
+			filesystem, err = node.GetFilesystem(part.ID)
+			if err != nil{
+				return err
+			}
+			partitionlist[index].Filesystem = *filesystem
+		} 
 		bmhnode.Partitions = partitionlist
+
 		err = bmhnode.CreateFileFromTemplate(outputdir, modulename)
 	}
 	return err
