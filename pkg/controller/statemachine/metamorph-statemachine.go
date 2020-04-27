@@ -32,6 +32,7 @@ const (
 	READY        = "ready"
 	SETUPREADY   = "setupready"
 	DEPLOYED     = "deployed"
+	DEPLOYING    = "deploying"
 	FAILED       = "failed"
 	INTRANSITION = "in-transition"
 )
@@ -225,7 +226,7 @@ func DeployedHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.W
 	} else {
 
 		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
-		bmnode.State = DEPLOYED
+		bmnode.State = DEPLOYING
 	}
 	node.Update(bmnode.Node)
 	nodeStatusChan <- nodestatus

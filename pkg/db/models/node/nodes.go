@@ -41,7 +41,7 @@ func GetNodes() ([]Node, error) {
 	db := getDB()
 	defer db.Close()
 	//db.Find(&nodes)
-	db.Not("state", []string{"failed", "in-transition", "deployed"}).Find(&nodes)
+	db.Not("state", []string{"failed", "in-transition", "deploying"}).Find(&nodes)
 	if len(nodes) > 0 {
 		return nodes, nil
 	} else {
