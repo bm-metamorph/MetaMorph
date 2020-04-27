@@ -22,7 +22,7 @@ type Node struct {
 	KvmPolicy            KvmPolicy
 	SSHPubKeys           []SSHPubKey
 	BondInterfaces       []BondInterface
-	BondParameters       BondParameters
+	BondParameters       []BondParameter
 	IPMIIP               string
 	IPMIUser             string
 	IPMIPassword         string
@@ -84,11 +84,11 @@ type Node struct {
 	BondInterface  string
   }
   
-  type BondParameters struct {
+  type BondParameter struct {
 	gorm.Model
 	NodeID         uint
-	Mode           string
-	LacpRate       string
+	Key           string
+	Value       string
   }
   
   type VirtualDisk struct {
@@ -102,6 +102,6 @@ type Node struct {
   
   type PhysicalDisk struct {
 	gorm.Model
-//	VirtualDiskID uint
+	VirtualDiskID uint
 	PhysicalDisk  string
   }

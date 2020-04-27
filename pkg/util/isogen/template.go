@@ -28,8 +28,17 @@ func (bmhnode *BMHNode) CreateNetplanFileFromTemplate(outputdir string, modulena
 		return err
 	}
 
+	bondParameters,err := node.GetBondParameters(bmhnode.NodeUUID.String())
+	if err != nil {
+		return err
+	}
+
+
 	bmhnode.BondInterfaces = interfacelist
 	bmhnode.NameServers = nameserverlist
+	bmhnode.BondParameters = bondParameters
+
+
 	err = bmhnode.CreateFileFromTemplate(outputdir, modulename)
 
 	return err
@@ -41,8 +50,17 @@ func (bmhnode *BMHNode) CreatePressedFileFromTemplate(outputdir string, modulena
 	var err error
 
 	partitionlist, err := node.GetPartitions(bmhnode.NodeUUID.String())
+	var filesystem *node.Filesystem
 	if err == nil {
+		for index,part := range partitionlist{
+			filesystem, err = node.GetFilesystem(part.ID)
+			if err != nil{
+				return err
+			}
+			partitionlist[index].Filesystem = *filesystem
+		} 
 		bmhnode.Partitions = partitionlist
+
 		err = bmhnode.CreateFileFromTemplate(outputdir, modulename)
 	}
 	return err

@@ -25,7 +25,7 @@ func getDB() *gorm.DB {
 		&KvmPolicy{},
 		&SSHPubKey{},
 		&BondInterface{},
-		&BondParameters{},
+		&BondParameter{},
 		&VirtualDisk{},
 		&PhysicalDisk{},
 	)
@@ -41,7 +41,7 @@ func GetNodes() ([]Node, error) {
 	db := getDB()
 	defer db.Close()
 	//db.Find(&nodes)
-	db.Not("state", []string{"failed", "in-transition"}).Find(&nodes)
+	db.Not("state", []string{"failed", "in-transition", "deployed"}).Find(&nodes)
 	if len(nodes) > 0 {
 		return nodes, nil
 	} else {
@@ -141,6 +141,50 @@ func GetPhysicalDisks(virtualDiskID uint) ([]PhysicalDisk, error) {
 	}
 }
 
+func GetBondParameters(node_uuid string) ([]BondParameter, error) {
+	node := Node{}
+	bondParameters := []BondParameter{}
+	db := getDB()
+	defer db.Close()
+	node_uuid1, _ := uuid.Parse(node_uuid)
+	db.Where("node_uuid = ?", node_uuid1).First(&node)
+	db.Model(&node).Related(&bondParameters)
+	if len(bondParameters) == 0 {
+		return nil, errors.New(" No record Found")
+	} else {
+		return bondParameters, nil
+	}
+}
+
+func GetKvmPolicy(node_uuid string) (*KvmPolicy, error) {
+	node := Node{}
+	kvmPolicy := KvmPolicy{}
+	db := getDB()
+	defer db.Close()
+	node_uuid1, _ := uuid.Parse(node_uuid)
+	db.Where("node_uuid = ?", node_uuid1).First(&node)
+	db.Model(&node).Related(&kvmPolicy)
+	if kvmPolicy == (KvmPolicy{}) {
+		return nil, errors.New(" No record Found")
+	} else {
+		return &kvmPolicy, nil
+	}
+}
+
+func GetFilesystem(partitionId uint) (*Filesystem, error) {
+	partition := Partition{}
+	filesystem := Filesystem{}
+	db := getDB()
+	defer db.Close()
+	db.Where("id = ?", partitionId).First(&partition)
+	db.Model(&partition).Related(&filesystem)
+	if filesystem == (Filesystem{}) {
+		return nil, errors.New(" No record Found")
+	} else {
+		return &filesystem, nil
+	}
+}
+
 func Describe(node_uuid string) ([]byte, error) {
 	node := Node{}
 	db := getDB()
@@ -190,9 +234,9 @@ func CreateTestNode() *Node {
 	if err != nil {
 		return nil
 	}
-		for _, node := range nodelist {
-			return &node
-		}
+	for _, node := range nodelist {
+		return &node
+	}
 
 	return nil
 

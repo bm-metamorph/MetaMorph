@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 
 	// "gopkg.in/yaml.v2"
 	"log"
@@ -18,6 +19,7 @@ import (
 	"strings"
 
 	config "bitbucket.com/metamorph/pkg/config"
+	"bitbucket.com/metamorph/pkg/db/models/node"
 )
 
 func CreateDirectory(directoryPath string) error {
@@ -143,7 +145,7 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	}
 
 	//Add Preseed
-	err = bmhnode.CreateFileFromTemplate(iso_DestinationFullpath, "preseed")
+	err = bmhnode.CreatePressedFileFromTemplate(iso_DestinationFullpath, "preseed")
 
 	if err != nil {
 		return fmt.Errorf("Failed to create Preseed file with error %v", err)
@@ -179,8 +181,8 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	if err != nil {
 		return fmt.Errorf("Failed to copy isolinux cfg file with error %v", err)
 	}
-
-	err = bmhnode.CreateFileFromTemplate(iso_custom_scripts_path, "netplan")
+    //Netplan
+	err = bmhnode.CreateNetplanFileFromTemplate(iso_custom_scripts_path, "netplan")
 
 	if err != nil {
 		return fmt.Errorf("Failed to create Netplan file with error %v", err)
@@ -306,9 +308,11 @@ func (bmhnode *BMHNode) RepackageISO(iso_DestinationFullpath string) error {
 	}
 
 	bmhnode.ImageURL = "http://" + config.Get("provisioning.ip").(string) + ":" +
-	                               string(config.Get("provisioning.httpport").(int)) + "/" + image_name
+	                               strconv.Itoa(config.Get("provisioning.httpport").(int)) + "/" + image_name
 
-	// TODO : bmhnode.UpdateNode(node)
+	// Update the DB with ImageURL
+	node.Update(bmhnode.Node)
+
 	// TODO : PROVISIONING IP etc moved to config ?
 	return nil
 }
