@@ -56,8 +56,3 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
-#manifests:
-#configmap_bin: true
-#confgimap: true
-#deployment: true
