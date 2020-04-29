@@ -7,9 +7,13 @@ replicaCount: 1
 namespace: metamorph
 
 image:
-  repository: aneeshep/metamorph 
-  tag: aafc7d91e97ef4b2e7435076192a1e5b97dcf480 
+  repository: metamorph-test
+  tag: latest
   pullPolicy: IfNotPresent
+
+#aneeshep/metamorph
+#aafc7d91e97ef4b2e7435076192a1e5b97dcf480
+#metamorph-test:latest
 
 metamorphConfigPath: "/src/bitbucket.com/metamorph"
 

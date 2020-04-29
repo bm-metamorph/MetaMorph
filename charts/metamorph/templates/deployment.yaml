@@ -37,22 +37,22 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: templates-vol
-              mountPath: "configs/templates/hwe_kernel/isolinux_txt.cfg"
-              subPath: isolinux_txt.cfg
-            - name: config-templates
-              mountPath: "/configs/templates/metamorph-client.service"
-              subPath: metamorph-client.service
-            - name: config-templates
-              mountPath: "/configs/templates/init.sh"
-              subPath: init.sh
-            - name: config
+#            - name: templates-vol
+#              mountPath: "configs/templates/hwe_kernel/isolinux_txt.cfg"
+#              subPath: isolinux_txt.cfg
+#            - name: templates-vol
+#              mountPath: "/configs/templates/metamorph-client.service"
+#              subPath: metamorph-client.service
+#            - name: templates-vol
+#              mountPath: "/configs/templates/init.sh"
+#              subPath: init.sh
+            - name: metamorph-config-vol
               mountPath: "/src/bitbucket.com/metamorph"
       volumes:
-        - name: templates-vol
-          configMap:
-            name: config-templates 
-        - name: config
+#        - name: templates-vol
+#          configMap:
+#            name: config-templates 
+        - name: metamorph-config-vol
           configMap:
             name: metamorph-config 
       {{- with .Values.nodeSelector }}
