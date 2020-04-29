@@ -1,0 +1,10 @@
+default hwe-install
+
+label hwe-install
+  menu label ^Install Ubuntu Server with the HWE kernel
+  kernel /install/hwe-vmlinuz
+  append  file=/cdrom/preseed/hwe-ubuntu-server.seed auto locale=en_US layoutcode=en localechooser/translation/warn-light=true localechooser/translation/warn-severe=true keymap=us tasks=server timeout=10 vga=788 initrd=/install/hwe-initrd.gz quiet ---
+
+label hd
+  menu label ^Boot from first hard disk
+  localboot 0x80

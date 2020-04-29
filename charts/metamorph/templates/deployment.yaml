@@ -27,28 +27,32 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: METAMORPH_CONFIGPATH
-              value: /src/bitbucket.com/metamorph
+              value: {{ .Values.metamorphConfigPath }}
           command: [ "/bin/sh", "-c" ]
-          args: [ "/metamorph controller; sleep 10; /metamorph api" ]
+          args: [ "touch /tmp/metamorph.log; mkdir -p /tmp/iso_root/isos; mkdir -p /tmp/http_root; /metamorph controller; sleep 10; /metamorph api" ]
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
-#          livenessProbe:
-#            httpGet:
-#              path: /
-#              port: http
-#          readinessProbe:
-#            httpGet:
-#              path: /
-#              port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: meta-config
-              mountPath: /src/bitbucket.com/metamorph/
+            - name: templates-vol
+              mountPath: "configs/templates/hwe_kernel/isolinux_txt.cfg"
+              subPath: isolinux_txt.cfg
+            - name: config-templates
+              mountPath: "/configs/templates/metamorph-client.service"
+              subPath: metamorph-client.service
+            - name: config-templates
+              mountPath: "/configs/templates/init.sh"
+              subPath: init.sh
+            - name: config
+              mountPath: "/src/bitbucket.com/metamorph"
       volumes:
-        - name: meta-config
+        - name: templates-vol
+          configMap:
+            name: config-templates 
+        - name: config
           configMap:
             name: metamorph-config 
       {{- with .Values.nodeSelector }}

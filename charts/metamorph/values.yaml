@@ -11,6 +11,8 @@ image:
   tag: aafc7d91e97ef4b2e7435076192a1e5b97dcf480 
   pullPolicy: IfNotPresent
 
+metamorphConfigPath: "/src/bitbucket.com/metamorph"
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
@@ -51,6 +53,7 @@ tolerations: []
 
 affinity: {}
 
-manifests:
-confgimap: true
-deployment: true
+#manifests:
+#configmap_bin: true
+#confgimap: true
+#deployment: true

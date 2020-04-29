@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: metamorph-config
-  namespace: metamorph
+  namespace: {{ .Values.namespace }}
 data:
   config.yaml: |
     database:
