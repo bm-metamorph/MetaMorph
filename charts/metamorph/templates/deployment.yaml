@@ -22,36 +22,46 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: nginx
+          image: nginx
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+        - name: {{ .Chart.Name }}-controller
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: METAMORPH_CONFIGPATH
               value: {{ .Values.metamorphConfigPath }}
           command: [ "/bin/sh", "-c" ]
-          args: [ "touch /tmp/metamorph.log; mkdir -p /tmp/iso_root/isos; mkdir -p /tmp/http_root; /metamorph controller; sleep 10; /metamorph api" ]
+          args: ["mkdir -p /tmp/db; mkdir -p /tmp/iso_root/isos; mkdir -p /tmp/http_root; /metamorph controller"]
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 4040
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-#            - name: templates-vol
-#              mountPath: "configs/templates/hwe_kernel/isolinux_txt.cfg"
-#              subPath: isolinux_txt.cfg
-#            - name: templates-vol
-#              mountPath: "/configs/templates/metamorph-client.service"
-#              subPath: metamorph-client.service
-#            - name: templates-vol
-#              mountPath: "/configs/templates/init.sh"
-#              subPath: init.sh
             - name: metamorph-config-vol
-              mountPath: "/src/bitbucket.com/metamorph"
+              mountPath: "/src/bitbucket.com/metamorph/config.yaml"
+              subPath: "config.yaml"
+        - name: {{ .Chart.Name }}-api
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: [ "/bin/sh", "-c" ]
+          args: ["/metamorph api"]
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: metamorph-config-vol
+              mountPath: "/src/bitbucket.com/metamorph/config.yaml"
+              subPath: "config.yaml"
       volumes:
-#        - name: templates-vol
-#          configMap:
-#            name: config-templates 
         - name: metamorph-config-vol
           configMap:
             name: metamorph-config 
@@ -59,11 +69,11 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-    {{- with .Values.affinity }}
+      {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
+      {{- end }}
+      {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- end }}
