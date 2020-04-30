@@ -31,9 +31,6 @@ spec:
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            - name: nginx-vol
-              mountPath: /etc/nginx/conf.d/
         - name: {{ .Chart.Name }}-controller
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -68,9 +65,6 @@ spec:
               mountPath: "/src/bitbucket.com/metamorph/config.yaml"
               subPath: "config.yaml"
       volumes:
-        - name: nginx-vol
-          configMap:
-            name: nginx
         - name: metamorph-config-vol
           configMap:
             name: metamorph-config
