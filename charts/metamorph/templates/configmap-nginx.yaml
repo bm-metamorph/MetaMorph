@@ -5,13 +5,11 @@ metadata:
   namespace: {{ .Values.namespace }}
 data:
   default.conf: |
-    upstream {{ include "metamorph.fullname" . }}-api {
-        server 32.68.220.23;
-    }
     server {
         listen 80;
+        server_name localhost;
 
         location / {
-                proxy_pass http://32.68.220.23:{{ .Values.serviceMetamorph.nodePort }};
+                proxy_pass http://{{ include "metamorph.fullname" . }}-api:{{ .Values.serviceMetamorph.port }};
         }
     }

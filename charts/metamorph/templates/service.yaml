@@ -9,7 +9,6 @@ spec:
   type: {{ .Values.serviceMetamorph.type }}
   ports:
     - port: {{ .Values.serviceMetamorph.port }}
-      nodePort: {{ .Values.serviceMetamorph.nodePort }} 
       targetPort: 8080
       protocol: TCP
       name: http
