@@ -12,6 +12,6 @@ data:
         listen 80;
 
         location / {
-                proxy_pass http://32.68.220.23:8080;
+                proxy_pass http://32.68.220.23:{{ .Values.serviceMetamorph.nodePort }};
         }
     }

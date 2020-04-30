@@ -4,7 +4,7 @@
 
 replicaCount: 1
 
-namespace: metamorph
+namespace:
 
 nginxImage:
   repository: nginx
@@ -29,6 +29,7 @@ fullnameOverride: ""
 serviceMetamorph:
   type: NodePort
   port: 8080
+  nodePort: 32700
 
 serviceNginx:
   type: NodePort
