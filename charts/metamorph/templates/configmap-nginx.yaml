@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx
+  namespace: {{ .Values.namespace }}
+data:
+  default.conf: |
+    upstream {{ include "metamorph.fullname" . }}-api {
+        server 32.68.220.23;
+    }
+    server {
+        listen 80;
+
+        location / {
+                proxy_pass http://32.68.220.23:8080;
+        }
+    }

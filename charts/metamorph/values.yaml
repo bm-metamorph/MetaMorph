@@ -26,9 +26,13 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-service:
+serviceMetamorph:
   type: NodePort
   port: 8080
+
+serviceNginx:
+  type: NodePort
+  port: 80
 
 ingress:
   enabled: false

@@ -1,14 +1,33 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "metamorph.fullname" . }}
+  name: {{ include "metamorph.fullname" . }}-api
   labels:
 {{ include "metamorph.labels" . | indent 4 }}
   namespace: {{ .Values.namespace }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.serviceMetamorph.type }}
   ports:
-    - port: {{ .Values.service.port }}
+    - port: {{ .Values.serviceMetamorph.port }}
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "metamorph.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "metamorph.fullname" . }}-nginx
+  labels:
+{{ include "metamorph.labels" . | indent 4 }}
+  namespace: {{ .Values.namespace }}
+spec:
+  type: {{ .Values.serviceNginx.type }}
+  ports:
+    - port: {{ .Values.serviceNginx.port }}
       targetPort: 80
       protocol: TCP
       name: http
