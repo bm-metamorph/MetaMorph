@@ -6,6 +6,10 @@ replicaCount: 1
 
 namespace: metamorph
 
+nginxImage:
+  repository: nginx
+  tag: latest
+
 image:
   repository: metamorph-test
   tag: latest
@@ -15,6 +19,7 @@ image:
 #aafc7d91e97ef4b2e7435076192a1e5b97dcf480
 #metamorph-test:latest
 
+#do not change the config path
 metamorphConfigPath: "/src/bitbucket.com/metamorph"
 
 imagePullSecrets: []
