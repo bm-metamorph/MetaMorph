@@ -116,7 +116,7 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	iso_tempdir := config.Get("iso.tempdir").(string)
 
 	iso_DownloadFullpath := path.Join(iso_tempdir, iso_name)
-	iso_DestinationFullpath := path.Join(iso_rootpath, iso_name)
+	iso_DestinationFullpath := path.Join(iso_rootpath, bmhnode.NodeUUID.String(),iso_name)
 
 	if _, err := os.Stat(iso_DownloadFullpath); os.IsNotExist(err) {
 		err = os.MkdirAll(iso_tempdir,os.ModePerm)

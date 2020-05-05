@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestgetDiskSpaceinMB(t *testing.T) {
+func TestGetDiskSpaceinMB(t *testing.T) {
 	dspace, maxdspace, _ := getDiskSpaceinMB(">300g")
 	fmt.Printf("%s, %s", dspace, maxdspace)
 }
