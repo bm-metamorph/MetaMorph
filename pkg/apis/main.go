@@ -7,6 +7,7 @@ import(
 	"net/http"
 	"log"
 	"google.golang.org/grpc"
+	
 )
 
 func grpcClient() ( proto.NodeServiceClient) {
@@ -106,12 +107,29 @@ func listNodes(ctx *gin.Context){
 
 }
 
+func getUUID(ctx *gin.Context){
+	client := grpcClient()
+	data,_ := ctx.GetRawData()
+	req := &proto.Request{NodeSpec: data }
+	if response, err := client.GetNodeUUID(ctx, req); err == nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"result": fmt.Sprint(response.Result),
+		})
+	} else {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+	}
+
+}
+	
 
 func Serve() {
 
 	r :=  gin.Default()
 
 	r.GET("/nodes", listNodes)
+	r.POST("/uuid", getUUID)
 	node := r.Group("/node")
 	{
 		node.POST("/", createNode)

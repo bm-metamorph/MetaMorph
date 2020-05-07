@@ -33,7 +33,7 @@ type Node struct {
 	RAIDFirmwareVersion  string
 	FirmwareVersion      string
 	VirtualDisks         []VirtualDisk
-	State                string
+	State                string `gorm:"DEFAULT:new"`
 	ProvisioningIP       string
 	ProvisionerPort      int
 	HTTPPort             int 

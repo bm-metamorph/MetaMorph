@@ -1,12 +1,15 @@
 package controller
 
-import(
+import (
 	"context"
-	"bitbucket.com/metamorph/proto"
-	"bitbucket.com/metamorph/pkg/db/models/node"
-	"net"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"net"
 
+	"bitbucket.com/metamorph/pkg/db/models/node"
+	"bitbucket.com/metamorph/pkg/drivers/redfish"
+	"bitbucket.com/metamorph/proto"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -31,9 +34,9 @@ func Serve() {
 
 }
 
-func (s *server) Describe( ctx context.Context, request *proto.Request ) ( *proto.Response, error) {
+func (s *server) Describe(ctx context.Context, request *proto.Request) (*proto.Response, error) {
 
-	nodeId:= request.GetNodeID()
+	nodeId := request.GetNodeID()
 	result, err := node.Describe(nodeId)
 	if err != nil {
 		return &proto.Response{Res: nil}, err
@@ -41,17 +44,17 @@ func (s *server) Describe( ctx context.Context, request *proto.Request ) ( *prot
 	return &proto.Response{Res: result}, nil
 }
 
-func (s *server) Deploy( ctx context.Context, request *proto.Request ) ( *proto.Response, error) {
+func (s *server) Deploy(ctx context.Context, request *proto.Request) (*proto.Response, error) {
 
-	nodeId:= request.GetNodeID()
+	nodeId := request.GetNodeID()
 	fmt.Println(nodeId)
 	result := nodeId
 	return &proto.Response{Result: result}, nil
 }
 
-func (s *server) Create( ctx context.Context, request *proto.Request ) ( *proto.Response, error) {
+func (s *server) Create(ctx context.Context, request *proto.Request) (*proto.Response, error) {
 
-	NodeSpec:= request.GetNodeSpec()
+	NodeSpec := request.GetNodeSpec()
 	fmt.Println(string(NodeSpec))
 	result := "Creating node"
 	result, err := node.Create(NodeSpec)
@@ -61,17 +64,20 @@ func (s *server) Create( ctx context.Context, request *proto.Request ) ( *proto.
 	return &proto.Response{Result: result}, nil
 }
 
-func (s *server) Update( ctx context.Context, request *proto.Request ) ( *proto.Response, error) {
+func (s *server) Update(ctx context.Context, request *proto.Request) (*proto.Response, error) {
 	NodeSpec := request.GetNodeSpec()
 	nodeId := request.GetNodeID()
-	fmt.Println(string(NodeSpec))
+	//fmt.Println(string(NodeSpec))
 	fmt.Println(nodeId)
-	result := "Updating node"
-	return &proto.Response{Result: result}, nil
+	err := node.UpdateRaw(nodeId,NodeSpec)
+	if err == nil {
+	    return &proto.Response{Result: "Update successful"}, nil
+
+	}
+	    return &proto.Response{Result: "Update failed"}, err 
 }
 
-
-func (s *server) Delete( ctx context.Context, request *proto.Request ) ( *proto.Response, error) {
+func (s *server) Delete(ctx context.Context, request *proto.Request) (*proto.Response, error) {
 
 	nodeId := request.GetNodeID()
 	fmt.Println(nodeId)
@@ -79,9 +85,34 @@ func (s *server) Delete( ctx context.Context, request *proto.Request ) ( *proto.
 	return &proto.Response{Result: result}, nil
 }
 
-func (s *server) List( ctx context.Context, request *proto.Request ) ( *proto.Response, error) {
+func (s *server) List(ctx context.Context, request *proto.Request) (*proto.Response, error) {
 
 	result := "List of  nodes"
 	return &proto.Response{Result: result}, nil
 
 }
+
+func (s *server) GetNodeUUID(ctx context.Context, request *proto.Request) (*proto.Response, error) {
+
+	nodeInfo := new(struct {
+		IPMIIP       string
+		IPMIUser     string
+		IPMIPassword string
+	})
+
+	var result string
+	data := request.GetNodeSpec()
+
+	err := json.Unmarshal(data, &nodeInfo)
+	if err == nil {
+		if uuid, _ := redfish.GetUUID(nodeInfo.IPMIIP, nodeInfo.IPMIUser, nodeInfo.IPMIPassword); uuid != "" {
+			result = uuid
+		} else {
+			err = errors.New(fmt.Sprintf("Failed to retrieve UUID from node for IPMI IP : %v", nodeInfo.IPMIIP))
+			result = ""
+		}
+	}
+	return &proto.Response{Result: result}, err
+
+}
+
