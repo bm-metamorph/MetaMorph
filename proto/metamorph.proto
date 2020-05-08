@@ -5,6 +5,8 @@ package proto;
 message Request {
     string NodeID = 1;
     bytes NodeSpec = 2;  
+    bytes Task = 3;
+    string NodeState = 4;
 }
 
 
@@ -23,3 +25,12 @@ service NodeService {
     rpc Deploy(Request) returns (Response);
 
 }
+
+
+service AgentService {
+    rpc GetTasks(Request) returns (Response);
+    rpc UpdateTaskStatus(Request) returns (Response);
+    rpc UpdateNodeState(Request) returns (Response);
+}
+
+

@@ -98,6 +98,10 @@ oem-config      oem-config/steps        multiselect language, timezone, keyboard
 d-i  base-installer/kernel/altmeta   string hwe-18.04
 d-i preseed/late_command string cp /cdrom/setup/install/init.sh  /target/root/ \
   && cp /cdrom/setup/install/50-cloud-init.yaml  /target/etc/netplan/50-cloud-init.yaml \
+  && in-target mkdir -p   /opt/metamorph/bin/ \
+  && cp /cdrom/setup/install/agent_config.yaml  /target/opt/metamorph/config.yaml \
+  && cp /cdrom/setup/install/metamorph_agent /target/opt/metamorph/bin/metamorph_agent \
+  && in-target chmod u+x /opt/metamorph/bin/metamorph_agent \
   && cp /cdrom/setup/install/metamorph-client.service  /target/etc/systemd/system/metamorph-client.service \
   && cp /cdrom/setup/install/grub.conf  /target/etc/default/grub \
   && chmod u+x /target/root/init.sh \

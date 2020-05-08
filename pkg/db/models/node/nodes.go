@@ -28,6 +28,7 @@ func getDB() *gorm.DB {
 		&BondParameter{},
 		&VirtualDisk{},
 		&PhysicalDisk{},
+		&BootAction{},
 	)
 	return db
 }
@@ -126,6 +127,24 @@ func GetVirtualDisks(node_uuid string) ([]VirtualDisk, error) {
 	}
 }
 
+
+func GetBootActions(node_uuid string) ([]byte, error) {
+	node := Node{}
+	bootactions := []BootAction{}
+
+	db := getDB()
+	defer db.Close()
+	node_uuid1,_ := uuid.Parse(node_uuid)
+	db.Where("node_uuid = ?", node_uuid1).First(&node)
+	db.Model(&node).Where("status = ?", "new").Order("priority").Related(&bootactions)
+	if len(bootactions) > 0 {
+		res, _ := json.Marshal(bootactions)
+		return res, nil
+	} else {
+		return nil, errors.New("No Record Found")
+	}
+}
+
 func GetPhysicalDisks(virtualDiskID uint) ([]PhysicalDisk, error) {
 
 	vdisk := VirtualDisk{}
@@ -205,6 +224,13 @@ func Update(node *Node) error {
 	db := getDB()
 	defer db.Close()
 	err := db.Save(node).Error
+	return err
+}
+
+func UpdateTaskStatus(task *BootAction) error{
+	db := getDB()
+	defer db.Close()
+	err := db.Save(task).Error
 	return err
 }
 

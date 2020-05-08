@@ -1,4 +1,6 @@
 #!/bin/bash
+echo "Depecrated. Will be removed from Future release."
+echo "This is script is replaced by Boot Actions and Metamorph Agent"
 sleep 30
 curl -d '{ "UUID" : "{{.NodeUUID}}", "Name": "demo-provisioning","DeployStatus": "OSINSTALLED" }' -H "Content-Type: application/json" -X  POST http://{{.ProvisioningIP}}:{{.ProvisionerPort}}/nodes/{{.NodeUUID}}
 
