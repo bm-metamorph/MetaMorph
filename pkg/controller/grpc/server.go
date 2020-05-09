@@ -69,12 +69,12 @@ func (s *server) Update(ctx context.Context, request *proto.Request) (*proto.Res
 	nodeId := request.GetNodeID()
 	//fmt.Println(string(NodeSpec))
 	fmt.Println(nodeId)
-	err := node.UpdateRaw(nodeId,NodeSpec)
+	err := node.UpdateRaw(nodeId, NodeSpec)
 	if err == nil {
-	    return &proto.Response{Result: "Update successful"}, nil
+		return &proto.Response{Result: "Update successful"}, nil
 
 	}
-	    return &proto.Response{Result: "Update failed"}, err 
+	return &proto.Response{Result: "Update failed"}, err
 }
 
 func (s *server) Delete(ctx context.Context, request *proto.Request) (*proto.Response, error) {
@@ -116,3 +116,61 @@ func (s *server) GetNodeUUID(ctx context.Context, request *proto.Request) (*prot
 
 }
 
+func (s *server) GetHWStatus(ctx context.Context, request *proto.Request) (*proto.Response, error) {
+	nodeId := request.GetNodeID()
+	data, err := node.Describe(nodeId)
+	if err != nil {
+		return &proto.Response{Res: nil}, err
+	}
+	var node node.Node
+	var result string = "Off"
+	err = json.Unmarshal(data, &node)
+	if err != nil {
+		return &proto.Response{Res: nil}, err
+	}
+	redfishClient := &redfish.BMHNode{&node}
+	status := redfishClient.GetPowerStatus()
+	if status == true {
+		result = "On"
+	}
+
+	return &proto.Response{Result: result}, nil
+
+}
+func (s *server) UpdateHWStatus(ctx context.Context, request *proto.Request) (*proto.Response, error) {
+	data := request.GetNodeSpec()
+	nodeId := request.GetNodeID()
+	nodeInfoBytes, err := node.Describe(nodeId)
+	if err != nil {
+		return &proto.Response{Result: ""}, err
+	}
+	var node node.Node
+	var status bool
+	err = json.Unmarshal(nodeInfoBytes, &node)
+	if err != nil {
+		return &proto.Response{Result: ""}, err
+	}
+	redfishClient := &redfish.BMHNode{&node}
+
+	hwInfo := new(struct {
+		PowerState string
+	})
+	err = json.Unmarshal(data, &hwInfo)
+	if err != nil {
+		return &proto.Response{Result: ""}, err
+	}
+	if hwInfo.PowerState == "On" {
+		status = redfishClient.PowerOn()
+		if status == false {
+			return &proto.Response{Result: ""}, errors.New("Failed to Power On")
+		}
+	} else if hwInfo.PowerState == "Off" {
+		status = redfishClient.PowerOff()
+		if status == false {
+			return &proto.Response{Result: ""}, errors.New("Failed to Power Off")
+		}
+
+	}
+
+	return &proto.Response{Result: "Successfull"}, nil
+}

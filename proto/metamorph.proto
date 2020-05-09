@@ -22,5 +22,7 @@ service NodeService {
     rpc List(Request) returns (Response);
     rpc Deploy(Request) returns (Response);
     rpc GetNodeUUID(Request) returns (Response);
+    rpc GetHWStatus(Request) returns (Response);
+    rpc UpdateHWStatus(Request) returns (Response);
 
 }

@@ -151,7 +151,7 @@ var file_proto_metamorph_proto_rawDesc = []byte{
 	0x08, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x65, 0x73,
 	0x75, 0x6c, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x65, 0x73, 0x75, 0x6c,
 	0x74, 0x12, 0x10, 0x0a, 0x03, 0x72, 0x65, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x03,
-	0x72, 0x65, 0x73, 0x32, 0xbf, 0x02, 0x0a, 0x0b, 0x4e, 0x6f, 0x64, 0x65, 0x53, 0x65, 0x72, 0x76,
+	0x72, 0x65, 0x73, 0x32, 0xa2, 0x03, 0x0a, 0x0b, 0x4e, 0x6f, 0x64, 0x65, 0x53, 0x65, 0x72, 0x76,
 	0x69, 0x63, 0x65, 0x12, 0x29, 0x0a, 0x06, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x12, 0x0e, 0x2e,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0f, 0x2e,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b,
@@ -171,7 +171,13 @@ var file_proto_metamorph_proto_rawDesc = []byte{
 	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2e, 0x0a, 0x0b, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65,
 	0x55, 0x55, 0x49, 0x44, 0x12, 0x0e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65, 0x71,
 	0x75, 0x65, 0x73, 0x74, 0x1a, 0x0f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2e, 0x0a, 0x0b, 0x47, 0x65, 0x74, 0x48, 0x57, 0x53, 0x74,
+	0x61, 0x74, 0x75, 0x73, 0x12, 0x0e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x0f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x31, 0x0a, 0x0e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x48,
+	0x57, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x0e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -199,15 +205,19 @@ var file_proto_metamorph_proto_depIdxs = []int32{
 	0, // 4: proto.NodeService.List:input_type -> proto.Request
 	0, // 5: proto.NodeService.Deploy:input_type -> proto.Request
 	0, // 6: proto.NodeService.GetNodeUUID:input_type -> proto.Request
-	1, // 7: proto.NodeService.Create:output_type -> proto.Response
-	1, // 8: proto.NodeService.Describe:output_type -> proto.Response
-	1, // 9: proto.NodeService.Update:output_type -> proto.Response
-	1, // 10: proto.NodeService.Delete:output_type -> proto.Response
-	1, // 11: proto.NodeService.List:output_type -> proto.Response
-	1, // 12: proto.NodeService.Deploy:output_type -> proto.Response
-	1, // 13: proto.NodeService.GetNodeUUID:output_type -> proto.Response
-	7, // [7:14] is the sub-list for method output_type
-	0, // [0:7] is the sub-list for method input_type
+	0, // 7: proto.NodeService.GetHWStatus:input_type -> proto.Request
+	0, // 8: proto.NodeService.UpdateHWStatus:input_type -> proto.Request
+	1, // 9: proto.NodeService.Create:output_type -> proto.Response
+	1, // 10: proto.NodeService.Describe:output_type -> proto.Response
+	1, // 11: proto.NodeService.Update:output_type -> proto.Response
+	1, // 12: proto.NodeService.Delete:output_type -> proto.Response
+	1, // 13: proto.NodeService.List:output_type -> proto.Response
+	1, // 14: proto.NodeService.Deploy:output_type -> proto.Response
+	1, // 15: proto.NodeService.GetNodeUUID:output_type -> proto.Response
+	1, // 16: proto.NodeService.GetHWStatus:output_type -> proto.Response
+	1, // 17: proto.NodeService.UpdateHWStatus:output_type -> proto.Response
+	9, // [9:18] is the sub-list for method output_type
+	0, // [0:9] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -283,6 +293,8 @@ type NodeServiceClient interface {
 	List(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	Deploy(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	GetNodeUUID(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	GetHWStatus(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	UpdateHWStatus(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 }
 
 type nodeServiceClient struct {
@@ -356,6 +368,24 @@ func (c *nodeServiceClient) GetNodeUUID(ctx context.Context, in *Request, opts .
 	return out, nil
 }
 
+func (c *nodeServiceClient) GetHWStatus(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/proto.NodeService/GetHWStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) UpdateHWStatus(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/proto.NodeService/UpdateHWStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NodeServiceServer is the server API for NodeService service.
 type NodeServiceServer interface {
 	Create(context.Context, *Request) (*Response, error)
@@ -365,6 +395,8 @@ type NodeServiceServer interface {
 	List(context.Context, *Request) (*Response, error)
 	Deploy(context.Context, *Request) (*Response, error)
 	GetNodeUUID(context.Context, *Request) (*Response, error)
+	GetHWStatus(context.Context, *Request) (*Response, error)
+	UpdateHWStatus(context.Context, *Request) (*Response, error)
 }
 
 // UnimplementedNodeServiceServer can be embedded to have forward compatible implementations.
@@ -391,6 +423,12 @@ func (*UnimplementedNodeServiceServer) Deploy(context.Context, *Request) (*Respo
 }
 func (*UnimplementedNodeServiceServer) GetNodeUUID(context.Context, *Request) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNodeUUID not implemented")
+}
+func (*UnimplementedNodeServiceServer) GetHWStatus(context.Context, *Request) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetHWStatus not implemented")
+}
+func (*UnimplementedNodeServiceServer) UpdateHWStatus(context.Context, *Request) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateHWStatus not implemented")
 }
 
 func RegisterNodeServiceServer(s *grpc.Server, srv NodeServiceServer) {
@@ -523,6 +561,42 @@ func _NodeService_GetNodeUUID_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NodeService_GetHWStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).GetHWStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.NodeService/GetHWStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).GetHWStatus(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_UpdateHWStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).UpdateHWStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.NodeService/UpdateHWStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).UpdateHWStatus(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _NodeService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "proto.NodeService",
 	HandlerType: (*NodeServiceServer)(nil),
@@ -554,6 +628,14 @@ var _NodeService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetNodeUUID",
 			Handler:    _NodeService_GetNodeUUID_Handler,
+		},
+		{
+			MethodName: "GetHWStatus",
+			Handler:    _NodeService_GetHWStatus_Handler,
+		},
+		{
+			MethodName: "UpdateHWStatus",
+			Handler:    _NodeService_UpdateHWStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

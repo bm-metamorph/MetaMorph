@@ -37,6 +37,24 @@ func (bhmnode *BMHNode) Reboot() bool {
 	return result
 }
 
+func (bhmnode *BMHNode) PowerOff() bool {
+	redfishClient := getRedfishClient(bhmnode)
+	result := redfishClient.PowerOff(config.Get("idrac.systemID").(string))
+	return result
+}
+
+func (bhmnode *BMHNode) PowerOn() bool {
+	redfishClient := getRedfishClient(bhmnode)
+	result := redfishClient.PowerOn(config.Get("idrac.systemID").(string))
+	return result
+}
+
+func (bhmnode *BMHNode) GetPowerStatus() bool {
+	redfishClient := getRedfishClient(bhmnode)
+	result := redfishClient.GetPowerStatus(config.Get("idrac.systemID").(string))
+	return result
+}
+
 func (bmhnode *BMHNode) EjectISO() bool {
 	var result bool
 	redfishClient := getRedfishClient(bmhnode)

@@ -267,6 +267,8 @@ github.com/manojkva/go-redfish-api-wrapper v1.0.2 h1:BYp1SzKI7BRkhgrKopla0msHBy3
 github.com/manojkva/go-redfish-api-wrapper v1.0.2/go.mod h1:6FufdmPIfDSBbBrYjK4anPsKfJQK2vNud7R/tNEFcvk=
 github.com/manojkva/go-redfish-api-wrapper v1.0.3 h1:1f2vqsd4bE8xmtPBOldYH/Rq5jVDiM0XOyc1O11kR9s=
 github.com/manojkva/go-redfish-api-wrapper v1.0.3/go.mod h1:6FufdmPIfDSBbBrYjK4anPsKfJQK2vNud7R/tNEFcvk=
+github.com/manojkva/go-redfish-api-wrapper v1.0.4 h1:uulbXg+NUyAiB+xm1+8dEcTWN8hgS7me8S/w8ihEfzI=
+github.com/manojkva/go-redfish-api-wrapper v1.0.4/go.mod h1:6FufdmPIfDSBbBrYjK4anPsKfJQK2vNud7R/tNEFcvk=
 github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
 github.com/mattn/go-isatty v0.0.4/go.mod h1:M+lRXTBqGeGNdLjl/ufCoiOlB5xdOkqRJdNxMWT7Zi4=
 github.com/mattn/go-isatty v0.0.12 h1:wuysRhFDzyxgEmMf5xjvJ2M9dZoWAXNNr5LSBS7uHXY=

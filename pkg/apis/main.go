@@ -1,26 +1,27 @@
 package api
 
-import(
-	"fmt"
+import (
 	"bitbucket.com/metamorph/proto"
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"log"
 	"google.golang.org/grpc"
-	
+	"log"
+	"net/http"
 )
 
-func grpcClient() ( proto.NodeServiceClient) {
-	conn, err := grpc.Dial( "localhost:4040", grpc.WithInsecure() )
-	if err != nil { panic(err) }
-	client := proto.NewNodeServiceClient(conn) 
+func grpcClient() proto.NodeServiceClient {
+	conn, err := grpc.Dial("localhost:4040", grpc.WithInsecure())
+	if err != nil {
+		panic(err)
+	}
+	client := proto.NewNodeServiceClient(conn)
 	return client
 }
 
- func createNode(ctx *gin.Context){
+func createNode(ctx *gin.Context) {
 	client := grpcClient()
-	data,_ := ctx.GetRawData()
-	req := &proto.Request{NodeSpec: data }
+	data, _ := ctx.GetRawData()
+	req := &proto.Request{NodeSpec: data}
 	if response, err := client.Create(ctx, req); err == nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"result": fmt.Sprint(response.Result),
@@ -32,7 +33,7 @@ func grpcClient() ( proto.NodeServiceClient) {
 	}
 }
 
-func describeNode(ctx *gin.Context){
+func describeNode(ctx *gin.Context) {
 	client := grpcClient()
 	node_id := ctx.Param("node_id")
 	fmt.Println(node_id)
@@ -46,11 +47,11 @@ func describeNode(ctx *gin.Context){
 	}
 }
 
-func updateNode(ctx *gin.Context){
+func updateNode(ctx *gin.Context) {
 	client := grpcClient()
 	node_id := ctx.Param("node_id")
-	data,_ := ctx.GetRawData()
-	req := &proto.Request{NodeID: string(node_id), NodeSpec: data }
+	data, _ := ctx.GetRawData()
+	req := &proto.Request{NodeID: string(node_id), NodeSpec: data}
 	if response, err := client.Update(ctx, req); err == nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"result": fmt.Sprint(response.Result),
@@ -62,7 +63,7 @@ func updateNode(ctx *gin.Context){
 	}
 }
 
-func deleteNode(ctx *gin.Context){
+func deleteNode(ctx *gin.Context) {
 	client := grpcClient()
 	node_id := ctx.Param("node_id")
 	req := &proto.Request{NodeID: string(node_id)}
@@ -77,7 +78,7 @@ func deleteNode(ctx *gin.Context){
 	}
 }
 
-func deployNode(ctx *gin.Context){
+func deployNode(ctx *gin.Context) {
 	client := grpcClient()
 	node_id := ctx.Param("node_id")
 	req := &proto.Request{NodeID: string(node_id)}
@@ -92,7 +93,7 @@ func deployNode(ctx *gin.Context){
 	}
 }
 
-func listNodes(ctx *gin.Context){
+func listNodes(ctx *gin.Context) {
 	client := grpcClient()
 	req := &proto.Request{}
 	if response, err := client.List(ctx, req); err == nil {
@@ -107,10 +108,10 @@ func listNodes(ctx *gin.Context){
 
 }
 
-func getUUID(ctx *gin.Context){
+func getUUID(ctx *gin.Context) {
 	client := grpcClient()
-	data,_ := ctx.GetRawData()
-	req := &proto.Request{NodeSpec: data }
+	data, _ := ctx.GetRawData()
+	req := &proto.Request{NodeSpec: data}
 	if response, err := client.GetNodeUUID(ctx, req); err == nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"result": fmt.Sprint(response.Result),
@@ -122,14 +123,46 @@ func getUUID(ctx *gin.Context){
 	}
 
 }
-	
+
+func getNodeHWStatus(ctx *gin.Context) {
+	client := grpcClient()
+	node_id := ctx.Param("node_id")
+
+	req := &proto.Request{NodeID: string(node_id)}
+	if response, err := client.GetHWStatus(ctx, req); err == nil {
+		ctx.Data(http.StatusOK, gin.MIMEJSON, response.Res)
+	} else {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+	}
+}
+
+func updateNodeHWStatus(ctx *gin.Context) {
+	client := grpcClient()
+	node_id := ctx.Param("node_id")
+	data, _ := ctx.GetRawData()
+	req := &proto.Request{NodeID: string(node_id), NodeSpec: data}
+	if response, err := client.UpdateHWStatus(ctx, req); err == nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"result": fmt.Sprint(response.Result),
+		})
+	} else {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+	}
+
+}
 
 func Serve() {
 
-	r :=  gin.Default()
+	r := gin.Default()
 
 	r.GET("/nodes", listNodes)
 	r.POST("/uuid", getUUID)
+	r.GET("/hwstatus/:node_id", getNodeHWStatus)
+	r.PUT("/hwstatus/:node_id", updateNodeHWStatus)
 	node := r.Group("/node")
 	{
 		node.POST("/", createNode)
@@ -144,4 +177,3 @@ func Serve() {
 	}
 
 }
-
