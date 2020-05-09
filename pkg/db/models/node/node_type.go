@@ -12,6 +12,8 @@ type Node struct {
 	NodeUUID             uuid.UUID
 	Name                 string
 	ImageURL             string
+	ChecksumURL          string
+    DisableCertVerification bool
 	ImageReadilyAvailable bool
 	OamIP                string
 	OamGateway           string
