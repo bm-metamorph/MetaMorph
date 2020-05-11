@@ -123,16 +123,16 @@ func (s *server) GetNodeUUID(ctx context.Context, request *proto.Request) (*prot
 }
 
 func (s *server) GetHWStatus(ctx context.Context, request *proto.Request) (*proto.Response, error) {
+	var result string = "Off"
 	nodeId := request.GetNodeID()
 	data, err := node.Describe(nodeId)
 	if err != nil {
-		return &proto.Response{Res: nil}, err
+		return &proto.Response{Result: result}, err
 	}
 	var node node.Node
-	var result string = "Off"
 	err = json.Unmarshal(data, &node)
 	if err != nil {
-		return &proto.Response{Res: nil}, err
+		return &proto.Response{Result: result}, err
 	}
 	redfishClient := &redfish.BMHNode{&node}
 	status := redfishClient.GetPowerStatus()

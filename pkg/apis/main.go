@@ -130,7 +130,7 @@ func getNodeHWStatus(ctx *gin.Context) {
 
 	req := &proto.Request{NodeID: string(node_id)}
 	if response, err := client.GetHWStatus(ctx, req); err == nil {
-		ctx.Data(http.StatusOK, gin.MIMEJSON, response.Res)
+		ctx.JSON(http.StatusOK, gin.H{"result": fmt.Sprint(response.Result)})
 	} else {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
