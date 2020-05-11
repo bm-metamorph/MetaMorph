@@ -37,6 +37,7 @@ const (
 	DEPLOYING      = "deploying"
 	FAILED         = "failed"
 	INTRANSITION   = "in-transition"
+    USERDATALOADED = "userdataloaded"
 )
 
 type NodeStatus struct {

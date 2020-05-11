@@ -79,10 +79,16 @@ func (s *server) Update(ctx context.Context, request *proto.Request) (*proto.Res
 
 func (s *server) Delete(ctx context.Context, request *proto.Request) (*proto.Response, error) {
 
+	var result string
+
 	nodeId := request.GetNodeID()
 	fmt.Println(nodeId)
-	result := "Deleting  node"
-	return &proto.Response{Result: result}, nil
+	err := node.Delete(nodeId)
+	if err != nil {
+		result = "Failed"
+	}
+	result = "Successful"
+	return &proto.Response{Result: result}, err
 }
 
 func (s *server) List(ctx context.Context, request *proto.Request) (*proto.Response, error) {

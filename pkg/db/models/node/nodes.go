@@ -202,6 +202,22 @@ func Describe(node_uuid string) ([]byte, error) {
 		return nil, errors.New("Node not found")
 	}
 }
+
+func Delete(node_uuid string) (error){
+	node := Node{}
+	db  := getDB()
+	defer db.Close()
+
+	node_uuid1, _ := uuid.Parse(node_uuid)
+	err := db.Where("node_uuid = ?", node_uuid1).First(&node).Error
+	if err == nil{
+		err = db.Delete(&node).Error
+	}
+	return err
+
+
+
+}
 /*
 func Update(node *Node) error {
 	db := getDB()
