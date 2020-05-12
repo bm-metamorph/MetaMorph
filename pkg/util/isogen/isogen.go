@@ -330,11 +330,11 @@ func (bmhnode *BMHNode) RepackageISO(iso_DestinationFullpath string) error {
 		return fmt.Errorf("Failed creating iso image with error : %v", err)
 	}
 
-	bmhnode.ImageURL = "http://" + config.Get("provisioning.ip").(string) + ":" +
+	imageURL := "http://" + config.Get("provisioning.ip").(string) + ":" +
 	                               strconv.Itoa(config.Get("provisioning.httpport").(int)) + "/" + image_name
 
 	// Update the DB with ImageURL
-	node.Update(bmhnode.Node)
+	node.Update(&node.Node{ImageURL: imageURL})
 
 	// TODO : PROVISIONING IP etc moved to config ?
 	return nil

@@ -34,7 +34,7 @@ func getRedfishClient(bmhnode *BMHNode) client.IdracRedfishClient {
 func (bmhnode *BMHNode) CleanVirtualDIskIfEExists() bool {
 	var result bool = false
 	redfishClient := getRedfishClient(bmhnode)
-	virtualdisklist, err  := node.GetVirtualDisks(bmhnode.NodeUUID.String())
+	virtualdisklist, err := node.GetVirtualDisks(bmhnode.NodeUUID.String())
 	if err != nil {
 		fmt.Printf("Virtual disk list is empty with err %v\n", err)
 		return false
@@ -64,7 +64,7 @@ func (bmhnode *BMHNode) CreateVirtualDisks() bool {
 	redfishClient := getRedfishClient(bmhnode)
 	raidLevelMap := getSupportedRAIDLevels()
 
-	virtualdisklist, err  := node.GetVirtualDisks(bmhnode.NodeUUID.String())
+	virtualdisklist, err := node.GetVirtualDisks(bmhnode.NodeUUID.String())
 	if err != nil {
 		fmt.Printf("Virtual disk list is empty with err %v\n", err)
 		return false
@@ -75,7 +75,7 @@ func (bmhnode *BMHNode) CreateVirtualDisks() bool {
 		var diskIDs []string
 		physicaldisklist, err := node.GetPhysicalDisks(vd.ID)
 
-		if err != nil{
+		if err != nil {
 			fmt.Printf("Failed to retrieve physical disks with error %v", err)
 			return false
 		}
@@ -87,10 +87,14 @@ func (bmhnode *BMHNode) CreateVirtualDisks() bool {
 
 		jobId := redfishClient.CreateVirtualDisk(config.Get("idrac.systemID").(string),
 			vd.RaidController, volumeType, vd.DiskName, diskIDs)
-			
+
 		fmt.Printf("Job Id returned is %v\n", jobId)
 		//check Job Status to decide on return value
-        result  = redfishClient.CheckJobStatus(jobId)
+		if jobId != "" {
+			result = redfishClient.CheckJobStatus(jobId)
+		} else {
+			result = false
+		}
 
 		if result != true {
 			return result

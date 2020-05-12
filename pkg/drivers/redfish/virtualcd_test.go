@@ -53,3 +53,17 @@ func TestEjectISO(t *testing.T){
 	assert.Equal(t, res,true)
 
 }
+
+func TestPowerOff(t *testing.T){
+	bmhnode := &BMHNode { node.CreateTestNode()}
+	res := bmhnode.PowerOff()
+	assert.Equal(t, res, true)
+
+}
+
+func TestPowerOn(t *testing.T){
+	bmhnode := &BMHNode { node.CreateTestNode()}
+	res := bmhnode.PowerOn()
+	assert.Equal(t, res, true)
+
+}

@@ -23,14 +23,14 @@ service NodeService {
     rpc Delete(Request) returns (Response);
     rpc List(Request) returns (Response);
     rpc Deploy(Request) returns (Response);
+    rpc GetNodeUUID(Request) returns (Response);
+    rpc GetHWStatus(Request) returns (Response);
+    rpc UpdateHWStatus(Request) returns (Response);
 
 }
-
 
 service AgentService {
     rpc GetTasks(Request) returns (Response);
     rpc UpdateTaskStatus(Request) returns (Response);
     rpc UpdateNodeState(Request) returns (Response);
 }
-
-

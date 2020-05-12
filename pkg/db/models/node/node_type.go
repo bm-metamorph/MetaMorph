@@ -12,6 +12,8 @@ type Node struct {
 	NodeUUID             uuid.UUID
 	Name                 string
 	ImageURL             string
+	ChecksumURL          string
+    DisableCertVerification bool
 	ImageReadilyAvailable bool
 	OamIP                string
 	OamGateway           string
@@ -33,7 +35,7 @@ type Node struct {
 	RAIDFirmwareVersion  string
 	FirmwareVersion      string
 	VirtualDisks         []VirtualDisk
-	State                string
+	State                string `gorm:"DEFAULT:new"`
 	ProvisioningIP       string
 	ProvisionerPort      int
 	HTTPPort             int

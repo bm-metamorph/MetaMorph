@@ -1,14 +1,16 @@
 package node
 
 import (
-	"bitbucket.com/metamorph/pkg/config"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+
+	"bitbucket.com/metamorph/pkg/config"
+//	"bitbucket.com/metamorph/pkg/drivers/redfish"
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"io/ioutil"
 )
 
 func getDB() *gorm.DB {
@@ -42,7 +44,7 @@ func GetNodes() ([]Node, error) {
 	db := getDB()
 	defer db.Close()
 	//db.Find(&nodes)
-	db.Not("state", []string{"failed", "in-transition", "deploying"}).Find(&nodes)
+	db.Not("state", []string{"failed", "in-transition", "deploying", "readywait", "setupreadywait"}).Find(&nodes)
 	if len(nodes) > 0 {
 		return nodes, nil
 	} else {
@@ -220,11 +222,49 @@ func Describe(node_uuid string) ([]byte, error) {
 	}
 }
 
+func Delete(node_uuid string) (error){
+	node := Node{}
+	db  := getDB()
+	defer db.Close()
+
+	node_uuid1, _ := uuid.Parse(node_uuid)
+	err := db.Where("node_uuid = ?", node_uuid1).First(&node).Error
+	if err == nil{
+		err = db.Delete(&node).Error
+	}
+	return err
+
+
+
+}
+/*
 func Update(node *Node) error {
 	db := getDB()
 	defer db.Close()
 	err := db.Save(node).Error
 	return err
+}
+*/
+/*
+func UpdateRaw(node_uuid string, data []byte )error{
+	var node Node
+	err := json.Unmarshal(data, &node)
+	if err == nil {
+		err = Update(node_uuid, &node)
+	}
+	return  err
+}
+
+*/
+func Update(updateNode *Node) error{
+	node := Node{}
+	db := getDB()
+	defer db.Close()
+
+	db.Where("node_uuid = ?", updateNode.NodeUUID).First(&node)
+	err := db.Model(&node).Updates(updateNode).Error
+	return err
+
 }
 
 func UpdateTaskStatus(task *BootAction) error{
@@ -239,12 +279,28 @@ func Create(data []byte) (string, error) {
 	defer db.Close()
 
 	var node Node
+	//var uuidString string
+
 	UUID, err := uuid.NewRandom()
-	//TODO : Get UUID using Redfish Library.
 	err = json.Unmarshal(data, &node)
-	node.NodeUUID = UUID
-	node.State = "new"
-	err = db.Create(&node).Error
+	/*
+	//Get UUID using Redfish Library.
+	err := json.Unmarshal(data, &node)
+	if err == nil {
+		uuidString, _ := redfish.GetUUID(node.IPMIIP, node.IPMIUser, node.IPMIPassword)
+		if uuidString == "" {
+
+			err = errors.New(fmt.Sprintf("Failed to retreive Node UUID for nodename : %v", node.Name))
+		}
+	}
+	UUID, err := uuid.Parse(uuidString)
+	*/
+
+	if err == nil {
+		node.NodeUUID = UUID
+		node.State = "new"
+		err = db.Create(&node).Error
+	}
 	if err != nil {
 		return "", err
 	} else {

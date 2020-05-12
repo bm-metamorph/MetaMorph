@@ -3,6 +3,7 @@ package redfish
 import (
 	config "bitbucket.com/metamorph/pkg/config"
 	"fmt"
+	client "github.com/manojkva/go-redfish-api-wrapper/pkg/redfishwrap/idrac"
 )
 
 func (bmhnode *BMHNode) GetVirtualMediaStatus() bool {
@@ -36,6 +37,24 @@ func (bhmnode *BMHNode) Reboot() bool {
 	return result
 }
 
+func (bhmnode *BMHNode) PowerOff() bool {
+	redfishClient := getRedfishClient(bhmnode)
+	result := redfishClient.PowerOff(config.Get("idrac.systemID").(string))
+	return result
+}
+
+func (bhmnode *BMHNode) PowerOn() bool {
+	redfishClient := getRedfishClient(bhmnode)
+	result := redfishClient.PowerOn(config.Get("idrac.systemID").(string))
+	return result
+}
+
+func (bhmnode *BMHNode) GetPowerStatus() bool {
+	redfishClient := getRedfishClient(bhmnode)
+	result := redfishClient.GetPowerStatus(config.Get("idrac.systemID").(string))
+	return result
+}
+
 func (bmhnode *BMHNode) EjectISO() bool {
 	var result bool
 	redfishClient := getRedfishClient(bmhnode)
@@ -49,8 +68,13 @@ func (bmhnode *BMHNode) EjectISO() bool {
 
 }
 
-func (bmhnode *BMHNode) GetUUID() (string, bool) {
-	redfishClient := getRedfishClient(bmhnode)
+func GetUUID(hostIP string, username string, password string) (string, bool) {
+
+	redfishClient := client.IdracRedfishClient{
+		Username: username,
+		Password: password,
+		HostIP:   hostIP,
+	}
 	uuid, result := redfishClient.GetNodeUUID(config.Get("idrac.systemID").(string))
 	return uuid, result
 
