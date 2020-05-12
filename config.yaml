@@ -36,6 +36,15 @@ templates:
     netplan:
         config: configs/templates/netplan.tmpl
         filepath: 50-cloud-init.yaml
+    agent_config:
+        config:  templates/agent_config.tmpl
+        filepath: agent_config.yaml
+
+assets:
+   rootdir: /home/ekuamaj/go/src/bitbucket.com/metamorph/assets
+   agent_binary:
+          src:  files/metamorph_agent
+          dest: metamorph_agent
 
 iso:
   rootpath: /tmp/iso_root
@@ -58,3 +67,9 @@ provisioning:
 
 testing:
     inputfile: "/home/ekuamaj/go/src/bitbucket.com/metamorph/examples/mtn52r07c001_input.json"
+
+agent:
+    node_id: "e415bbbe-be68-4705-aa05-16350e0c8151"
+    cntrl_endpoint: "localhost:4040"
+    logdir : "/tmp/metamorph"
+    temp_dir : "/tmp/metamorph/.tmp"

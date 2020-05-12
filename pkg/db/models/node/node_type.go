@@ -38,9 +38,20 @@ type Node struct {
 	State                string `gorm:"DEFAULT:new"`
 	ProvisioningIP       string
 	ProvisionerPort      int
-	HTTPPort             int 
+	HTTPPort             int
+	BootActions          []BootAction 
   }
   
+  type BootAction struct {
+	  gorm.Model
+	  NodeID     uint
+	  Name       string
+	  Location   string
+	  Priority   uint
+	  Control    string
+	  Args       string
+	  Status     string  `gorm:"DEFAULT:new"`
+  }
   
   type NameServer struct {
 	gorm.Model

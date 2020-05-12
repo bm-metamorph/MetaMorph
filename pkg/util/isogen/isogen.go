@@ -188,6 +188,27 @@ func (bmhnode *BMHNode) PrepareISO() error {
 		return fmt.Errorf("Failed to create Netplan file with error %v", err)
 	}
 
+	//MetaMorph Agent
+	metamorph_assets_root := config.Get("assets.rootdir").(string)
+	metamorph_agent_file_src := config.Get("assets.agent_binary.src").(string)
+	metamorph_agent_file_src_abs := path.Join(metamorph_assets_root,metamorph_agent_file_src )
+
+	metamorph_agent_file_dest := config.Get("assets.agent_binary.dest").(string)
+	metamorph_agent_file_dest_abs := path.Join(iso_custom_scripts_path,metamorph_agent_file_dest )
+	err = CopyfileToDestination(metamorph_agent_file_src_abs, metamorph_agent_file_dest_abs)
+
+	if err != nil {
+		return fmt.Errorf("Failed to copy metamorph agent file with error %v", err)
+	}
+
+	//MetaMorph Agent config
+	bmhnode.ProvisioningIP = config.Get("provisioning.ip").(string)
+	err = bmhnode.CreateFileFromTemplate(iso_custom_scripts_path, "agent_config")
+
+	if err != nil {
+		return fmt.Errorf("Failed to create Metamorph Agent config file with error %v", err)
+	}
+
 	//metamorph-client.service
 	metamorph_servicetemplatepath := config.Get("templates.service.config").(string)
 	
@@ -201,6 +222,8 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	if err != nil {
 		return fmt.Errorf("Failed to copy metamorph service file with error %v", err)
 	}
+
+
 	//init.sh
 
 	bmhnode.ProvisioningIP = config.Get("provisioning.ip").(string)
@@ -311,7 +334,7 @@ func (bmhnode *BMHNode) RepackageISO(iso_DestinationFullpath string) error {
 	                               strconv.Itoa(config.Get("provisioning.httpport").(int)) + "/" + image_name
 
 	// Update the DB with ImageURL
-	node.Update(bmhnode.Node.NodeUUID.String(),&node.Node{ImageURL: imageURL})
+	node.Update(&node.Node{ImageURL: imageURL})
 
 	// TODO : PROVISIONING IP etc moved to config ?
 	return nil

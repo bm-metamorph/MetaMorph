@@ -151,8 +151,7 @@ func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 	var state string
 	fmt.Printf("[%v] Entering Ready State Handler\n", bmnode.Name)
 	//Update the DB Now
-	nodeuuidStringRandom := bmnode.Node.NodeUUID.String()
-	err = node.Update(nodeuuidStringRandom, &node.Node{State: INTRANSITION})
+	err = node.Update( &node.Node{State: INTRANSITION})
 	fmt.Printf("[%v] - NodeUUID - %v\n", bmnode.Name, bmnode.NodeUUID)
 	var nodestatus NodeStatus
 
@@ -179,11 +178,11 @@ func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
 	}
 	//Update the DB Now
-	err = node.Update(nodeuuidStringRandom, &node.Node{State: state, NodeUUID: node_uuid})
+	err = node.Update(&node.Node{State: state, NodeUUID: node_uuid})
 	if err != nil {
 		fmt.Printf("Failed to update [%v] to READYWAIT state", bmnode.Name)
 		state = FAILED
-		node.Update(nodeuuidStringRandom, &node.Node{State: state, NodeUUID: node_uuid})
+		node.Update( &node.Node{State: state, NodeUUID: node_uuid})
 	}
 	nodeStatusChan <- nodestatus
 	wg.Done()
@@ -197,7 +196,7 @@ func SetupreadyHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 
 	//Update the DB Now
 	nodeuuidString := bmnode.Node.NodeUUID.String()
-	err = node.Update(nodeuuidString, &node.Node{State: INTRANSITION})
+	err = node.Update(&node.Node{State: INTRANSITION})
 
 	fmt.Println(nodeuuidString)
 	isogenClient := &isogen.BMHNode{bmnode.Node}
@@ -216,11 +215,11 @@ func SetupreadyHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
 		state = SETUPREADYWAIT
 	}
-	err = node.Update(nodeuuidString, &node.Node{State: state})
+	err = node.Update( &node.Node{State: state})
 	if err != nil {
 		fmt.Printf("Failed to update [%v] to SETUPREADYWAIT state", bmnode.Name)
 		state = FAILED
-		node.Update(nodeuuidString, &node.Node{State: state })
+		node.Update( &node.Node{State: state })
 	}
 	nodeStatusChan <- nodestatus
 	wg.Done()
@@ -230,8 +229,7 @@ func DeployedHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.W
 	var nodestatus NodeStatus
 	var result bool
 	//Update the DB Now
-	nodeuuidString := bmnode.Node.NodeUUID.String()
-	err := node.Update(nodeuuidString, &node.Node{State: INTRANSITION})
+	err := node.Update(&node.Node{State: INTRANSITION})
 	fmt.Println(bmnode.NodeUUID)
 	redfishClient := &redfish.BMHNode{bmnode.Node}
 
@@ -248,11 +246,11 @@ func DeployedHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.W
 		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
 		state = DEPLOYING
 	}
-	err = node.Update(nodeuuidString, &node.Node{State: state})
+	err = node.Update( &node.Node{State: state})
 	if err != nil {
 		fmt.Printf("Failed to update [%v] to DEPLOYING state", bmnode.Name)
 		state = FAILED
-		node.Update(nodeuuidString, &node.Node{State: state })
+		node.Update( &node.Node{State: state })
 	}
 	nodeStatusChan <- nodestatus
 	wg.Done()
