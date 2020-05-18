@@ -1,0 +1,300 @@
+{
+	"info": {
+		"_postman_id": "23173b13-05a6-4863-b9b1-8b6e581a7bc7",
+		"name": "MetaMorph Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "CreateNode",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "920210ae-6b77-480c-9bda-2763efa7d944",
+						"exec": [
+							"const response = pm.response.json();\r",
+							"\r",
+							"var nodeuuid = response.result\r",
+							"postman.setEnvironmentVariable(\"nodeuuid\", nodeuuid)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"mtn52r07c001\",\r\n  \"imageURL\": \"http://32.68.49.133:31180/ubuntu-18.04.3-server-amd64.iso\",\r\n\r\n  \"IPMIUser\": \"root\",\r\n  \"IPMIPassword\": \"Abc.1234\",\r\n  \"IPMIIP\": \"32.68.220.135\"\r\n\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}",
+					"host": [
+						"{{url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT for Userdata",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\r\n{\r\n\r\n  \"OamIP\": \"32.68.220.14\",\r\n  \"OamGateway\": \"32.68.220.1\",\r\n  \"NameServers\": [{\r\n      \"Nameserver\": \"150.234.210.5\"\r\n    },\r\n    {\r\n      \"Nameserver\": \"150.234.210.205\"\r\n    },\r\n    {\r\n      \"Nameserver\": \"135.188.34.124\"\r\n    }\r\n  ],\r\n  \"OsDisk\": \"/dev/sda\",\r\n  \"Partitions\": [{\r\n      \"partitionName\": \"root\",\r\n      \"size\": \"30g\",\r\n      \"filesystem\": {\r\n        \"mountpoint\": \"/\",\r\n        \"fstype\": \"ext4\",\r\n        \"mount-options\": \"defaults\"\r\n      }\r\n    },\r\n    {\r\n      \"name\": \"boot\",\r\n      \"size\": \"1g\",\r\n      \"bootable\": true,\r\n      \"primary\": true,\r\n      \"filesystem\": {\r\n        \"mountpoint\": \"/boot\",\r\n        \"fstype\": \"ext4\",\r\n        \"mount-options\": \"defaults\"\r\n      }\r\n    },\r\n    {\r\n      \"name\": \"var-log\",\r\n      \"size\": \"100g\",\r\n      \"filesystem\": {\r\n        \"mountpoint\": \"/var/log\",\r\n        \"fstype\": \"ext4\",\r\n        \"mount-options\": \"defaults\"\r\n      }\r\n    },\r\n    {\r\n      \"name\": \"var\",\r\n      \"size\": \">300g\",\r\n      \"filesystem\": {\r\n        \"mountpoint\": \"/var\",\r\n        \"fstype\": \"ext4\",\r\n        \"mount-options\": \"defaults\"\r\n      }\r\n    }\r\n  ],\r\n  \"grubConfig\": \"image=bionic isolcpus=0-3,44-47 amd_iommu=on kernel_package=linux-image-5.0.0-23-generic kernel=hwe-18.04 hugepagesz=1G hugepages=160 intel_iommu=on console=ttyS1,115200n8 transparent_hugepage=never\",\r\n  \"kvmPolicy\": {\r\n    \"cpuAllocation\": \"1:1\",\r\n    \"cpuPinning\": \"enabled\",\r\n    \"cpuHyperthreading\": \"enabled\"\r\n  },\r\n  \"SSHPubKeys\": [{\r\n      \"SSHPubKey\": \"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCurXRaUe/ukR84FRseqnrNdDLg6zS4qtJi8e8o4VCNxbV0Jsu5iw17ZBF1B1uF8+Bdhz9eiYIkokxaiVkHHqOpRzF5v4phRK+k4MugjT3OAR78cEdg8MR2om5IIMbYYhVyjY1IyZOZv9PQ1noqzyR2Glo6q7AHPadVY2emk16VmmcVJc/z+6awZXitwdamFDRZ9HK+xoRCd6WDIIphJbI6nnFw2ytokgfpqptkwNGQ/2q8/skvRBaB78byIMU70O1q0fQEbm9VhbjmIE/qwNYEsVMAdHE6EYYyW1YnC3VqhBGlBqF/KPxTX/uQksOmvXoydbnvtaTRG0qq/AAvdJw5 root@mtn52r07c001\"\r\n    },\r\n    {\r\n      \"SSHPubKey\": \"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtIbTb2c33GhoprVOdZB5EvuCs7JOo5dgq8z3aOpJO/7efCF3Wft/Q0ve8ndRNVNt30KxpK7ro5ad31yloVQqj/MhYvI/fPMsyocCyPo+fJOf/8+u2TEMJUaDjwTRCnsPSu8fendpNt9HdreZcUT5R/foN3dpPfUiAPREgpvMqVfE7rtSyGs8ZRRTVYIohBwOVemCrdIGjjIzbGVLQfRWHkuJpl6Js2kHlO6trsE7aEiEqkaGEaJGCyGOlSS119lBsvsiEc4ExNczKAduMYY86xSxGo7zpf2R6mQTOmCHVSSwSfy0UHIgDVFPIVgyZSI27F2NLYnJeAmRqN9PNitPp ae196e@att.com\"\r\n    }\r\n  ],\r\n  \"BondInterfaces\": [{\r\n      \"BondInterface\": \"enp135s0f0\"\r\n    },\r\n    {\r\n      \"BondInterface\": \"enp94s0f1\"\r\n    }\r\n  ],\r\n  \"BondParameters\": [{\r\n      \"Key\": \"down-delay\",\r\n      \"Value\": \"3000\"\r\n    },\r\n    {\r\n      \"Key\": \"lacp-rate\",\r\n      \"Value\": \"fast\"\r\n    },\r\n    {\r\n      \"Key\": \"mii-monitor-interval\",\r\n      \"Value\": \"100\"\r\n    },\r\n    {\r\n      \"Key\": \"mode\",\r\n      \"Value\": \"802.3ad\"\r\n    },\r\n    {\r\n      \"Key\": \"up-delay\",\r\n      \"Value\": \"1000\"\r\n    }\r\n  ],\r\n\r\n  \"vendor\": \"Dell\",\r\n  \"Model\": \"Gen9\",\r\n  \"biosVersion\": \"2.0.0\",\r\n  \"CPLDFirmwareVersion\": \"3.43.4\",\r\n  \"RAIDFirmwareVersion\": \"4.5.6\",\r\n  \"FirmwareVersion\": \"32.32.32\",\r\n\r\n\r\n\r\n  \"virtualDisks\": [{\r\n      \"DiskName\": \"osdisk\",\r\n      \"raidType\": 1,\r\n      \"RaidController\": \"RAID.Slot.6-1\",\r\n      \"PhysicalDisks\": [{\r\n          \"VirtualDiskID\": 1,\r\n          \"PhysicalDisk\": \"Disk.Bay.0:Enclosure.Internal.0-1:RAID.Slot.6-1\"\r\n        },\r\n        {\r\n          \"VirtualDiskID\": 1,\r\n          \"PhysicalDisk\": \"Disk.Bay.1:Enclosure.Internal.0-1:RAID.Slot.6-1\"\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"name\": \"ephemeral\",\r\n      \"raidType\": 1,\r\n      \"RaidController\": \"RAID.Slot.6-1\",\r\n      \"PhysicalDisks\": [{\r\n          \"VirtualDiskID\": 2,\r\n          \"PhysicalDisk\": \"Disk.Bay.4:Enclosure.Internal.0-1:RAID.Slot.6-1\"\r\n        },\r\n        {\r\n          \"VirtualDiskID\": 2,\r\n          \"PhysicalDisk\": \"Disk.Bay.5:Enclosure.Internal.0-1:RAID.Slot.6-1\"\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n  ,\r\n\t\"BootActions\": [\r\n\r\n\t\t{\r\n\t\t\t\"location\": \"https://raw.githubusercontent.com/ruanyf/simple-bash-scripts/master/scripts/hello-world.sh\",\r\n\t\t\t\"control\": \"bash\",\r\n\t\t\t\"name\": \"Hello World\",\r\n\t\t\t\"priority\": 1\r\n\t\t},\r\n\t\t{\r\n\t\t\t\"location\": \"https://raw.githubusercontent.com/qjcg/shell-examples/master/00-fundamentals/if\",\r\n\t\t\t\"control\": \"bash\",\r\n\t\t\t\"name\": \"Fibonacci\",\r\n\t\t\t\"priority\": 5\r\n\t\t},\r\n\t\t{\r\n\t\t\t\"location\": \"https://raw.githubusercontent.com/ruanyf/simple-bash-scripts/master/scripts/list-dir.sh\",\r\n\t\t\t\"control\": \"bash\",\r\n\t\t\t\"name\": \"List Dir\",\r\n\t\t\t\"priority\": 1\r\n\t\t},\r\n\t\t\t\t{\r\n\t\t\t\"location\": \"https://raw.githubusercontent.com/kubernetes/website/master/content/en/examples/application/deployment.yaml\",\r\n\t\t\t\"control\": \"kubectl\",\r\n\t\t\t\"args\" : \"apply -f\",\r\n\t\t\t\"name\": \"Deploy Nginx\",\r\n\t\t\t\"priority\": 5\r\n\t\t}\r\n\t\t\r\n\t]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/{{nodeuuid}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"{{nodeuuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET After Create - ReadyWait State",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ceb7f34b-4dc0-4cc4-b421-4be2a69d8eca",
+						"exec": [
+							"const response = pm.response.json();\r",
+							"\r",
+							"if (response.State !== \"readywait\") {\r",
+							"    setTimeout(() => { }, 1000);\r",
+							"    postman.setNextRequest(pm.info.requestId);\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/{{nodeuuid}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"{{nodeuuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT - Ready State",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\r\n{\r\n\t\"State\" : \"ready\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/{{nodeuuid}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"{{nodeuuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET After SetupReadyWait",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "04edda1c-5bd6-445d-b8cd-a2970de265fa",
+						"exec": [
+							"const response = pm.response.json();\r",
+							"\r",
+							"if (response.State !== \"setupreadywait\") {\r",
+							"    setTimeout(() => { }, 1000);\r",
+							"    postman.setNextRequest(pm.info.requestId);\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/{{nodeuuid}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"{{nodeuuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT - SetupReady State",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\r\n{\r\n\t\"State\" : \"setupready\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/{{nodeuuid}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"{{nodeuuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Deployed State",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e9c6d724-fe1f-4aa5-b8c3-39f40ed9b3d5",
+						"exec": [
+							"const response = pm.response.json();\r",
+							"\r",
+							"if (response.State !== \"deployed\") {\r",
+							"    setTimeout(() => { }, 1000);\r",
+							"    postman.setNextRequest(pm.info.requestId);\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/{{nodeuuid}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"{{nodeuuid}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -18,4 +18,9 @@ require (
 	google.golang.org/grpc v1.28.0
 	google.golang.org/protobuf v1.22.0
 	k8s.io/api v0.18.1 // indirect
+	opendev.org/airship/go-redfish/client v0.0.0-0
 )
+
+replace opendev.org/airship/go-redfish/client => /home/ekuamaj/go/src/opendev.org/airship/go-redfish/client
+
+replace github.com/manojkva/go-redfish-api-wrapper => /home/ekuamaj/go/src/github.com/manojkva/go-redfish-api-wrapper

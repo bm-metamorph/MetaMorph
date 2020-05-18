@@ -37,7 +37,7 @@ templates:
         config: configs/templates/netplan.tmpl
         filepath: 50-cloud-init.yaml
     agent_config:
-        config:  templates/agent_config.tmpl
+        config:  configs/templates/agent_config.tmpl
         filepath: agent_config.yaml
 
 assets:
