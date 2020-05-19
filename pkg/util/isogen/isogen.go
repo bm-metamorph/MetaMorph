@@ -91,7 +91,7 @@ func (bmhnode *BMHNode) PrepareISO() error {
 
 	var err error
 	if bmhnode.ImageReadilyAvailable {
-
+                fmt.Println("Customised ISO already available. No need to prepare custom ISO")
 		return fmt.Errorf("Customised ISO already available. No need to prepare custom ISO")
 	}
 
@@ -105,10 +105,12 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	iso_name := iso_name_parts[len(iso_name_parts)-1]
 
 	if _, err := os.Stat(iso_rootpath); os.IsNotExist(err) {
-		return fmt.Errorf("ISO root directory not found : %v\n", err)
+                fmt.Printf("iso root directory not found : %v\n", err)
+		return fmt.Errorf("iso root directory not found : %v\n", err)
 	}
 
 	if _, err := os.Stat(HTTPRootPath); os.IsNotExist(err) {
+                fmt.Printf("HTTP root directory not found : %v\n", err)
 		return fmt.Errorf("HTTP root directory not found : %v\n", err)
 	}
 	//Get temporary directory for copying ISO
@@ -121,10 +123,14 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	if _, err := os.Stat(iso_DownloadFullpath); os.IsNotExist(err) {
 		err = os.MkdirAll(iso_tempdir,os.ModePerm)
 		if err != nil {
+                        fmt.Printf("Failed to create dir %v with error  %v", iso_tempdir, err)
+
 			return fmt.Errorf("Failed to create dir %v with error  %v", iso_tempdir, err)
 		}
 		err = DownloadUrl(iso_DownloadFullpath, iso_urlpath)
 		if err != nil {
+                        fmt.Printf("Failed to download ISO Image : %v", err)
+
 			return fmt.Errorf("Failed to download ISO Image : %v", err)
 		}
 
@@ -135,12 +141,16 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	err = ValidateChecksum(iso_checksum, iso_DownloadFullpath)
 
 	if err != nil {
+                fmt.Printf("Failed to validate checksum. Error : %v", err)
+
 		return fmt.Errorf("Failed to validate checksum. Error : %v", err)
 	}
 
 	err = ExtractAndCopyISO(iso_DownloadFullpath, iso_DestinationFullpath)
 
 	if err != nil {
+                fmt.Printf("Failed to Extract and Copy ISO file. Error %v", err)
+
 		return fmt.Errorf("Failed to Extract and Copy ISO file. Error %v", err)
 	}
 
@@ -148,6 +158,7 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	err = bmhnode.CreatePressedFileFromTemplate(iso_DestinationFullpath, "preseed")
 
 	if err != nil {
+                fmt.Printf("Failed to create Preseed file with error %v", err)
 		return fmt.Errorf("Failed to create Preseed file with error %v", err)
 	}
 
@@ -158,12 +169,14 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	err = os.MkdirAll(iso_custom_scripts_path, os.ModePerm)
 
 	if err != nil {
+                fmt.Printf("Failed to create directory %v with error %v", iso_custom_scripts_path, err)
 		return fmt.Errorf("Failed to create directory %v with error %v", iso_custom_scripts_path, err)
 	}
 
 	err = bmhnode.CreateFileFromTemplate(iso_custom_scripts_path, "grub")
 
 	if err != nil {
+                fmt.Printf("Failed to create Grub file with error %v", err)
 		return fmt.Errorf("Failed to create Grub file with error %v", err)
 	}
 
@@ -179,12 +192,14 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	err = CopyfileToDestination(isolinux_cfg_sourcepath, isolinux_cfg_destpath)
 
 	if err != nil {
+                fmt.Printf("Failed to copy isolinux cfg file with error %v", err)
 		return fmt.Errorf("Failed to copy isolinux cfg file with error %v", err)
 	}
     //Netplan
 	err = bmhnode.CreateNetplanFileFromTemplate(iso_custom_scripts_path, "netplan")
 
 	if err != nil {
+                fmt.Printf("Failed to create Netplan file with error %v", err)
 		return fmt.Errorf("Failed to create Netplan file with error %v", err)
 	}
 
@@ -198,6 +213,7 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	err = CopyfileToDestination(metamorph_agent_file_src_abs, metamorph_agent_file_dest_abs)
 
 	if err != nil {
+                fmt.Printf("Failed to copy metamorph agent file with error %v", err)
 		return fmt.Errorf("Failed to copy metamorph agent file with error %v", err)
 	}
 
@@ -206,6 +222,7 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	err = bmhnode.CreateFileFromTemplate(iso_custom_scripts_path, "agent_config")
 
 	if err != nil {
+                fmt.Printf("Failed to create Metamorph Agent config file with error %v", err)
 		return fmt.Errorf("Failed to create Metamorph Agent config file with error %v", err)
 	}
 
@@ -220,6 +237,7 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	err = CopyfileToDestination(metamorph_servicefilesourepath, metamorph_servicefileDestpath)
 
 	if err != nil {
+                fmt.Printf("Failed to copy metamorph service file with error %v", err)
 		return fmt.Errorf("Failed to copy metamorph service file with error %v", err)
 	}
 
@@ -233,6 +251,7 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	err = bmhnode.CreateFileFromTemplate(iso_custom_scripts_path, "init")
 
 	if err != nil {
+                fmt.Printf("Failed to create init file with error %v", err)
 		return fmt.Errorf("Failed to create init file with error %v", err)
 	}
 
