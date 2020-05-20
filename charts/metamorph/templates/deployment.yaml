@@ -37,10 +37,11 @@ spec:
           env:
             - name: METAMORPH_CONFIGPATH
               value: {{ .Values.metamorphConfigPath }}
-          command: [ "/bin/sh", "-c" ]
-          args: ["mkdir -p /tmp/db; mkdir -p /tmp/iso_root/isos; mkdir -p /tmp/http_root; /metamorph controller"]
+          command: [ "metamorph", "controller" ]
+          # command: [ "/bin/sh", "-c" ]
+          # args: ["/metamorph controller"]
           ports:
-            - name: http
+            - name: grpc
               containerPort: 4040
               protocol: TCP
           resources:
@@ -49,11 +50,19 @@ spec:
             - name: metamorph-config-vol
               mountPath: "/src/bitbucket.com/metamorph/config.yaml"
               subPath: "config.yaml"
+            - name: db-data-dir
+              mountPath: "/opt/metamorph/db"
+            - name: iso_root
+              mountPath: "/opt/metamorph/iso_root/isos"
+            - name: http_root
+              mountPath: "/opt/metamorph/http_root"
+
         - name: {{ .Chart.Name }}-api
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: [ "/bin/sh", "-c" ]
-          args: ["/metamorph api"]
+          command: [ "metamorph", "api" ]
+          # command: [ "/bin/sh", "-c" ]
+          # args: ["/metamorph api"]
           ports:
             - name: http
               containerPort: 8080
@@ -64,10 +73,24 @@ spec:
             - name: metamorph-config-vol
               mountPath: "/src/bitbucket.com/metamorph/config.yaml"
               subPath: "config.yaml"
+            - name: db-data-dir
+              mountPath: "/opt/metamorph/db"
+            - name: iso_root
+              mountPath: "/opt/metamorph/iso_root/isos"
+            - name: http_root
+              mountPath: "/opt/metamorph/http_root"
+
       volumes:
         - name: metamorph-config-vol
           configMap:
             name: metamorph-config
+        - name: db-data-dir
+          hostPath: /opt/metamorph/db
+        - name: iso_root
+          hostPath: /opt/metamorph/iso_root/isos
+        - name: http_root
+          hostPath: /opt/metamorph/http_root
+
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

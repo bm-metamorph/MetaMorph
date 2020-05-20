@@ -6,13 +6,33 @@ metadata:
 {{ include "metamorph.labels" . | indent 4 }}
   namespace: {{ .Values.namespace }}
 spec:
-  type: {{ .Values.serviceMetamorph.type }}
+  type: {{ .Values.serviceMetamorphApi.type }}
   ports:
-    - port: {{ .Values.serviceMetamorph.port }}
-      nodePort: {{ .Values.serviceMetamorph.nodePort }}
-      targetPort: 8080
+    - port: {{ .Values.serviceMetamorphApi.port }}
+      nodePort: {{ .Values.serviceMetamorphApi.nodePort }}
+      targetPort: {{ .Values.serviceMetamorphApi.port }}
       protocol: TCP
       name: http
+  selector:
+    app.kubernetes.io/name: {{ include "metamorph.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "metamorph.fullname" . }}-controller
+  labels:
+{{ include "metamorph.labels" . | indent 4 }}
+  namespace: {{ .Values.namespace }}
+spec:
+  type: {{ .Values.serviceMetamorphCtrl.type }}
+  ports:
+    - port: {{ .Values.serviceMetamorphCtrl.port }}
+      nodePort: {{ .Values.serviceMetamorphCtrl.nodePort }}
+      targetPort: {{ .Values.serviceMetamorphCtrl.port }}
+      protocol: TCP
+      name: grpc
   selector:
     app.kubernetes.io/name: {{ include "metamorph.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
