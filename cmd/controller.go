@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	config "bitbucket.com/metamorph/pkg/config"
 	ctrlgRPCServer "bitbucket.com/metamorph/pkg/controller/grpc"
 	ctrlgFSMServer "bitbucket.com/metamorph/pkg/controller/statemachine"
 )
@@ -29,6 +30,7 @@ var controllerCmd = &cobra.Command{
 	Short: "Start MetaMorph controller",
 	Long: `This will start MetaMorph Controller's gRPC server`,
 	Run: func(cmd *cobra.Command, args []string) {
+		config.SetLoggerConfig("logger.controllerpath")
 		fmt.Println("Starting metamorph FSM")
      	go ctrlgFSMServer.StartMetamorphFSM(false) //check if this causes crash in case DB is not setup yet.
 		fmt.Println("controller called")

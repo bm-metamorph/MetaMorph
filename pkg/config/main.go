@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 	"path"
+	"bitbucket.com/metamorph/pkg/logger"
 )
 
 var Config string
@@ -34,3 +35,9 @@ func init() {
 func Get(key string) interface{} { return viper.Get(key) }
 
 func Set(key string, value interface{}) { viper.Set(key, value) }
+
+func SetLoggerConfig(filepathConfig string){
+	loglevelString := viper.GetString("METAMORPH_LOG_LEVEL")
+	level := logger.GetLogLevel(loglevelString)
+	logger.InitLogger( level, path.Join(Get(filepathConfig).(string)))
+}

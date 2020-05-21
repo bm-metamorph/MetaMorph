@@ -9,7 +9,8 @@ controller:
     port : 8080
 
 logger:
-    path: /tmp/metamorph.log
+    apipath: /tmp/metamorph_api.log
+    controllerpath: /tmp/metamorph_controller.log
 
 
 idrac:

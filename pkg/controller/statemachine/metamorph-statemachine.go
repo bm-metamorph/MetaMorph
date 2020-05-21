@@ -4,6 +4,7 @@ import (
 	"bitbucket.com/metamorph/pkg/db/models/node"
 	"bitbucket.com/metamorph/pkg/drivers/redfish"
 	"bitbucket.com/metamorph/pkg/util/isogen"
+	"bitbucket.com/metamorph/pkg/logger"
 	"fmt"
 	"github.com/google/uuid"
 	"runtime"
@@ -54,7 +55,7 @@ func StartMetamorphFSM(runOnce bool) {
 
 func (h *DBHandler) startFSM(runOnce bool) {
 
-	fmt.Println("Starting FSM")
+	logger.Log.Info("Starting FSM")
 
 	var wg sync.WaitGroup
 
@@ -74,7 +75,7 @@ func (h *DBHandler) startFSM(runOnce bool) {
 		//nodelist, err := h.db.GetNodes()
 
 		if err != nil {
-			fmt.Println("No Nodes to process...")
+			logger.Log.Info("No Nodes to process...")
 
 		} else {
 

@@ -20,6 +20,7 @@ import (
 
 	"github.com/spf13/cobra"
 	api "bitbucket.com/metamorph/pkg/apis"
+	config "bitbucket.com/metamorph/pkg/config"
 )
 
 // apiCmd represents the api command
@@ -31,6 +32,7 @@ var apiCmd = &cobra.Command{
 http://localhost:8080`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("api called")
+		config.SetLoggerConfig("logger.apipath")
 		api.Serve()
 	},
 }
