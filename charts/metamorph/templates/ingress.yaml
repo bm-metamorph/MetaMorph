@@ -24,13 +24,13 @@ spec:
   rules:
   {{- range .Values.ingress.hosts }}
     - host: {{ .host | quote }}
-      http:
+      tcp:
         paths:
         {{- range .paths }}
           - path: {{ . }}
             backend:
               serviceName: {{ $fullName }}
-              servicePort: http
+              servicePort: grpc
         {{- end }}
   {{- end }}
 {{- end }}

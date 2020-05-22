@@ -48,7 +48,7 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   hosts:
       # This has to be passed as cmdline Argument
-    - host: chart-example.local
+    - host: metamorph.example.local
       paths: []
 
   tls: []
