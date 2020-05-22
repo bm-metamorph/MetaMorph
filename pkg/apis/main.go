@@ -1,12 +1,15 @@
 package api
 
 import (
+	"bitbucket.com/metamorph/pkg/logger"
 	"bitbucket.com/metamorph/proto"
 	"fmt"
+	"github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"log"
 	"net/http"
+	"time"
 )
 
 func grpcClient() proto.NodeServiceClient {
@@ -158,6 +161,8 @@ func updateNodeHWStatus(ctx *gin.Context) {
 func Serve() {
 
 	r := gin.Default()
+	r.Use(ginzap.Ginzap(logger.Log, time.RFC3339, false))
+	r.Use(ginzap.RecoveryWithZap(logger.Log, true))
 
 	r.GET("/nodes", listNodes)
 	r.POST("/uuid", getUUID)
