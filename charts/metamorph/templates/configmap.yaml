@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: metamorph-config
+  namespace: {{ .Values.namespace }}
+data:
+  config.yaml: |
+    database:
+        type: sqlite
+        path: "/tmp/db/metamorph.db"
+    
+    controller:
+        port : 8080
+    
+    logger:
+        path: /tmp/metamorph.log
+    
+    idrac:
+        systemID: "System.Embedded.1"
+        managerID: "iDRAC.Embedded.1"
+        controllerID: "RAID.Slot.6-1"
+    
+    templates:
+        rootdir: src/bitbucket.com/metamorph
+        preseed:
+            config:  configs/templates/preseed.tmpl
+            filepath: preseed/hwe-ubuntu-server.seed
+        grub:
+            config:  configs/templates/grub.tmpl
+            filepath: grub.conf
+        isolinux:
+            config: configs/templates/hwe_kernel/isolinux_txt.cfg
+        init:
+            config: configs/templates/init.sh
+            filepath: init.sh
+        service:
+            config: configs/templates/metamorph-client.service
+            filepath: metamorph-client.service
+        netplan:
+            config: configs/templates/netplan.tmpl
+            filepath: 50-cloud-init.yaml
+
+    iso:
+      rootpath: /tmp/iso_root
+      tempdir: /tmp/iso_root/isos    
+    
+    http:
+      rootpath: /tmp/http_root
+    
+    image:
+        url: "http://32.68.220.23:31180/ubuntu-18.04.4-server-amd64.iso"
+        checksum: "http://32.68.220.23:31180/ubuntu-18.04.4-server-amd64.iso.md5sum"
+    
+    provisioning:
+        ip : "32.68.220.23"
+        port:  3190
+        httpport: 31180
+    
+    testing:
+        inputfile: "/home/ekuamaj/go/src/bitbucket.com/metamorph/examples/input.json"

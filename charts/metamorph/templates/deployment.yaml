@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "metamorph.fullname" . }}
+  labels:
+{{ include "metamorph.labels" . | indent 4 }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "metamorph.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "metamorph.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}-nginx
+          image: "{{ .Values.nginxImage.repository }}:{{ .Values.nginxImage.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        - name: {{ .Chart.Name }}-controller
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: METAMORPH_CONFIGPATH
+              value: {{ .Values.metamorphConfigPath }}
+          command: [ "metamorph", "controller" ]
+          # command: [ "/bin/sh", "-c" ]
+          # args: ["/metamorph controller"]
+          ports:
+            - name: grpc
+              containerPort: 4040
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: metamorph-config-vol
+              mountPath: "/src/bitbucket.com/metamorph/config.yaml"
+              subPath: "config.yaml"
+            - name: db-data-dir
+              mountPath: "/opt/metamorph/db"
+            - name: iso_root
+              mountPath: "/opt/metamorph/iso_root/isos"
+            - name: http_root
+              mountPath: "/opt/metamorph/http_root"
+
+        - name: {{ .Chart.Name }}-api
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: [ "metamorph", "api" ]
+          # command: [ "/bin/sh", "-c" ]
+          # args: ["/metamorph api"]
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: metamorph-config-vol
+              mountPath: "/src/bitbucket.com/metamorph/config.yaml"
+              subPath: "config.yaml"
+            - name: db-data-dir
+              mountPath: "/opt/metamorph/db"
+            - name: iso_root
+              mountPath: "/opt/metamorph/iso_root/isos"
+            - name: http_root
+              mountPath: "/opt/metamorph/http_root"
+
+      volumes:
+        - name: metamorph-config-vol
+          configMap:
+            name: metamorph-config
+        - name: db-data-dir
+          hostPath: /opt/metamorph/db
+        - name: iso_root
+          hostPath: /opt/metamorph/iso_root/isos
+        - name: http_root
+          hostPath: /opt/metamorph/http_root
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

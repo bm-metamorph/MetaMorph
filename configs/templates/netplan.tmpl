@@ -5,7 +5,7 @@ network:
     eno4:
       dhcp4: true
       match:
-        name: en04{{range .BondInterfaces}} 
+        name: "en04{{range .BondInterfaces}}"
     {{.BondInterface}}:
       mtu: 9214
       match:

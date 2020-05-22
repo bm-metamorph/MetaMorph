@@ -1,0 +1,61 @@
+---
+schema: armada/Chart/v1
+metadata:
+  schema: metadata/Document/v1
+  name: metamorph
+data:
+  chart_name: metamorph
+  release: metamorph
+  namespace: metamorph
+  wait:
+    timeout: 600
+  protected:
+    continue_processing: false
+  install:
+    no_hooks: false
+  upgrade:
+    no_hooks: false
+  values: {}
+  source:
+    type: local
+    location: /metamorph
+    subpath: charts/metamorph
+    reference: helm-chart
+  dependencies:
+    - helm-toolkit
+---
+schema: armada/Chart/v1
+metadata:
+  schema: metadata/Document/v1
+  name: helm-toolkit
+data:
+  chart_name: helm-toolkit
+  release: helm-toolkit
+  namespace: helm-tookit
+  wait:
+    timeout: 600
+  values: {}
+  source:
+    type: git
+    location: https://opendev.org/openstack/openstack-helm-infra.git
+    subpath: helm-toolkit
+    reference: master
+---
+schema: armada/ChartGroup/v1
+metadata:
+  schema: metadata/Document/v1
+  name: metamorph-group
+data:
+  description: Deploys Simple Service
+  sequenced: True
+  chart_group:
+    - metamorph
+---
+schema: armada/Manifest/v1
+metadata:
+  schema: metadata/Document/v1
+  name: simple-armada
+data:
+  release_prefix: armada
+  chart_groups:
+    - metamorph-group

@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "metamorph.fullname" . }}-api
+  labels:
+{{ include "metamorph.labels" . | indent 4 }}
+  namespace: {{ .Values.namespace }}
+spec:
+  type: {{ .Values.serviceMetamorphApi.type }}
+  ports:
+    - port: {{ .Values.serviceMetamorphApi.port }}
+      nodePort: {{ .Values.serviceMetamorphApi.nodePort }}
+      targetPort: {{ .Values.serviceMetamorphApi.port }}
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "metamorph.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "metamorph.fullname" . }}-controller
+  labels:
+{{ include "metamorph.labels" . | indent 4 }}
+  namespace: {{ .Values.namespace }}
+spec:
+  type: {{ .Values.serviceMetamorphCtrl.type }}
+  ports:
+    - port: {{ .Values.serviceMetamorphCtrl.port }}
+      nodePort: {{ .Values.serviceMetamorphCtrl.nodePort }}
+      targetPort: {{ .Values.serviceMetamorphCtrl.port }}
+      protocol: TCP
+      name: grpc
+  selector:
+    app.kubernetes.io/name: {{ include "metamorph.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "metamorph.fullname" . }}-nginx
+  labels:
+{{ include "metamorph.labels" . | indent 4 }}
+  namespace: {{ .Values.namespace }}
+spec:
+  type: {{ .Values.serviceNginx.type }}
+  ports:
+    - port: {{ .Values.serviceNginx.port }}
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "metamorph.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
