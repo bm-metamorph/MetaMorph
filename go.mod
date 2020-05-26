@@ -25,6 +25,6 @@ require (
 	k8s.io/api v0.18.1 // indirect
 )
 
-replace opendev.org/airship/go-redfish/client => /home/ekuamaj/go/src/opendev.org/airship/go-redfish/client
+replace opendev.org/airship/go-redfish/client => /root/go/src/opendev.org/airship/go-redfish/client // Use opendev/org/airship/go-redfish refs/changes/36/728636/2
 
-replace github.com/manojkva/go-redfish-api-wrapper => /home/ekuamaj/go/src/github.com/manojkva/go-redfish-api-wrapper
+replace github.com/manojkva/go-redfish-api-wrapper => /root/go/src/github.com/manojkva/go-redfish-api-wrapper //Replace the above redfish PS in the local dir of api-wrapper too
