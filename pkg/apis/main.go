@@ -6,15 +6,17 @@ import (
 	"fmt"
 	"github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"log"
 	"net/http"
 	"time"
 )
 
 func grpcClient() proto.NodeServiceClient {
+	logger.Log.Info("grpcClient()")
 	conn, err := grpc.Dial("localhost:4040", grpc.WithInsecure())
 	if err != nil {
+		logger.Log.Error("Failed to connect to GRPC server", zap.Error(err))
 		panic(err)
 	}
 	client := proto.NewNodeServiceClient(conn)
@@ -22,6 +24,7 @@ func grpcClient() proto.NodeServiceClient {
 }
 
 func createNode(ctx *gin.Context) {
+	logger.Log.Info("createNode()")
 	client := grpcClient()
 	data, _ := ctx.GetRawData()
 	req := &proto.Request{NodeSpec: data}
@@ -30,6 +33,8 @@ func createNode(ctx *gin.Context) {
 			"result": fmt.Sprint(response.Result),
 		})
 	} else {
+
+		logger.Log.Error("Failed to create Node", zap.Error(err))
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -37,6 +42,7 @@ func createNode(ctx *gin.Context) {
 }
 
 func describeNode(ctx *gin.Context) {
+	logger.Log.Info("describeNode()")
 	client := grpcClient()
 	node_id := ctx.Param("node_id")
 	fmt.Println(node_id)
@@ -44,6 +50,7 @@ func describeNode(ctx *gin.Context) {
 	if response, err := client.Describe(ctx, req); err == nil {
 		ctx.Data(http.StatusOK, gin.MIMEJSON, response.Res)
 	} else {
+		logger.Log.Error("Failed to retrieve Node information", zap.Error(err))
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -51,6 +58,7 @@ func describeNode(ctx *gin.Context) {
 }
 
 func updateNode(ctx *gin.Context) {
+	logger.Log.Info("updateNode()")
 	client := grpcClient()
 	node_id := ctx.Param("node_id")
 	data, _ := ctx.GetRawData()
@@ -60,6 +68,7 @@ func updateNode(ctx *gin.Context) {
 			"result": fmt.Sprint(response.Result),
 		})
 	} else {
+		logger.Log.Error("Failed to update Node", zap.Error(err))
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -67,6 +76,7 @@ func updateNode(ctx *gin.Context) {
 }
 
 func deleteNode(ctx *gin.Context) {
+	logger.Log.Info("deleteNode()")
 	client := grpcClient()
 	node_id := ctx.Param("node_id")
 	req := &proto.Request{NodeID: string(node_id)}
@@ -75,6 +85,7 @@ func deleteNode(ctx *gin.Context) {
 			"result": fmt.Sprint(response.Result),
 		})
 	} else {
+		logger.Log.Error("Failed to delete node", zap.Error(err))
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -82,6 +93,7 @@ func deleteNode(ctx *gin.Context) {
 }
 
 func deployNode(ctx *gin.Context) {
+	logger.Log.Info("deployNode")
 	client := grpcClient()
 	node_id := ctx.Param("node_id")
 	req := &proto.Request{NodeID: string(node_id)}
@@ -90,6 +102,7 @@ func deployNode(ctx *gin.Context) {
 			"result": fmt.Sprintf("Node %s deployed", response.Result),
 		})
 	} else {
+		logger.Log.Error("Failed to deploy Node", zap.Error(err))
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -97,6 +110,7 @@ func deployNode(ctx *gin.Context) {
 }
 
 func listNodes(ctx *gin.Context) {
+	logger.Log.Info("listNodes()")
 	client := grpcClient()
 	req := &proto.Request{}
 	if response, err := client.List(ctx, req); err == nil {
@@ -104,6 +118,7 @@ func listNodes(ctx *gin.Context) {
 			"result": fmt.Sprint(response.Result),
 		})
 	} else {
+		logger.Log.Error("Failed to list Nodes", zap.Error(err))
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -112,6 +127,7 @@ func listNodes(ctx *gin.Context) {
 }
 
 func getUUID(ctx *gin.Context) {
+	logger.Log.Info("getUUID")
 	client := grpcClient()
 	data, _ := ctx.GetRawData()
 	req := &proto.Request{NodeSpec: data}
@@ -120,6 +136,7 @@ func getUUID(ctx *gin.Context) {
 			"result": fmt.Sprint(response.Result),
 		})
 	} else {
+		logger.Log.Error("Failed to retrieve Node UUID", zap.Error(err))
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -128,6 +145,7 @@ func getUUID(ctx *gin.Context) {
 }
 
 func getNodeHWStatus(ctx *gin.Context) {
+	logger.Log.Info("getNodeHWStatus()")
 	client := grpcClient()
 	node_id := ctx.Param("node_id")
 
@@ -135,6 +153,7 @@ func getNodeHWStatus(ctx *gin.Context) {
 	if response, err := client.GetHWStatus(ctx, req); err == nil {
 		ctx.JSON(http.StatusOK, gin.H{"result": fmt.Sprint(response.Result)})
 	} else {
+		logger.Log.Error("Failed to retrieve HW status from Node", zap.Error(err))
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -142,6 +161,7 @@ func getNodeHWStatus(ctx *gin.Context) {
 }
 
 func updateNodeHWStatus(ctx *gin.Context) {
+	logger.Log.Info("updateNodeHWStatus()")
 	client := grpcClient()
 	node_id := ctx.Param("node_id")
 	data, _ := ctx.GetRawData()
@@ -151,6 +171,7 @@ func updateNodeHWStatus(ctx *gin.Context) {
 			"result": fmt.Sprint(response.Result),
 		})
 	} else {
+		logger.Log.Error("Failed to Update HW status", zap.Error(err))
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -159,6 +180,7 @@ func updateNodeHWStatus(ctx *gin.Context) {
 }
 
 func Serve() {
+	logger.Log.Info("Serve()")
 
 	r := gin.Default()
 	r.Use(ginzap.Ginzap(logger.Log, time.RFC3339, false))
@@ -178,7 +200,8 @@ func Serve() {
 	}
 
 	if err := r.Run(":8080"); err != nil {
-		log.Fatalf("Failed to Run server: %v ", err)
+		logger.Log.Fatal("Failed to Run Server", zap.Error(err))
+		//log.Fatalf("Failed to Run server: %v ", err)
 	}
 
 }
