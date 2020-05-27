@@ -1,14 +1,17 @@
 package controller
 
 import (
-	"bitbucket.com/metamorph/pkg/db/models/node"
-	"bitbucket.com/metamorph/pkg/drivers/redfish"
-	"bitbucket.com/metamorph/pkg/util/isogen"
 	"fmt"
-	"github.com/google/uuid"
 	"runtime"
 	"sync"
 	"time"
+
+	"bitbucket.com/metamorph/pkg/db/models/node"
+	"bitbucket.com/metamorph/pkg/drivers/redfish"
+	"bitbucket.com/metamorph/pkg/logger"
+	"bitbucket.com/metamorph/pkg/util/isogen"
+	"github.com/google/uuid"
+	"go.uber.org/zap"
 )
 
 type BMNode struct {
@@ -46,7 +49,7 @@ type NodeStatus struct {
 }
 
 func StartMetamorphFSM(runOnce bool) {
-	fmt.Println("Starting Metamorph FSM")
+        logger.Log.Info("Starting Metamorph FSM")
 	dbHandler := new(DBHandler)
 	dbHandler.startFSM(runOnce)
 
@@ -54,7 +57,7 @@ func StartMetamorphFSM(runOnce bool) {
 
 func (h *DBHandler) startFSM(runOnce bool) {
 
-	fmt.Println("Starting FSM")
+        logger.Log.Info("Starting Metamorph FSM")
 
 	var wg sync.WaitGroup
 
@@ -66,7 +69,7 @@ func (h *DBHandler) startFSM(runOnce bool) {
 	go serviceRequest(requestsChan, nodeStatusChan, &wg)
 	wg.Add(2)
 
-	fmt.Println("Number of Go Routines ", runtime.NumGoroutine())
+	logger.Log.Debug("Number of Go Routines at the Start",zap.Int("Number ", runtime.NumGoroutine()))
 
 	for {
 
@@ -74,7 +77,7 @@ func (h *DBHandler) startFSM(runOnce bool) {
 		//nodelist, err := h.db.GetNodes()
 
 		if err != nil {
-			fmt.Println("No Nodes to process...")
+			logger.Log.Debug("No Nodes to process...")
 
 		} else {
 
@@ -93,12 +96,13 @@ func (h *DBHandler) startFSM(runOnce bool) {
 			break
 		}
 	}
-	fmt.Println("Number of Go Routines", runtime.NumGoroutine())
+
+	logger.Log.Debug("Number of Go Routines Before start of close",zap.Int("Number ", runtime.NumGoroutine()))
 
 	close(requestsChan)
 	close(nodeStatusChan)
 	wg.Wait()
-	fmt.Println("Number of Go Routines", runtime.NumGoroutine())
+	logger.Log.Debug("Number of Go Routines at the End",zap.Int("Number ", runtime.NumGoroutine()))
 
 }
 
@@ -107,11 +111,11 @@ func checkFailedNodes(nodeStatusChan chan NodeStatus, wg *sync.WaitGroup) {
 	for nodestatus := range nodeStatusChan {
 
 		if nodestatus.Status == false {
-			fmt.Printf("Failed Node %v\n", nodestatus.NodeUUID)
+                        logger.Log.Warn("Failed Node ", zap.String("NodeUUID", nodestatus.NodeUUID.String()))
 			//try update of the db
 		}
 	}
-	fmt.Println("Closing checkFailedNodes Goroutine")
+        logger.Log.Info("Closing checkFailedNodes Goroutine")
 	wg.Done()
 }
 
@@ -121,27 +125,28 @@ func serviceRequest(requestsChan chan BMNode, nodeStatusChan chan<- NodeStatus, 
 
 		switch bmnode.State {
 		case NEW:
-			fmt.Printf("[%v] Transition to Ready State\n", bmnode.Name)
+                        logger.Log.Info("Node Changing States", zap.String("Node Name", bmnode.Name),zap.String("From", NEW), zap.String("To", bmnode.State))
 			wg.Add(1)
 			go ReadystateHandler(bmnode, nodeStatusChan, wg)
 		case READY:
-			fmt.Printf("[%v] Transitioning to SetupReady\n", bmnode.Name)
+                        logger.Log.Info("Node Changing States", zap.String("Node Name", bmnode.Name),zap.String("From", READY), zap.String("To", bmnode.State))
 			wg.Add(1)
 			go SetupreadyHandler(bmnode, nodeStatusChan, wg)
 		case SETUPREADY:
-			fmt.Printf("[%v] Transitioning to Deployed State\n", bmnode.Name)
+                        logger.Log.Info("Node Changing States", zap.String("Node Name", bmnode.Name),zap.String("From", SETUPREADY), zap.String("To", bmnode.State))
 			wg.Add(1)
 			go DeployedHandler(bmnode, nodeStatusChan, wg)
 		default:
-			fmt.Printf("[%v] State not defined\n", bmnode.Name)
+                        logger.Log.Warn("State not handled...", zap.String("Node Name", bmnode.Name))
 			//nodestatus := NodeStatus { NodeUUID: node.NodeUUID, Status: false }
 			//nodeStatusChan <- nodestatus
 		}
 
-		fmt.Println("Number of Go Routines ", runtime.NumGoroutine())
+	        logger.Log.Debug("Number of Go Routines During request handling",zap.Int("Number ", runtime.NumGoroutine()))
+
 
 	}
-	fmt.Println("Closing serviceRequest Goroutine")
+        logger.Log.Info("Closing serviceRequest Goroutine")
 	wg.Done()
 
 }
@@ -149,10 +154,9 @@ func serviceRequest(requestsChan chan BMNode, nodeStatusChan chan<- NodeStatus, 
 func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
 	var err error
 	var state string
-	fmt.Printf("[%v] Entering Ready State Handler\n", bmnode.Name)
+        logger.Log.Info("ReadystateHandler()", zap.String("Node Name", bmnode.Name), zap.String("Node UUID", bmnode.NodeUUID.String()))
 	//Update the DB Now
 	err = node.Update( &node.Node{State: INTRANSITION})
-	fmt.Printf("[%v] - NodeUUID - %v\n", bmnode.Name, bmnode.NodeUUID)
 	var nodestatus NodeStatus
 
 	// Check if we could extract UUID from the Node using Redfish
@@ -170,6 +174,7 @@ func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 	node_uuid = bmnode.NodeUUID
 
 	if (err != nil) || (res == false) {
+                logger.Log.Error("Failed to connect to Node using Redfish Protocol or Failed to update DB.Setting Node to FAILED State",zap.String("IPMIIP", bmnode.Node.IPMIIP), zap.String("IPMIUser", bmnode.IPMIUser))
 		nodestatus = NodeStatus{NodeUUID: node_uuid, Status: false}
 		state = FAILED
 	} else {
@@ -180,7 +185,7 @@ func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 	//Update the DB Now
 	err = node.Update(&node.Node{State: state, NodeUUID: node_uuid})
 	if err != nil {
-		fmt.Printf("Failed to update [%v] to READYWAIT state", bmnode.Name)
+                logger.Log.Error("Failed to update Node to READYWAIT state", zap.String("Node Name", bmnode.Name))
 		state = FAILED
 		node.Update( &node.Node{State: state, NodeUUID: node_uuid})
 	}
@@ -190,7 +195,7 @@ func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 }
 
 func SetupreadyHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
-	fmt.Printf("[%v] Entering Setup Ready State Handler\n", bmnode.Name)
+        logger.Log.Info("SetupreadyHandler()", zap.String("Node Name", bmnode.Name))
 	var nodestatus NodeStatus
 	var err error
 
@@ -206,7 +211,7 @@ func SetupreadyHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 
 	var state string
 	if err != nil {
-		fmt.Printf("[%v] failed to create ISO file", bmnode.Name)
+                logger.Log.Error("Failed to create ISO file", zap.String("Node Name", bmnode.Name))
 		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: false}
 		state = FAILED
 
@@ -217,7 +222,7 @@ func SetupreadyHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 	}
 	err = node.Update( &node.Node{State: state})
 	if err != nil {
-		fmt.Printf("Failed to update [%v] to SETUPREADYWAIT state", bmnode.Name)
+                logger.Log.Error("Failed to update to SETUPREADYWAIT state", zap.String("Node Name", bmnode.Name))
 		state = FAILED
 		node.Update( &node.Node{State: state })
 	}
@@ -225,7 +230,7 @@ func SetupreadyHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 	wg.Done()
 }
 func DeployedHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
-	fmt.Printf("[%v] Entering Deployed State Handler\n", bmnode.Name)
+        logger.Log.Info("DeployedHandler()", zap.String("Node Name", bmnode.Name))
 	var nodestatus NodeStatus
 	var result bool
 	//Update the DB Now
@@ -238,7 +243,7 @@ func DeployedHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.W
 	var state string
 
 	if (result == false) || (err != nil){
-
+                logger.Log.Error("Failed to Deply ISO", zap.String("Node Name", bmnode.Name))
 		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: false}
 		state = FAILED
 	} else {
@@ -248,7 +253,7 @@ func DeployedHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.W
 	}
 	err = node.Update( &node.Node{State: state})
 	if err != nil {
-		fmt.Printf("Failed to update [%v] to DEPLOYING state", bmnode.Name)
+                logger.Log.Error("Failed to update to DEPLOYING state", zap.String("Node Name", bmnode.Name))
 		state = FAILED
 		node.Update( &node.Node{State: state })
 	}

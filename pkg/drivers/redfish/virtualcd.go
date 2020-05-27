@@ -4,6 +4,7 @@ import (
 	config "bitbucket.com/metamorph/pkg/config"
 	"fmt"
 	client "github.com/manojkva/go-redfish-api-wrapper/pkg/redfishwrap/idrac"
+	"time"
 )
 
 func (bmhnode *BMHNode) GetVirtualMediaStatus() bool {
@@ -20,7 +21,19 @@ func (bmhnode *BMHNode) InsertISO() bool {
 
 	redfishClient := getRedfishClient(bmhnode)
 	fmt.Printf("Image URL to be inserted = %v", bmhnode.ImageURL)
-	result := redfishClient.InsertISO(config.Get("idrac.managerID").(string), "CD", bmhnode.ImageURL)
+	result := false
+	for retryCount := 0; ; retryCount++ {
+		result = redfishClient.InsertISO(config.Get("idrac.managerID").(string), "CD", bmhnode.ImageURL)
+		if result == true {
+			break
+		}
+		if retryCount >= 2 {
+			break
+		}
+		time.Sleep(time.Second * 5)
+		fmt.Printf("Retrying after 5 seconds. Retry Count :%v", retryCount+1)
+
+	}
 	return result
 }
 

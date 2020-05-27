@@ -9,7 +9,8 @@ controller:
     port : 8080
 
 logger:
-    path: /tmp/metamorph.log
+    apipath: /tmp/metamorph_api.log
+    controllerpath: /tmp/metamorph_controller.log
 
 
 idrac:
@@ -37,7 +38,7 @@ templates:
         config: configs/templates/netplan.tmpl
         filepath: 50-cloud-init.yaml
     agent_config:
-        config:  templates/agent_config.tmpl
+        config:  configs/templates/agent_config.tmpl
         filepath: agent_config.yaml
 
 assets:
