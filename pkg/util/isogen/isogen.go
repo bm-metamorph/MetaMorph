@@ -223,7 +223,12 @@ func (bmhnode *BMHNode) PrepareISO() error {
 		return fmt.Errorf(errMessage + "%+v", err)
 	}
 	//Netplan
-	err = bmhnode.CreateNetplanFileFromTemplate(iso_custom_scripts_path, "netplan")
+	// Try using the NetPlanCloudInit string
+	err = bmhnode.CreateNetplanFileFromString(iso_custom_scripts_path, "netplan")
+	if err !=  nil {
+		// Try using the standalone network config data structure
+		err = bmhnode.CreateNetplanFileFromTemplate(iso_custom_scripts_path, "netplan")
+	}
 
 	if err != nil {
                 errMessage = "Failed to create Netplan file with error"

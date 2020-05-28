@@ -8,13 +8,34 @@ import (
 	"path"
 	"regexp"
 	"strconv"
+        "io/ioutil"
 
 	config "bitbucket.com/metamorph/pkg/config"
 	"bitbucket.com/metamorph/pkg/db/models/node"
+	"encoding/base64"
 )
 
 type BMHNode struct {
 	*node.Node
+}
+
+func (bmhnode *BMHNode) CreateNetplanFileFromString(outputdir string, modulename string) error {
+	var cloudInitfile = bmhnode.NetPlanCloudInitFile
+	if cloudInitfile == "" {
+		return  fmt.Errorf("NetPlanCloudInitfile is empty")
+	}
+	decodedStringInBytes, result := IsBase64(cloudInitfile)
+	if result != true{
+		return fmt.Errorf("NetPlanCloudInitfile is not Base64 encoded")
+	}
+
+	filepath := config.Get("templates." + modulename + ".filepath").(string)
+	outputfilepathAbsolute := path.Join(outputdir, filepath)
+
+	//Write stirng to file
+	err := ioutil.WriteFile(outputfilepathAbsolute,decodedStringInBytes,0644)
+	return err
+
 }
 
 func (bmhnode *BMHNode) CreateNetplanFileFromTemplate(outputdir string, modulename string) error {
@@ -132,4 +153,9 @@ func getDiskSpaceinMB(diskspace string) (diskspaceinMB string, maxdiskSizeinMB s
 	}
 	return "", "", err
 
+}
+
+func IsBase64(s string) ([]byte, bool) {
+	decodedString , err := base64.StdEncoding.DecodeString(s)
+	return decodedString , err == nil
 }
