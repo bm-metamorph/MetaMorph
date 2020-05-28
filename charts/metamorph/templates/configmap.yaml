@@ -7,13 +7,14 @@ data:
   config.yaml: |
     database:
         type: sqlite
-        path: "/tmp/db/metamorph.db"
+        path: "/opt/metamorph/db/metamorph.db"
     
     controller:
         port : 8080
     
     logger:
-        path: /tmp/metamorph.log
+        apipath: /opt/metamorph/metamorph_api.log
+        controllerpath: /opt/metamorph/metamorph_controller.log
     
     idrac:
         systemID: "System.Embedded.1"
@@ -21,7 +22,7 @@ data:
         controllerID: "RAID.Slot.6-1"
     
     templates:
-        rootdir: src/bitbucket.com/metamorph
+        rootdir: /opt/metamorph
         preseed:
             config:  configs/templates/preseed.tmpl
             filepath: preseed/hwe-ubuntu-server.seed
@@ -39,13 +40,21 @@ data:
         netplan:
             config: configs/templates/netplan.tmpl
             filepath: 50-cloud-init.yaml
+        agent_config:
+            config:  configs/templates/agent_config.tmpl
+            filepath: agent_config.yaml
+    assets:
+        rootdir: /opt/metamorph/assets
+        agent_binary:
+          src:  files/metamorph_agent
+          dest: metamorph_agent
 
     iso:
-      rootpath: /tmp/iso_root
-      tempdir: /tmp/iso_root/isos    
+      rootpath: /opt/metamorph/iso_root
+      tempdir: /opt/metamorph/iso_root/isos    
     
     http:
-      rootpath: /tmp/http_root
+      rootpath: /opt/metamorph/http_root
     
     image:
         url: "http://32.68.220.23:31180/ubuntu-18.04.4-server-amd64.iso"

@@ -7,19 +7,19 @@ replicaCount: 1
 namespace: metamorph
 
 nginxImage:
-  repository: docker.io/library/nginx
+  repository: nginx
   tag: latest
   pullPolicy: IfNotPresent
 
 image:
-  repository: docker.io/library/metamorph
+  repository: metamorph
   tag: latest
   pullPolicy: IfNotPresent
 
 
 # do not change the config path
 # TODO: push the config via env Vars
-metamorphConfigPath: "/src/bitbucket.com/metamorph"
+metamorphConfigPath: "/opt/metamorph"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -28,17 +28,17 @@ fullnameOverride: ""
 serviceMetamorphCtrl:
   type: NodePort
   port: 4040
-  nodePort: 32600
+  nodePort: 31380
 
 serviceMetamorphApi:
   type: NodePort
   port: 8080
-  nodePort: 32700
+  nodePort: 31280
 
 serviceNginx:
   type: NodePort
   port: 80
-  nodePort: 32800
+  nodePort: 31180
 
 
 ingress:
