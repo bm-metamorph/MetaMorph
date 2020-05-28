@@ -40,6 +40,7 @@ type Node struct {
 	ProvisionerPort      int
 	HTTPPort             int
 	BootActions          []BootAction 
+	NetPlanCloudInitFile string
   }
   
   type BootAction struct {

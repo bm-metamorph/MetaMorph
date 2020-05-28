@@ -30,6 +30,13 @@ func TestCreateNetplanfile(t *testing.T) {
 	bmhnode.CreateNetplanFileFromTemplate("/tmp", "netplan")
 	assert.FileExists(t, "/tmp/50-cloud-init.yaml")
 }
+
+func TestCreateNetplanFileFromString(t *testing.T){
+       bmhnode := &BMHNode{node.CreateTestNode()}
+       bmhnode.CreateNetplanFileFromString("/tmp","netplan")
+        assert.FileExists(t, "/tmp/50-cloud-init.yaml")
+
+}
 func TestCreateInitfile(t *testing.T) {
 	bmhnode := &BMHNode{node.CreateTestNode()}
 	bmhnode.CreateFileFromTemplate("/tmp", "init")
