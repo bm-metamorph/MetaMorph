@@ -19,7 +19,7 @@ idrac:
     controllerID: "RAID.Slot.6-1"
 
 templates:
-    rootdir: src/bitbucket.com/metamorph
+    rootdir: /home/ekuamaj/go/src/bitbucket.com/metamorph
     preseed:
         config:  configs/templates/preseed.tmpl
         filepath: preseed/hwe-ubuntu-server.seed
