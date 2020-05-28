@@ -121,8 +121,8 @@ func (bmhnode *BMHNode) PrepareISO() error {
 	iso_rootpath := config.Get("iso.rootpath").(string)
 	HTTPRootPath := config.Get("http.rootpath").(string)
 
-	iso_urlpath := config.Get("image.url").(string)
-	iso_checksum := config.Get("image.checksum").(string)
+	iso_urlpath := bmhnode.ISOURL
+	iso_checksum := bmhnode.ISOChecksum
 
 	iso_name_parts := strings.Split(iso_urlpath, "/")
 	iso_name := iso_name_parts[len(iso_name_parts)-1]

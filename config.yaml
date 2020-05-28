@@ -55,11 +55,6 @@ iso:
 http:
   rootpath: /tmp/http_root
 
-
-image:
-    url: "http://32.68.220.23:31180/ubuntu-18.04.4-server-amd64.iso"
-    checksum: "http://32.68.220.23:31180/ubuntu-18.04.4-server-amd64.iso.md5sum"
-
 provisioning:
     ip : "32.68.220.23"
     port:  3190

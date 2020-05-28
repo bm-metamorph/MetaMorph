@@ -20,13 +20,13 @@ type BMHNode struct {
 }
 
 func (bmhnode *BMHNode) CreateNetplanFileFromString(outputdir string, modulename string) error {
-	var cloudInitfile = bmhnode.NetPlanCloudInitFile
-	if cloudInitfile == "" {
-		return  fmt.Errorf("NetPlanCloudInitfile is empty")
+	var networkConfig = bmhnode.NetworkConfig
+	if networkConfig == "" {
+		return  fmt.Errorf("NetworkConfig is empty")
 	}
-	decodedStringInBytes, result := IsBase64(cloudInitfile)
+	decodedStringInBytes, result := IsBase64(networkConfig)
 	if result != true{
-		return fmt.Errorf("NetPlanCloudInitfile is not Base64 encoded")
+		return fmt.Errorf("NetworkConfig is not Base64 encoded")
 	}
 
 	filepath := config.Get("templates." + modulename + ".filepath").(string)

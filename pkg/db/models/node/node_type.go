@@ -11,6 +11,8 @@ type Node struct {
 	gorm.Model
 	NodeUUID             uuid.UUID
 	Name                 string
+        ISOURL               string
+        ISOChecksum          string
 	ImageURL             string
 	ChecksumURL          string
     DisableCertVerification bool
@@ -39,10 +41,11 @@ type Node struct {
 	ProvisioningIP       string
 	ProvisionerPort      int
 	HTTPPort             int
-	BootActions          []BootAction 
-	NetPlanCloudInitFile string
+	BootActions          []BootAction
+	NetworkConfig        string
+        RAID_reset           bool  `gorm:"DEFAULT:true"`
   }
-  
+
   type BootAction struct {
 	  gorm.Model
 	  NodeID     uint
