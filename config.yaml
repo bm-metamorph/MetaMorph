@@ -12,12 +12,6 @@ logger:
     apipath: /tmp/metamorph_api.log
     controllerpath: /tmp/metamorph_controller.log
 
-
-idrac:
-    systemID: "System.Embedded.1"
-    managerID: "iDRAC.Embedded.1"
-    controllerID: "RAID.Slot.6-1"
-
 templates:
     rootdir: /home/ekuamaj/go/src/bitbucket.com/metamorph
     preseed:
