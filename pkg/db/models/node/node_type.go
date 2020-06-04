@@ -43,7 +43,9 @@ type Node struct {
 	HTTPPort             int
 	BootActions          []BootAction
 	NetworkConfig        string
-        RAID_reset           bool  `gorm:"DEFAULT:true"`
+        RAID_reset           bool
+        RedfishManagerID     string
+        RedfishSystemID      string
   }
 
   type BootAction struct {

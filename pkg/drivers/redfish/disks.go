@@ -1,7 +1,7 @@
 package redfish
 
 import (
-	config "bitbucket.com/metamorph/pkg/config"
+	//config "bitbucket.com/metamorph/pkg/config"
 	"bitbucket.com/metamorph/pkg/db/models/node"
 	"fmt"
 	client "github.com/manojkva/go-redfish-api-wrapper/pkg/redfishwrap/idrac"
@@ -41,7 +41,7 @@ func (bmhnode *BMHNode) CleanVirtualDIskIfEExists() bool {
 	}
 	for _, raiddisk := range virtualdisklist {
 
-		result = redfishClient.CleanVirtualDisksIfAny(config.Get("idrac.systemID").(string), raiddisk.RaidController)
+		result = redfishClient.CleanVirtualDisksIfAny(bmhnode.RedfishSystemID, raiddisk.RaidController)
 		if result == false {
 			fmt.Printf("Failed to clean up Virtual Disk %v\n", raiddisk)
 			return result
@@ -85,7 +85,7 @@ func (bmhnode *BMHNode) CreateVirtualDisks() bool {
 
 		volumeType := raidLevelMap[vd.RaidType]
 
-		jobId := redfishClient.CreateVirtualDisk(config.Get("idrac.systemID").(string),
+		jobId := redfishClient.CreateVirtualDisk(bmhnode.RedfishSystemID,
 			vd.RaidController, volumeType, vd.DiskName, diskIDs)
 
 		fmt.Printf("Job Id returned is %v\n", jobId)

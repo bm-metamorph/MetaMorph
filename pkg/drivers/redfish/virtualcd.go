@@ -1,7 +1,7 @@
 package redfish
 
 import (
-	config "bitbucket.com/metamorph/pkg/config"
+	//config "bitbucket.com/metamorph/pkg/config"
 	"bitbucket.com/metamorph/pkg/logger"
 	"fmt"
 	client "github.com/manojkva/go-redfish-api-wrapper/pkg/redfishwrap/idrac"
@@ -19,7 +19,7 @@ func init() {
 
 func (bmhnode *BMHNode) GetVirtualMediaStatus() bool {
 	redfishClient := getRedfishClient(bmhnode)
-	result := redfishClient.GetVirtualMediaStatus(config.Get("idrac.managerID").(string), "CD")
+	result := redfishClient.GetVirtualMediaStatus(bmhnode.RedfishManagerID, "CD")
 	return result
 }
 
@@ -33,7 +33,7 @@ func (bmhnode *BMHNode) InsertISO() bool {
 	fmt.Printf("Image URL to be inserted = %v", bmhnode.ImageURL)
 	result := false
 	for retryCount := 0; ; retryCount++ {
-		result = redfishClient.InsertISO(config.Get("idrac.managerID").(string), "CD", bmhnode.ImageURL)
+		result = redfishClient.InsertISO(bmhnode.RedfishManagerID, "CD", bmhnode.ImageURL)
 		if result == true {
 			break
 		}
@@ -49,32 +49,32 @@ func (bmhnode *BMHNode) InsertISO() bool {
 
 func (bmhnode *BMHNode) SetOneTimeBoot() bool {
 	redfishClient := getRedfishClient(bmhnode)
-	result := redfishClient.SetOneTimeBoot(config.Get("idrac.systemID").(string))
+	result := redfishClient.SetOneTimeBoot(bmhnode.RedfishSystemID)
 	return result
 
 }
 
-func (bhmnode *BMHNode) Reboot() bool {
-	redfishClient := getRedfishClient(bhmnode)
-	result := redfishClient.RebootServer(config.Get("idrac.systemID").(string))
+func (bmhnode *BMHNode) Reboot() bool {
+	redfishClient := getRedfishClient(bmhnode)
+	result := redfishClient.RebootServer(bmhnode.RedfishSystemID)
 	return result
 }
 
-func (bhmnode *BMHNode) PowerOff() bool {
-	redfishClient := getRedfishClient(bhmnode)
-	result := redfishClient.PowerOff(config.Get("idrac.systemID").(string))
+func (bmhnode *BMHNode) PowerOff() bool {
+	redfishClient := getRedfishClient(bmhnode)
+	result := redfishClient.PowerOff(bmhnode.RedfishSystemID)
 	return result
 }
 
-func (bhmnode *BMHNode) PowerOn() bool {
-	redfishClient := getRedfishClient(bhmnode)
-	result := redfishClient.PowerOn(config.Get("idrac.systemID").(string))
+func (bmhnode *BMHNode) PowerOn() bool {
+	redfishClient := getRedfishClient(bmhnode)
+	result := redfishClient.PowerOn(bmhnode.RedfishSystemID)
 	return result
 }
 
-func (bhmnode *BMHNode) GetPowerStatus() bool {
-	redfishClient := getRedfishClient(bhmnode)
-	result := redfishClient.GetPowerStatus(config.Get("idrac.systemID").(string))
+func (bmhnode *BMHNode) GetPowerStatus() bool {
+	redfishClient := getRedfishClient(bmhnode)
+	result := redfishClient.GetPowerStatus(bmhnode.RedfishSystemID)
 	return result
 }
 
@@ -82,7 +82,7 @@ func (bmhnode *BMHNode) EjectISO() bool {
 	var result bool
 	redfishClient := getRedfishClient(bmhnode)
 	if bmhnode.GetVirtualMediaStatus() == true {
-		result = redfishClient.EjectISO(config.Get("idrac.managerID").(string), "CD")
+		result = redfishClient.EjectISO(bmhnode.RedfishManagerID, "CD")
 	} else {
 		fmt.Printf("Skipping Eject . VirtualMedia not attached \n")
 		result = true
@@ -92,15 +92,26 @@ func (bmhnode *BMHNode) EjectISO() bool {
 }
 
 func GetUUID(hostIP string, username string, password string) (string, bool) {
-
 	redfishClient := client.IdracRedfishClient{
-		Username: username,
-		Password: password,
-		HostIP:   hostIP,
+	              Username: username,
+	               Password: password,
+	               HostIP:   hostIP,
+		   }
+	redfishSystemID := redfishClient.GetSystemID()
+	if redfishSystemID == "" {
+		return  "", false
 	}
-	uuid, result := redfishClient.GetNodeUUID(config.Get("idrac.systemID").(string))
+	uuid, result := redfishClient.GetNodeUUID(redfishSystemID)
 	return uuid, result
+}
 
+func (bmhnode *BMHNode)GetManagerID() string {
+	redfishClient := getRedfishClient(bmhnode)
+	return redfishClient.GetManagerID()
+}
+func (bmhnode *BMHNode)GetSystemID() string {
+	redfishClient := getRedfishClient(bmhnode)
+	return redfishClient.GetSystemID()
 }
 
 func (bmhnode *BMHNode) DeployISO() bool {
