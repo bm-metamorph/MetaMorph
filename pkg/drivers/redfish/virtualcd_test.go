@@ -67,3 +67,10 @@ func TestPowerOn(t *testing.T){
 	assert.Equal(t, res, true)
 
 }
+
+func TestGetRedfishVersion(t *testing.T){
+	bmhnode := &BMHNode { node.CreateTestNode()}
+	rfvers := bmhnode.GetRedfishVersion()
+	assert.Equal(t,rfvers,"1.4.0")
+
+}
