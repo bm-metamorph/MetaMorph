@@ -46,6 +46,7 @@ type Node struct {
         RAID_reset           bool
         RedfishManagerID     string
         RedfishSystemID      string
+        RedfishVersion       string
   }
 
   type BootAction struct {

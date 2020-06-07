@@ -167,6 +167,7 @@ func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 	redfishClient := &redfish.BMHNode{bmnode.Node}
 	redfishManagerID := redfishClient.GetManagerID()
 	redfishSystemID := redfishClient.GetSystemID()
+	redfishVersion := redfishClient.GetRedfishVersion()
 
 	var res bool = false
 	var nodeuuidStringFromServer string
@@ -179,7 +180,7 @@ func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 
 	node_uuid = bmnode.NodeUUID // to be removed once UUID = Server UUID is planned.
 
-	if (err != nil) || (res == false) || (redfishSystemID == "") || (redfishManagerID == "") {
+	if (err != nil) || (res == false) || (redfishSystemID == "") || (redfishManagerID == "") || (redfishVersion == "") {
 		logger.Log.Error("Failed to connect to Node using Redfish Protocol or Failed to update DB.Setting Node to FAILED State", zap.String("IPMIIP", bmnode.Node.IPMIIP), zap.String("IPMIUser", bmnode.IPMIUser))
 		nodestatus = NodeStatus{NodeUUID: node_uuid, Status: false}
 		state = FAILED
@@ -189,7 +190,7 @@ func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
 	}
 	//Update the DB Now
-	err = node.Update(&node.Node{State: state, NodeUUID: node_uuid, RedfishManagerID: redfishManagerID, RedfishSystemID: redfishSystemID})
+	err = node.Update(&node.Node{State: state, NodeUUID: node_uuid, RedfishManagerID: redfishManagerID, RedfishSystemID: redfishSystemID, RedfishVersion: redfishVersion,})
 	if err != nil {
 		logger.Log.Error("Failed to update Node to READYWAIT state", zap.String("Node Name", bmnode.Name))
 		state = FAILED
