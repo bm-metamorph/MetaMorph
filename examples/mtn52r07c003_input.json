@@ -1,18 +1,7 @@
 {
   "name": "mtn52r07c003",
-  "imageURL": "http://32.68.49.133:31180/ubuntu-18.04.3-server-amd64.iso",
-  "OamIP": "32.68.220.15",
-  "OamGateway": "32.68.220.1",
-  "NameServers": [{
-      "Nameserver": "150.234.210.5"
-    },
-    {
-      "Nameserver": "150.234.210.205"
-    },
-    {
-      "Nameserver": "135.188.34.124"
-    }
-  ],
+  "ISOURL": "http://32.68.220.23:31180/ubuntu-18.04.4-server-amd64.iso",
+  "ISOChecksum": "http://32.68.220.23:31180/ubuntu-18.04.4-server-amd64.iso.md5sum",
   "OsDisk": "/dev/sda",
   "Partitions": [{
       "partitionName": "root",
@@ -64,34 +53,6 @@
     },
     {
       "SSHPubKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtIbTb2c33GhoprVOdZB5EvuCs7JOo5dgq8z3aOpJO/7efCF3Wft/Q0ve8ndRNVNt30KxpK7ro5ad31yloVQqj/MhYvI/fPMsyocCyPo+fJOf/8+u2TEMJUaDjwTRCnsPSu8fendpNt9HdreZcUT5R/foN3dpPfUiAPREgpvMqVfE7rtSyGs8ZRRTVYIohBwOVemCrdIGjjIzbGVLQfRWHkuJpl6Js2kHlO6trsE7aEiEqkaGEaJGCyGOlSS119lBsvsiEc4ExNczKAduMYY86xSxGo7zpf2R6mQTOmCHVSSwSfy0UHIgDVFPIVgyZSI27F2NLYnJeAmRqN9PNitPp ae196e@att.com"
-    }
-  ],
-  "BondInterfaces": [{
-      "BondInterface": "enp135s0f0"
-    },
-    {
-      "BondInterface": "enp94s0f1"
-    }
-  ],
-  "BondParameters": [{
-      "Key": "down-delay",
-      "Value": "3000"
-    },
-    {
-      "Key": "lacp-rate",
-      "Value": "fast"
-    },
-    {
-      "Key": "mii-monitor-interval",
-      "Value": "100"
-    },
-    {
-      "Key": "mode",
-      "Value": "802.3ad"
-    },
-    {
-      "Key": "up-delay",
-      "Value": "1000"
     }
   ],
 
@@ -166,5 +127,8 @@
 			"priority": 5
 		}
 		
-	]
+	],
+ "NetworkConfig": "ICAgIG5hbWU6ICJlbjA0IgogICAgZW5wMTM1czBmMDoKICAgICAgbXR1OiA5MjE0CiAgICAgIG1hdGNoOgogICAgICAgIG5hbWU6IGVucDEzNXMwZjAiCiAgICBlbnA5NHMwZjE6CiAgICAgIG10dTogOTIxNAogICAgICBtYXRjaDoKICAgICAgICBuYW1lOiBlbnA5NHMwZjEKICBib25kczoKICAgIGJvbmQwOgogICAgICBtdHU6IDkyMTQKICAgICAgaW50ZXJmYWNlczogCiAgICAgIC0gZW5wMTM1czBmMAogICAgICAtIGVucDk0czBmMQogICAgICBwYXJhbWV0ZXJzOiAKICAgICAgICBkb3duLWRlbGF5OiAzMDAwCiAgICAgICAgbGFjcC1yYXRlOiBmYXN0CiAgICAgICAgbWlpLW1vbml0b3ItaW50ZXJ2YWw6IDEwMAogICAgICAgIG1vZGU6IDgwMi4zYWQKICAgICAgICB1cC1kZWxheTogMTAwMAogIHZsYW5zOgogICAgb2FtOgogICAgICBpZDogNDEKICAgICAgbGluazogYm9uZDAKICAgICAgZGhjcDQ6IG5vCiAgICAgIG10dTogOTIxNAogICAgICBhZGRyZXNzZXM6IFszMi42OC4yMjAuMTUvMjYsIF0KICAgICAgZ2F0ZXdheTQ6IDMyLjY4LjIyMC4xCiAgICAgIG5hbWVzZXJ2ZXJzOgogICAgICAgIGFkZHJlc3NlczogWzE1MC4yMzQuMjEwLjUsIDE1MC4yMzQuMjEwLjIwNSwgMTM1LjE4OC4zNC4xMjQsIF0K",
+  "RAID_reset" : false
+
 }

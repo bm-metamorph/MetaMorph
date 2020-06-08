@@ -14,7 +14,7 @@ const ilo4VirtualMediaAction string = "/VirtualMedia/2/Actions/Oem/Hp/HpiLOVirtu
 const ejectVirtualMedia string = "EjectVirtualMedia/"
 const insertVirtualMedia string = "InsertVirtualMedia/"
 const managerEndPoint string = "https://%v/redfish/v1/Managers/%v"
-const systemEndPoint string = "https://%v/redfish/v1/Systems/%v"
+const systemEndPoint string = "https://%v/redfish/v1/Systems/%v/"
 
 func checkStatusCode(statuscode int) bool {
 	sucessCodes := []int{200, 204, 202}
@@ -31,6 +31,7 @@ func (bmhnode *BMHNode) PostRequestToRedfish(endpointURL string, data []byte) (m
 	restyClient := resty.New()
 	restyClient.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 	restyClient.SetBasicAuth(bmhnode.IPMIUser, bmhnode.IPMIPassword)
+	restyClient.SetDebug(true)
 
 	resp, err := restyClient.R().EnableTrace().
 		SetHeader("Content-Type", "application/json").
@@ -50,6 +51,7 @@ func (bmhnode *BMHNode) PatchRequestToRedfish(endpointURL string, data []byte) (
 	restyClient := resty.New()
 	restyClient.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 	restyClient.SetBasicAuth(bmhnode.IPMIUser, bmhnode.IPMIPassword)
+	restyClient.SetDebug(true)
 
 	resp, err := restyClient.R().EnableTrace().
 		SetHeader("Content-Type", "application/json").
@@ -70,6 +72,7 @@ func (bmhnode *BMHNode) GetRequestRedfish(endpointURL string) (map[string]interf
 	restyClient := resty.New()
 	restyClient.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 	restyClient.SetBasicAuth(bmhnode.IPMIUser, bmhnode.IPMIPassword)
+	restyClient.SetDebug(true)
 
 	resp, err := restyClient.R().EnableTrace().Get(endpointURL)
 	fmt.Println("Trace Info:", resp.Request.TraceInfo())
@@ -122,10 +125,13 @@ func (bmhnode *BMHNode) SetOneTimeBootILO4() bool {
 
 	requestBody := "{ \"Boot\": { \"BootSourceOverrideEnabled\": \"Once\", \"BootSourceOverrideTarget\": \"Cd\" } }"
 
-	fmt.Printf("Endpoint %+v", redfishEndpoint)
+	fmt.Printf("Endpoint %+v\n", redfishEndpoint)
+
+	fmt.Printf("Request Body %+v\n", requestBody)
 
 	_, err = bmhnode.PatchRequestToRedfish(redfishEndpoint, []byte(requestBody))
 	if err != nil {
+		fmt.Printf("Failed to set one time boot\n")
 		return false
 	}
 	return true
