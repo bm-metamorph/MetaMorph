@@ -39,7 +39,9 @@ func (bmhnode *BMHNode) PostRequestToRedfish(endpointURL string, data []byte) (m
 	fmt.Println("Trace Info:", resp.Request.TraceInfo())
 
 	if (err == nil) && checkStatusCode(resp.StatusCode()) {
-		err = json.Unmarshal(resp.Body(), &resultBody)
+		if len(resp.Body()) != 0 {
+			err = json.Unmarshal(resp.Body(), &resultBody)
+		}
 	} else {
 		return nil, errors.Wrap(err, fmt.Sprintf("Post request failed : URL - %v, reqbody - %v", endpointURL, string(data)))
 	}

@@ -59,12 +59,13 @@ func (bmhnode *BMHNode) InsertISO() bool {
 
 func (bmhnode *BMHNode) SetOneTimeBoot() bool {
 	var result bool
-	redfishClient := getRedfishClient(bmhnode)
+	//redfishClient := getRedfishClient(bmhnode)
 	if bmhnode.RedfishVersion == "1.0.0" {
 		result = bmhnode.SetOneTimeBootILO4()
 
 	} else {
-		result = redfishClient.SetOneTimeBoot(bmhnode.RedfishSystemID)
+		//result = redfishClient.SetOneTimeBoot(bmhnode.RedfishSystemID)
+		result = bmhnode.SetOneTimeBootIDRAC()
 	}
 	return result
 
