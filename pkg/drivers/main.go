@@ -4,16 +4,16 @@ import (
 	"bitbucket.com/metamorph/pkg/db/models/node"
 	"bitbucket.com/metamorph/pkg/drivers/redfish"
 	"fmt"
-	"os"
+//	"os"
 )
 
 // For Testing Purpose only !!!
 
 func main() {
+        var res bool
 
 	bmhnode := &redfish.BMHNode{node.CreateTestNode()}
 	bmhnode.ImageURL = "http://test/xyz.iso"
-	fmt.Println("Insert ISO ")
 	bmhnode.RedfishVersion = bmhnode.GetRedfishVersion()
 
 	fmt.Scanln()
@@ -23,6 +23,8 @@ func main() {
 
 	bmhnode.RedfishSystemID = bmhnode.GetSystemID()
 	fmt.Scanln()
+/*
+	fmt.Println("Insert ISO ")
 
 	res := bmhnode.InsertISO()
 	if !res {
@@ -42,6 +44,7 @@ func main() {
 	fmt.Scanln()
 	fmt.Println("Check Status of virtual media")
 	bmhnode.GetVirtualMediaStatus()
+*/
 	fmt.Scanln()
 	fmt.Println("Set Onetime Boot the server")
 	res = bmhnode.SetOneTimeBoot()
@@ -50,11 +53,13 @@ func main() {
 	}
 
 	fmt.Scanln()
+/*
 	fmt.Println("Reboot the server")
 	res = bmhnode.Reboot()
 	if !res {
 		fmt.Println("Reboot server failed")
 
 	}
+*/
 
 }
