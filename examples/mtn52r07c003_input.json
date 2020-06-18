@@ -1,5 +1,6 @@
 {
   "name": "mtn52r07c003",
+  "Domain": "mtn52g.cci.xyz.com",
   "ISOURL": "http://32.68.220.23:31180/ubuntu-18.04.4-server-amd64.iso",
   "ISOChecksum": "http://32.68.220.23:31180/ubuntu-18.04.4-server-amd64.iso.md5sum",
   "OsDisk": "/dev/sda",
