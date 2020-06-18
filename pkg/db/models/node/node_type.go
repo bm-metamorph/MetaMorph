@@ -47,6 +47,7 @@ type Node struct {
         RedfishManagerID     string
         RedfishSystemID      string
         RedfishVersion       string
+        Domain               string
   }
 
   type BootAction struct {
@@ -59,7 +60,7 @@ type Node struct {
 	  Args       string
 	  Status     string  `gorm:"DEFAULT:new"`
   }
-  
+
   type NameServer struct {
 	gorm.Model
 	NodeID      uint
