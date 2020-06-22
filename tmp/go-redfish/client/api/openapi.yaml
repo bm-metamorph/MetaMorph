@@ -1,0 +1,1778 @@
+openapi: 3.0.2
+info:
+  description: Partial Redfish OAPI specification for a limited client
+  title: Redfish OAPI specification
+  version: 0.0.1
+servers:
+- url: /
+paths:
+  /redfish/v1:
+    get:
+      operationId: get_root
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Root'
+          description: Get redfish root
+  /redfish/v1/Systems:
+    get:
+      operationId: list_systems
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+          description: Computer Systems List
+  /redfish/v1/Systems/{systemId}:
+    get:
+      operationId: get_system
+      parameters:
+      - description: ID of resource
+        explode: false
+        in: path
+        name: systemId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputerSystem'
+          description: Computer Systems List
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Error condition
+    patch:
+      operationId: set_system
+      parameters:
+      - description: ID of resource
+        explode: false
+        in: path
+        name: systemId
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComputerSystem'
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputerSystem'
+          description: ComputerSystem Properties set successfully
+        204:
+          description: Success, but no response data
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Error condition
+  /redfish/v1/Systems/{ComputerSystemId}/Actions/ComputerSystem.Reset:
+    post:
+      operationId: reset_system
+      parameters:
+      - explode: false
+        in: path
+        name: ComputerSystemId
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetRequestBody'
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Success with response
+        204:
+          description: Success, but no response data
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Error condition
+  /redfish/v1/Managers:
+    get:
+      operationId: list_managers
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+          description: Managers List
+  /redfish/v1/Managers/{managerId}:
+    get:
+      operationId: get_manager
+      parameters:
+      - description: ID of resource
+        explode: false
+        in: path
+        name: managerId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manager'
+          description: Get Manager
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Error condition
+  /redfish/v1/Managers/{managerId}/VirtualMedia:
+    get:
+      operationId: list_manager_virtual_media
+      parameters:
+      - description: ID of resource
+        explode: false
+        in: path
+        name: managerId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+          description: Get a list of Manager's virtual media
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Error condition
+  /redfish/v1/Managers/{managerId}/VirtualMedia/{virtualMediaId}:
+    get:
+      operationId: get_manager_virtual_media
+      parameters:
+      - description: ID of resource
+        explode: false
+        in: path
+        name: managerId
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: ID of resource
+        explode: false
+        in: path
+        name: virtualMediaId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VirtualMedia'
+          description: Get a list of Manager's virtual media
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Error condition
+  /redfish/v1/Managers/{managerId}/VirtualMedia/{virtualMediaId}/Actions/VirtualMedia.InsertMedia:
+    post:
+      operationId: insert_virtual_media
+      parameters:
+      - description: ID of resource
+        explode: false
+        in: path
+        name: managerId
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: ID of resource
+        explode: false
+        in: path
+        name: virtualMediaId
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertMediaRequestBody'
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Insert virtual media
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Error condition
+  /redfish/v1/Managers/{managerId}/VirtualMedia/{virtualMediaId}/Actions/VirtualMedia.EjectMedia:
+    post:
+      operationId: eject_virtual_media
+      parameters:
+      - description: ID of resource
+        explode: false
+        in: path
+        name: managerId
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: ID of resource
+        explode: false
+        in: path
+        name: virtualMediaId
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EjectMediaRequestBody'
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Insert virtual media
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Error condition
+  /redfish/v1/UpdateService:
+    get:
+      operationId: Update_Service
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateService'
+          description: Update Service
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Error condition
+  /redfish/v1/UpdateService/Actions/UpdateService.SimpleUpdate:
+    post:
+      operationId: UpdateService_Simple_Update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleUpdateRequestBody'
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Update Service Simple Update
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Error condition
+  /redfish/v1/UpdateService/FirmwareInventory:
+    get:
+      operationId: Firmware_Inventory
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+          description: Collection of Firmware Inventory
+    post:
+      operationId: FirmwareInventory_Download_Image
+      requestBody:
+        $ref: '#/components/requestBodies/inline_object'
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Update Service Simple Update
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Error condition
+  /redfish/v1/TaskService/Tasks:
+    get:
+      operationId: get_task_list
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+          description: Task List
+  /redfish/v1/TaskService/Tasks/{taskId}:
+    get:
+      operationId: get_task
+      parameters:
+      - description: Task ID
+        explode: false
+        in: path
+        name: taskId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: Get details of a Task
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Error condition
+  /redfish/v1/Systems/{ComputerSystemId}/Storage/{StorageControllerId}/Volumes:
+    get:
+      operationId: get_volumes
+      parameters:
+      - description: System ID
+        explode: false
+        in: path
+        name: ComputerSystemId
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Storage Controller ID
+        explode: false
+        in: path
+        name: StorageControllerId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+          description: Get Volumes of given Storage Controller
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Error condition
+    post:
+      operationId: create_virtual_disk
+      parameters:
+      - description: System ID
+        explode: false
+        in: path
+        name: ComputerSystemId
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Storage Controller ID
+        explode: false
+        in: path
+        name: StorageControllerId
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVirtualDiskRequestBody'
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Create Virual Disk Update
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Error condition
+  /redfish/v1/Systems/{ComputerSystemId}/Storage/Volumes/{StorageId}:
+    delete:
+      operationId: delete_virtualdisk
+      parameters:
+      - description: System ID
+        explode: false
+        in: path
+        name: ComputerSystemId
+        required: true
+        schema:
+          type: string
+        style: simple
+      - allowReserved: true
+        description: Storage ID
+        explode: false
+        in: path
+        name: StorageId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          description: Delete virtual Disk
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Error condition
+components:
+  requestBodies:
+    inline_object:
+      content:
+        multipart/formdata:
+          schema:
+            $ref: '#/components/schemas/inline_object'
+      required: true
+  schemas:
+    BootSource:
+      enum:
+      - None
+      - Pxe
+      - Floppy
+      - Cd
+      - Usb
+      - Hdd
+      - BiosSetup
+      - Utilities
+      - Diags
+      - UefiShell
+      - UefiTarget
+      - SDCard
+      - UefiHttp
+      - RemoteDrive
+      - UefiBootNext
+      type: string
+    BootSourceOverrideEnabled:
+      enum:
+      - Once
+      - Continuous
+      type: string
+    State:
+      enum:
+      - Enabled
+      - Disabled
+      - StandbyOffline
+      - StandbySpare
+      - InTest
+      - Starting
+      - Absent
+      - UnavailableOffline
+      - Deferring
+      - Quiesced
+      - Updating
+      type: string
+    Health:
+      enum:
+      - OK
+      - Warning
+      - Critical
+      type: string
+    PowerState:
+      enum:
+      - On
+      - Off
+      - PoweringOn
+      - PoweringOff
+      type: string
+    ResetType:
+      enum:
+      - On
+      - ForceOff
+      - GracefulShutdown
+      - GracefulRestart
+      - ForceRestart
+      - Nmi
+      - ForceOn
+      - PushPowerButton
+      - PowerCycle
+      type: string
+    IndicatorLED:
+      enum:
+      - Unknown
+      - Lit
+      - Blinking
+      - Off
+      type: string
+    ManagerType:
+      enum:
+      - ManagementController
+      - EnclosureManager
+      - BMC
+      - RackManager
+      - AuxiliaryController
+      - Service
+      type: string
+    ConnectedVia:
+      enum:
+      - NotConnected
+      - URI
+      - Applet
+      - Oem
+      type: string
+    TransferMethod:
+      enum:
+      - Stream
+      - Upload
+      type: string
+    TransferProtocolType:
+      enum:
+      - CIFS
+      - FTP
+      - SFTP
+      - HTTP
+      - HTTPS
+      - NFS
+      - SCP
+      - TFTP
+      type: string
+    context:
+      description: The OData description of a payload.
+      format: uri-reference
+      readOnly: true
+      type: string
+    count:
+      description: The number of items in a collection.
+      readOnly: true
+      type: integer
+    name:
+      description: The name of the resource.
+      readOnly: true
+      type: string
+    etag:
+      description: The current ETag of the resource.
+      readOnly: true
+      type: string
+    id:
+      description: The name of the resource.
+      readOnly: true
+      type: string
+    odataId:
+      description: The unique identifier for a resource.
+      format: uri-reference
+      readOnly: true
+      type: string
+    idRef:
+      additionalProperties: false
+      description: A reference to a resource.
+      example:
+        '@odata.id': '@odata.id'
+      properties:
+        '@odata.id':
+          description: The unique identifier for a resource.
+          format: uri-reference
+          readOnly: true
+          type: string
+      type: object
+    nextLink:
+      description: The URI to the resource containing the next set of partial members.
+      format: uri-reference
+      readOnly: true
+      type: string
+    rtype:
+      description: The type of a resource.
+      readOnly: true
+      type: string
+    UUID:
+      pattern: ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})
+      type: string
+    Message:
+      additionalProperties: false
+      example:
+        MessageArgs:
+        - MessageArgs
+        - MessageArgs
+        Message: Message
+        RelatedProperties:
+        - RelatedProperties
+        - RelatedProperties
+        Severity: Severity
+        MessageId: MessageId
+        Resolution: Resolution
+      properties:
+        Message:
+          readOnly: true
+          type: string
+        MessageArgs:
+          items:
+            type: string
+          readOnly: true
+          type: array
+        MessageId:
+          readOnly: true
+          type: string
+        RelatedProperties:
+          items:
+            type: string
+          readOnly: true
+          type: array
+        Resolution:
+          readOnly: true
+          type: string
+        Severity:
+          readOnly: true
+          type: string
+      required:
+      - MessageId
+      type: object
+    RedfishError:
+      description: Contains an error payload from a Redfish Service.
+      example:
+        error:
+          '@Message.ExtendedInfo':
+          - MessageArgs:
+            - MessageArgs
+            - MessageArgs
+            Message: Message
+            RelatedProperties:
+            - RelatedProperties
+            - RelatedProperties
+            Severity: Severity
+            MessageId: MessageId
+            Resolution: Resolution
+          - MessageArgs:
+            - MessageArgs
+            - MessageArgs
+            Message: Message
+            RelatedProperties:
+            - RelatedProperties
+            - RelatedProperties
+            Severity: Severity
+            MessageId: MessageId
+            Resolution: Resolution
+          code: code
+          message: message
+      properties:
+        error:
+          $ref: '#/components/schemas/RedfishError_error'
+      required:
+      - error
+      type: object
+    Root:
+      additionalProperties: false
+      description: Root redfish path.
+      example:
+        '@odata.id': '@odata.id'
+        Managers:
+          '@odata.id': '@odata.id'
+        '@odata.type': '@odata.type'
+        RedfishVersion: RedfishVersion
+        Id: Id
+        UUID: UUID
+        '@Redfish.Copyright': '@Redfish.Copyright'
+        Systems:
+          '@odata.id': '@odata.id'
+        Name: Name
+      properties:
+        Id:
+          description: The name of the resource.
+          readOnly: true
+          type: string
+        Name:
+          description: The name of the resource.
+          readOnly: true
+          type: string
+        RedfishVersion:
+          description: redfish version
+          type: string
+        UUID:
+          pattern: ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})
+          type: string
+        '@odata.type':
+          description: The type of a resource.
+          readOnly: true
+          type: string
+        '@odata.id':
+          description: The unique identifier for a resource.
+          format: uri-reference
+          readOnly: true
+          type: string
+        '@Redfish.Copyright':
+          description: redfish copyright
+          type: string
+        Systems:
+          $ref: '#/components/schemas/idRef'
+        Managers:
+          $ref: '#/components/schemas/idRef'
+      required:
+      - '@odata.id'
+      - '@odata.type'
+      - Name
+      type: object
+    Collection:
+      additionalProperties: false
+      description: A Collection of ComputerSystem resource instances.
+      example:
+        '@odata.id': '@odata.id'
+        Description: Description
+        '@odata.type': '@odata.type'
+        Members@odata.count: 0
+        '@odata.etag': '@odata.etag'
+        '@odata.context': '@odata.context'
+        Members@odata.nextLink: Members@odata.nextLink
+        Members:
+        - '@odata.id': '@odata.id'
+        - '@odata.id': '@odata.id'
+        Name: Name
+      properties:
+        '@odata.context':
+          description: context
+          type: string
+        '@odata.etag':
+          description: etag
+          type: string
+        '@odata.id':
+          description: id
+          type: string
+        '@odata.type':
+          description: type
+          type: string
+        Description:
+          description: description
+          nullable: true
+          readOnly: true
+          type: string
+        Members:
+          description: Contains the members of this collection.
+          items:
+            $ref: '#/components/schemas/idRef'
+          readOnly: true
+          type: array
+        Members@odata.count:
+          description: The number of items in a collection.
+          readOnly: true
+          type: integer
+        Members@odata.nextLink:
+          description: The URI to the resource containing the next set of partial
+            members.
+          format: uri-reference
+          readOnly: true
+          type: string
+        Name:
+          description: The name of the resource.
+          readOnly: true
+          type: string
+      required:
+      - '@odata.id'
+      - '@odata.type'
+      - Members
+      - Name
+      type: object
+    Status:
+      additionalProperties: false
+      example: {}
+      properties:
+        Health:
+          $ref: '#/components/schemas/Health'
+        HealthRollup:
+          $ref: '#/components/schemas/Health'
+        State:
+          $ref: '#/components/schemas/State'
+      type: object
+    Boot:
+      additionalProperties: false
+      example:
+        BootSourceOverrideTarget@Redfish.AllowableValues:
+        - null
+        - null
+      properties:
+        BootSourceOverrideEnabled:
+          $ref: '#/components/schemas/BootSourceOverrideEnabled'
+        BootSourceOverrideTarget:
+          $ref: '#/components/schemas/BootSource'
+        BootSourceOverrideTarget@Redfish.AllowableValues:
+          items:
+            $ref: '#/components/schemas/BootSource'
+          type: array
+      type: object
+    ProcessorSummary:
+      additionalProperties: false
+      example:
+        Status: {}
+        Count: 0
+      properties:
+        Count:
+          minimum: 0
+          nullable: true
+          readOnly: true
+          type: integer
+        Status:
+          $ref: '#/components/schemas/Status'
+      type: object
+    MemorySummary:
+      additionalProperties: false
+      example:
+        Status: {}
+        TotalSystemPersistentMemoryGiB: 0.14658129805029452
+        TotalSystemMemoryGiB: 0.6027456183070403
+      properties:
+        TotalSystemMemoryGiB:
+          minimum: 0
+          nullable: true
+          readOnly: true
+          type: number
+        TotalSystemPersistentMemoryGiB:
+          minimum: 0
+          nullable: true
+          readOnly: true
+          type: number
+        Status:
+          $ref: '#/components/schemas/Status'
+      type: object
+    SystemLinks:
+      additionalProperties: false
+      example:
+        Chassis:
+        - '@odata.id': '@odata.id'
+        - '@odata.id': '@odata.id'
+        ManagedBy:
+        - '@odata.id': '@odata.id'
+        - '@odata.id': '@odata.id'
+      properties:
+        Chassis:
+          items:
+            $ref: '#/components/schemas/idRef'
+          type: array
+        ManagedBy:
+          items:
+            $ref: '#/components/schemas/idRef'
+          type: array
+      type: object
+    ManagerLinks:
+      additionalProperties: false
+      example:
+        ManagerForServers:
+        - '@odata.id': '@odata.id'
+        - '@odata.id': '@odata.id'
+        ManagerForSwitches:
+        - '@odata.id': '@odata.id'
+        - '@odata.id': '@odata.id'
+        ManagerForChassis:
+        - '@odata.id': '@odata.id'
+        - '@odata.id': '@odata.id'
+        ManagerInChassis:
+        - '@odata.id': '@odata.id'
+        - '@odata.id': '@odata.id'
+      properties:
+        ManagerForServers:
+          items:
+            $ref: '#/components/schemas/idRef'
+          type: array
+        ManagerForChassis:
+          items:
+            $ref: '#/components/schemas/idRef'
+          type: array
+        ManagerForSwitches:
+          items:
+            $ref: '#/components/schemas/idRef'
+          type: array
+        ManagerInChassis:
+          items:
+            $ref: '#/components/schemas/idRef'
+          type: array
+      type: object
+    ComputerSystemReset:
+      additionalProperties: false
+      example:
+        ResetType@Redfish.AllowableValues:
+        - null
+        - null
+        target: target
+      properties:
+        target:
+          description: The unique identifier for a resource.
+          format: uri-reference
+          readOnly: true
+          type: string
+        ResetType@Redfish.AllowableValues:
+          items:
+            $ref: '#/components/schemas/ResetType'
+          type: array
+      type: object
+    ResetRequestBody:
+      additionalProperties: false
+      example: {}
+      properties:
+        ResetType:
+          $ref: '#/components/schemas/ResetType'
+      type: object
+    ComputerSystem:
+      additionalProperties: false
+      description: Root redfish path.
+      example:
+        Status: {}
+        Actions:
+          '#ComputerSystem.Reset':
+            ResetType@Redfish.AllowableValues:
+            - null
+            - null
+            target: target
+        '@odata.type': '@odata.type'
+        Memory:
+          '@odata.id': '@odata.id'
+        RedfishVersion: RedfishVersion
+        '@odata.context': '@odata.context'
+        Boot:
+          BootSourceOverrideTarget@Redfish.AllowableValues:
+          - null
+          - null
+        Name: Name
+        '@odata.id': '@odata.id'
+        Bios:
+          '@odata.id': '@odata.id'
+        ProcessorSummary:
+          Status: {}
+          Count: 0
+        Links:
+          Chassis:
+          - '@odata.id': '@odata.id'
+          - '@odata.id': '@odata.id'
+          ManagedBy:
+          - '@odata.id': '@odata.id'
+          - '@odata.id': '@odata.id'
+        Id: Id
+        MemorySummary:
+          Status: {}
+          TotalSystemPersistentMemoryGiB: 0.14658129805029452
+          TotalSystemMemoryGiB: 0.6027456183070403
+        UUID: UUID
+        '@Redfish.Copyright': '@Redfish.Copyright'
+        Processors:
+          '@odata.id': '@odata.id'
+        EthernetInterfaces:
+          '@odata.id': '@odata.id'
+        SimpleStorage:
+          '@odata.id': '@odata.id'
+      properties:
+        Id:
+          description: The name of the resource.
+          readOnly: true
+          type: string
+        Name:
+          description: The name of the resource.
+          readOnly: true
+          type: string
+        RedfishVersion:
+          description: redfish version
+          type: string
+        UUID:
+          pattern: ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})
+          type: string
+        '@odata.type':
+          description: The type of a resource.
+          readOnly: true
+          type: string
+        '@odata.id':
+          description: The unique identifier for a resource.
+          format: uri-reference
+          readOnly: true
+          type: string
+        '@odata.context':
+          description: The OData description of a payload.
+          format: uri-reference
+          readOnly: true
+          type: string
+        '@Redfish.Copyright':
+          description: redfish copyright
+          type: string
+        Bios:
+          $ref: '#/components/schemas/idRef'
+        Processors:
+          $ref: '#/components/schemas/idRef'
+        Memory:
+          $ref: '#/components/schemas/idRef'
+        EthernetInterfaces:
+          $ref: '#/components/schemas/idRef'
+        SimpleStorage:
+          $ref: '#/components/schemas/idRef'
+        PowerState:
+          $ref: '#/components/schemas/PowerState'
+        Status:
+          $ref: '#/components/schemas/Status'
+        Boot:
+          $ref: '#/components/schemas/Boot'
+        ProcessorSummary:
+          $ref: '#/components/schemas/ProcessorSummary'
+        MemorySummary:
+          $ref: '#/components/schemas/MemorySummary'
+        IndicatorLED:
+          $ref: '#/components/schemas/IndicatorLED'
+        Links:
+          $ref: '#/components/schemas/SystemLinks'
+        Actions:
+          $ref: '#/components/schemas/ComputerSystem_Actions'
+      required:
+      - '@odata.id'
+      - '@odata.type'
+      - Name
+      type: object
+    Manager:
+      additionalProperties: false
+      description: Redfish manager resource.
+      example:
+        Status: {}
+        Description: Description
+        DateTimeLocalOffset: DateTimeLocalOffset
+        ServiceEntryPointUUID: ServiceEntryPointUUID
+        '@odata.type': '@odata.type'
+        '@odata.context': '@odata.context'
+        DateTime: DateTime
+        FirmwareVersion: FirmwareVersion
+        Name: Name
+        '@odata.id': '@odata.id'
+        VirtualMedia:
+          '@odata.id': '@odata.id'
+        Model: Model
+        Links:
+          ManagerForServers:
+          - '@odata.id': '@odata.id'
+          - '@odata.id': '@odata.id'
+          ManagerForSwitches:
+          - '@odata.id': '@odata.id'
+          - '@odata.id': '@odata.id'
+          ManagerForChassis:
+          - '@odata.id': '@odata.id'
+          - '@odata.id': '@odata.id'
+          ManagerInChassis:
+          - '@odata.id': '@odata.id'
+          - '@odata.id': '@odata.id'
+        Id: Id
+        UUID: UUID
+        '@Redfish.Copyright': '@Redfish.Copyright'
+        EthernetInterfaces:
+          '@odata.id': '@odata.id'
+      properties:
+        Id:
+          description: The name of the resource.
+          readOnly: true
+          type: string
+        Name:
+          description: The name of the resource.
+          readOnly: true
+          type: string
+        UUID:
+          pattern: ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})
+          type: string
+        ServiceEntryPointUUID:
+          pattern: ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})
+          type: string
+        '@odata.type':
+          description: The type of a resource.
+          readOnly: true
+          type: string
+        '@odata.id':
+          description: The unique identifier for a resource.
+          format: uri-reference
+          readOnly: true
+          type: string
+        '@odata.context':
+          description: The OData description of a payload.
+          format: uri-reference
+          readOnly: true
+          type: string
+        '@Redfish.Copyright':
+          description: redfish copyright
+          type: string
+        Model:
+          nullable: true
+          readOnly: true
+          type: string
+        ManagerType:
+          $ref: '#/components/schemas/ManagerType'
+        Status:
+          $ref: '#/components/schemas/Status'
+        DateTime:
+          format: string
+          nullable: true
+          readOnly: false
+          type: string
+        DateTimeLocalOffset:
+          description: 'The time offset from UTC that the DateTime property is set
+            to in format: +06:00 .'
+          nullable: true
+          pattern: ([-+][0-1][0-9]:[0-5][0-9])
+          readOnly: false
+          type: string
+        Description:
+          description: description
+          nullable: true
+          readOnly: true
+          type: string
+        EthernetInterfaces:
+          $ref: '#/components/schemas/idRef'
+        FirmwareVersion:
+          nullable: true
+          readOnly: true
+          type: string
+        Links:
+          $ref: '#/components/schemas/ManagerLinks'
+        PowerState:
+          $ref: '#/components/schemas/PowerState'
+        VirtualMedia:
+          $ref: '#/components/schemas/idRef'
+      required:
+      - '@odata.id'
+      - '@odata.type'
+      - Name
+      type: object
+    VirtualMedia:
+      additionalProperties: false
+      description: Redfish virtual media resource for manager.
+      example:
+        Description: Description
+        UserName: UserName
+        Actions:
+          '#VirtualMedia.InsertMedia':
+            target: target
+          '#VirtualMedia.EjectMedia':
+            target: target
+        '@odata.type': '@odata.type'
+        '@odata.context': '@odata.context'
+        Image: Image
+        MediaTypes:
+        - MediaTypes
+        - MediaTypes
+        Name: Name
+        ImageName: ImageName
+        '@odata.id': '@odata.id'
+        WriteProtected: true
+        Id: Id
+        '@Redfish.Copyright': '@Redfish.Copyright'
+        Inserted: true
+        Password: Password
+      properties:
+        Id:
+          description: The name of the resource.
+          readOnly: true
+          type: string
+        Name:
+          description: The name of the resource.
+          readOnly: true
+          type: string
+        '@odata.type':
+          description: The type of a resource.
+          readOnly: true
+          type: string
+        '@odata.id':
+          description: The unique identifier for a resource.
+          format: uri-reference
+          readOnly: true
+          type: string
+        '@odata.context':
+          description: The OData description of a payload.
+          format: uri-reference
+          readOnly: true
+          type: string
+        '@Redfish.Copyright':
+          description: redfish copyright
+          type: string
+        Description:
+          description: description
+          nullable: true
+          readOnly: true
+          type: string
+        Image:
+          format: uri-reference
+          nullable: true
+          readOnly: false
+          type: string
+        ImageName:
+          nullable: true
+          readOnly: true
+          type: string
+        Inserted:
+          nullable: true
+          readOnly: false
+          type: boolean
+        ConnectedVia:
+          $ref: '#/components/schemas/ConnectedVia'
+        MediaTypes:
+          items:
+            type: string
+          readOnly: true
+          type: array
+        WriteProtected:
+          nullable: true
+          readOnly: false
+          type: boolean
+        UserName:
+          nullable: true
+          readOnly: false
+          type: string
+        Password:
+          nullable: true
+          readOnly: false
+          type: string
+        TransferMethod:
+          $ref: '#/components/schemas/TransferMethod'
+        TransferProtocolType:
+          $ref: '#/components/schemas/TransferProtocolType'
+        Actions:
+          $ref: '#/components/schemas/VirtualMedia_Actions'
+      required:
+      - '@odata.id'
+      - '@odata.type'
+      - Name
+      type: object
+    InsertMediaRequestBody:
+      additionalProperties: false
+      example:
+        UserName: UserName
+        WriteProtected: true
+        Image: Image
+        Inserted: true
+        Password: Password
+      properties:
+        Image:
+          type: string
+        Inserted:
+          type: boolean
+        Password:
+          type: string
+        TransferMethod:
+          $ref: '#/components/schemas/TransferMethod'
+        TransferProtocolType:
+          $ref: '#/components/schemas/TransferProtocolType'
+        UserName:
+          type: string
+        WriteProtected:
+          type: boolean
+      required:
+      - Image
+      type: object
+    EjectMediaRequestBody:
+      additionalProperties: false
+      properties: {}
+      type: object
+    FirmwareInventory:
+      example:
+        '@odata.id': '@odata.id'
+      properties:
+        '@odata.id':
+          description: The unique identifier for a resource.
+          format: uri-reference
+          readOnly: true
+          type: string
+      type: object
+    UpdateService:
+      additionalProperties: false
+      description: Redfish Update Service.
+      example:
+        '@odata.id': '@odata.id'
+        Description: Description
+        HttpPushUri: HttpPushUri
+        Actions:
+          '#UpdateService.SimpleUpdate':
+            target: target
+          '#UpdateService.StartUpdate':
+            target: target
+        '@odata.type': '@odata.type'
+        FirmwareInventory:
+          '@odata.id': '@odata.id'
+        ServiceEnabled: true
+        Id: Id
+        '@odata.context': '@odata.context'
+        Name: Name
+      properties:
+        FirmwareInventory:
+          $ref: '#/components/schemas/FirmwareInventory'
+        Id:
+          description: The name of the resource.
+          readOnly: true
+          type: string
+        Name:
+          description: The name of the resource.
+          readOnly: true
+          type: string
+        '@odata.type':
+          description: The type of a resource.
+          readOnly: true
+          type: string
+        '@odata.id':
+          description: The unique identifier for a resource.
+          format: uri-reference
+          readOnly: true
+          type: string
+        '@odata.context':
+          description: The OData description of a payload.
+          format: uri-reference
+          readOnly: true
+          type: string
+        Description:
+          description: description
+          nullable: true
+          readOnly: true
+          type: string
+        HttpPushUri:
+          format: uri-reference
+          readOnly: true
+          type: string
+        ServiceEnabled:
+          nullable: true
+          readOnly: false
+          type: boolean
+        Actions:
+          $ref: '#/components/schemas/UpdateService_Actions'
+      required:
+      - '@odata.id'
+      - '@odata.type'
+      - Name
+      type: object
+    SimpleUpdateRequestBody:
+      additionalProperties: false
+      example:
+        Targets:
+        - Targets
+        - Targets
+        ImageURI: ImageURI
+      properties:
+        ImageURI:
+          format: uri-reference
+          type: string
+        Targets:
+          items:
+            type: string
+          type: array
+        TransferProtocolType:
+          $ref: '#/components/schemas/TransferProtocolType'
+      required:
+      - ImageURI
+      type: object
+    Payload:
+      additionalProperties: false
+      description: The HTTP and JSON payload details for this Task.
+      example:
+        HttpHeaders:
+        - HttpHeaders
+        - HttpHeaders
+        JsonBody: JsonBody
+        HttpOperation: HttpOperation
+        TargetUri: https://openapi-generator.tech
+      properties:
+        HttpHeaders:
+          description: This represents the HTTP headers used in the operation of this
+            Task.
+          items:
+            type: string
+          readOnly: true
+          type: array
+          x-longDescription: The value of this property shall be an array of HTTP
+            headers used in the execution of this Task.
+        HttpOperation:
+          description: The HTTP operation to perform to execute this Task.
+          readOnly: true
+          type: string
+          x-longDescription: This property shall contain the HTTP operation to execute
+            for this Task.
+        JsonBody:
+          description: This property contains the JSON payload to use in the execution
+            of this Task.
+          readOnly: true
+          type: string
+          x-longDescription: The value of this property shall be JSON formatted payload
+            used for this Task.
+        TargetUri:
+          description: The URI of the target for this task.
+          format: uri
+          readOnly: true
+          type: string
+          x-longDescription: This property shall contain a URI referencing a location
+            to be used as the target for an HTTP operation.
+      type: object
+      x-longDescription: This object shall contain information detailing the HTTP
+        and JSON payload information for executing this Task.
+      x-patternProperties:
+        ^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message)\.[a-zA-Z_][a-zA-Z0-9_.]+$:
+          description: This property shall specify a valid odata or Redfish property.
+    TaskState:
+      enum:
+      - New
+      - Starting
+      - Running
+      - Suspended
+      - Interrupted
+      - Pending
+      - Stopping
+      - Completed
+      - Killed
+      - Exception
+      - Service
+      - Cancelling
+      - Cancelled
+      type: string
+      x-enumDeprecated:
+        Killed: This value has been deprecated and is being replaced by the value
+          Cancelled which has more determinate semantics.
+      x-enumDescriptions:
+        Cancelled: Task has been cancelled by an operator or internal process.
+        Cancelling: Task is in the process of being cancelled.
+        Completed: Task has completed.
+        Exception: Task has stopped due to an exception condition.
+        Interrupted: Task has been interrupted.
+        Killed: Task was terminated.
+        New: A new task.
+        Pending: Task is pending and has not started.
+        Running: Task is running normally.
+        Service: Task is running as a service.
+        Starting: Task is starting.
+        Stopping: Task is in the process of stopping.
+        Suspended: Task has been suspended.
+      x-enumLongDescriptions:
+        Cancelled: This value shall represent that the operation was cancelled either
+          through a Delete on a Task Monitor or Task Resource or by an internal process.
+        Cancelling: This value shall represent that the operation is in the process
+          of being cancelled.
+        Completed: This value shall represent that the operation is complete and completed
+          sucessfully or with warnings.
+        Exception: This value shall represent that the operation is complete and completed
+          with errors.
+        Interrupted: This value shall represent that the operation has been interrupted
+          but is expected to restart and is therefore not complete.
+        Killed: This value shall represent that the operation is complete because
+          the task was killed by an operator.
+        New: This value shall represent that this task is newly created but the operation
+          has not yet started.
+        Pending: This value shall represent that the operation is pending some condition
+          and has not yet begun to execute.
+        Running: This value shall represent that the operation is executing.
+        Service: This value shall represent that the operation is now running as a
+          service and expected to continue operation until stopped or killed.
+        Starting: This value shall represent that the operation is starting.
+        Stopping: This value shall represent that the operation is stopping but is
+          not yet complete.
+        Suspended: This value shall represent that the operation has been suspended
+          but is expected to restart and is therefore not complete.
+    Task:
+      additionalProperties: false
+      description: This resource contains information about a specific Task scheduled
+        by or being executed by a Redfish service's Task Service.
+      example:
+        Description: Description
+        Messages:
+        - MessageArgs:
+          - MessageArgs
+          - MessageArgs
+          Message: Message
+          RelatedProperties:
+          - RelatedProperties
+          - RelatedProperties
+          Severity: Severity
+          MessageId: MessageId
+          Resolution: Resolution
+        - MessageArgs:
+          - MessageArgs
+          - MessageArgs
+          Message: Message
+          RelatedProperties:
+          - RelatedProperties
+          - RelatedProperties
+          Severity: Severity
+          MessageId: MessageId
+          Resolution: Resolution
+        EndTime: 2000-01-23T04:56:07.000+00:00
+        '@odata.type': '@odata.type'
+        '@odata.etag': '@odata.etag'
+        StartTime: 2000-01-23T04:56:07.000+00:00
+        '@odata.context': '@odata.context'
+        Name: Name
+        '@odata.id': '@odata.id'
+        HidePayload: true
+        Oem: Oem
+        TaskMonitor: https://openapi-generator.tech
+        Payload:
+          HttpHeaders:
+          - HttpHeaders
+          - HttpHeaders
+          JsonBody: JsonBody
+          HttpOperation: HttpOperation
+          TargetUri: https://openapi-generator.tech
+        Id: Id
+      properties:
+        '@odata.context':
+          description: The OData description of a payload.
+          format: uri-reference
+          readOnly: true
+          type: string
+        '@odata.etag':
+          description: The current ETag of the resource.
+          readOnly: true
+          type: string
+        '@odata.id':
+          description: The name of the resource.
+          readOnly: true
+          type: string
+        '@odata.type':
+          description: The type of a resource.
+          readOnly: true
+          type: string
+        Description:
+          description: description
+          nullable: true
+          readOnly: true
+          type: string
+        EndTime:
+          description: The date-time stamp that the task was last completed.
+          format: date-time
+          readOnly: true
+          type: string
+          x-longDescription: The value of this property shall indicate the time the
+            task was completed.
+        HidePayload:
+          description: Indicates that the contents of the Payload should be hidden
+            from view after the Task has been created.  When set to True, the Payload
+            object will not be returned on GET.
+          readOnly: true
+          type: boolean
+          x-longDescription: This property shall be set to True if the Payload object
+            shall not be returned on GET operations, and set to False if the contents
+            can be returned normally. If this property is not specified when the Task
+            is created, the default value shall be False.
+        Id:
+          description: The name of the resource.
+          readOnly: true
+          type: string
+        Messages:
+          description: This is an array of messages associated with the task.
+          items:
+            $ref: '#/components/schemas/Message'
+          type: array
+          x-longDescription: The value of this property shall be an array of messages
+            associated with the task.
+        Name:
+          description: The name of the resource.
+          readOnly: true
+          type: string
+        Oem:
+          description: This is the manufacturer/provider specific extension moniker
+            used to divide the Oem object into sections.
+          type: string
+          x-longDescription: The value of this string shall be of the format for the
+            reserved word *Oem*.
+        Payload:
+          $ref: '#/components/schemas/Payload'
+        StartTime:
+          description: The date-time stamp that the task was last started.
+          format: date-time
+          readOnly: true
+          type: string
+          x-longDescription: The value of this property shall indicate the time the
+            task was started.
+        TaskMonitor:
+          description: The URI of the Task Monitor for this task.
+          format: uri
+          readOnly: true
+          type: string
+          x-longDescription: This property shall contain a URI to Task Monitor as
+            defined in the Redfish Specification.
+        TaskState:
+          $ref: '#/components/schemas/TaskState'
+        TaskStatus:
+          $ref: '#/components/schemas/Health'
+      required:
+      - '@odata.id'
+      - '@odata.type'
+      - Id
+      - Name
+      type: object
+      x-longDescription: This resource shall be used to represent a task for a Redfish
+        implementation.
+      x-patternProperties:
+        ^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message)\.[a-zA-Z_][a-zA-Z0-9_.]+$:
+          description: This property shall specify a valid odata or Redfish property.
+    VolumeType:
+      enum:
+      - RawDevice
+      - NonRedundant
+      - Mirrored
+      - StripedWithParity
+      - SpannedMirrors
+      - SpannedStripesWithParity
+      type: string
+      x-enumDescriptions:
+        Mirrored: The volume is a mirrored device.
+        NonRedundant: The volume is a non-redundant storage device.
+        RawDevice: The volume is a raw physical device without any RAID or other virtualization
+          applied.
+        SpannedMirrors: The volume is a spanned set of mirrored devices.
+        SpannedStripesWithParity: The volume is a spanned set of devices which uses
+          parity to retain redundant information.
+        StripedWithParity: The volume is a device which uses parity to retain redundant
+          information.
+    CreateVirtualDiskRequestBody:
+      additionalProperties: false
+      example:
+        Drives:
+        - '@odata.id': '@odata.id'
+        - '@odata.id': '@odata.id'
+        Name: Name
+      properties:
+        VolumeType:
+          $ref: '#/components/schemas/VolumeType'
+        Name:
+          type: string
+        Drives:
+          items:
+            $ref: '#/components/schemas/idRef'
+          type: array
+      required:
+      - Drives
+      - Name
+      - VolumeType
+      type: object
+    inline_object:
+      properties:
+        softwareImage:
+          format: binary
+          type: string
+      type: object
+    RedfishError_error:
+      example:
+        '@Message.ExtendedInfo':
+        - MessageArgs:
+          - MessageArgs
+          - MessageArgs
+          Message: Message
+          RelatedProperties:
+          - RelatedProperties
+          - RelatedProperties
+          Severity: Severity
+          MessageId: MessageId
+          Resolution: Resolution
+        - MessageArgs:
+          - MessageArgs
+          - MessageArgs
+          Message: Message
+          RelatedProperties:
+          - RelatedProperties
+          - RelatedProperties
+          Severity: Severity
+          MessageId: MessageId
+          Resolution: Resolution
+        code: code
+        message: message
+      properties:
+        '@Message.ExtendedInfo':
+          items:
+            $ref: '#/components/schemas/Message'
+          type: array
+        code:
+          readOnly: true
+          type: string
+        message:
+          readOnly: true
+          type: string
+      required:
+      - code
+      - message
+    ComputerSystem_Actions:
+      example:
+        '#ComputerSystem.Reset':
+          ResetType@Redfish.AllowableValues:
+          - null
+          - null
+          target: target
+      properties:
+        '#ComputerSystem.Reset':
+          $ref: '#/components/schemas/ComputerSystemReset'
+    VirtualMedia_Actions__VirtualMedia_EjectMedia:
+      example:
+        target: target
+      properties:
+        target:
+          description: The unique identifier for a resource.
+          format: uri-reference
+          readOnly: true
+          type: string
+    VirtualMedia_Actions:
+      example:
+        '#VirtualMedia.InsertMedia':
+          target: target
+        '#VirtualMedia.EjectMedia':
+          target: target
+      properties:
+        '#VirtualMedia.EjectMedia':
+          $ref: '#/components/schemas/VirtualMedia_Actions__VirtualMedia_EjectMedia'
+        '#VirtualMedia.InsertMedia':
+          $ref: '#/components/schemas/VirtualMedia_Actions__VirtualMedia_EjectMedia'
+    UpdateService_Actions:
+      example:
+        '#UpdateService.SimpleUpdate':
+          target: target
+        '#UpdateService.StartUpdate':
+          target: target
+      properties:
+        '#UpdateService.SimpleUpdate':
+          $ref: '#/components/schemas/VirtualMedia_Actions__VirtualMedia_EjectMedia'
+        '#UpdateService.StartUpdate':
+          $ref: '#/components/schemas/VirtualMedia_Actions__VirtualMedia_EjectMedia'

@@ -10,22 +10,30 @@ import (
 	"google.golang.org/grpc"
 	"net/http"
 	"time"
+        "os"
 )
 
-func grpcClient() proto.NodeServiceClient {
+func grpcClient() (proto.NodeServiceClient, *grpc.ClientConn) {
+
+        grpcServer := "localhost"
+        if gs := os.Getenv("METMORPH_CONTROLLER_HOST"); gs != "" {
+            grpcServer = gs
+        }
+ 
 	logger.Log.Info("grpcClient()")
-	conn, err := grpc.Dial("localhost:4040", grpc.WithInsecure())
+	conn, err := grpc.Dial(fmt.Sprintf("%s:4040", grpcServer), grpc.WithInsecure())
 	if err != nil {
 		logger.Log.Error("Failed to connect to GRPC server", zap.Error(err))
 		panic(err)
 	}
 	client := proto.NewNodeServiceClient(conn)
-	return client
+        
+	return client, conn
 }
 
 func createNode(ctx *gin.Context) {
 	logger.Log.Info("createNode()")
-	client := grpcClient()
+	client, conn := grpcClient()
 	data, _ := ctx.GetRawData()
 	req := &proto.Request{NodeSpec: data}
 	if response, err := client.Create(ctx, req); err == nil {
@@ -39,11 +47,12 @@ func createNode(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
+        defer conn.Close()
 }
 
 func describeNode(ctx *gin.Context) {
 	logger.Log.Info("describeNode()")
-	client := grpcClient()
+	client, conn := grpcClient()
 	node_id := ctx.Param("node_id")
 	fmt.Println(node_id)
 	req := &proto.Request{NodeID: string(node_id)}
@@ -55,11 +64,12 @@ func describeNode(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
+        defer conn.Close()
 }
 
 func updateNode(ctx *gin.Context) {
 	logger.Log.Info("updateNode()")
-	client := grpcClient()
+	client, conn := grpcClient()
 	node_id := ctx.Param("node_id")
 	data, _ := ctx.GetRawData()
 	req := &proto.Request{NodeID: string(node_id), NodeSpec: data}
@@ -73,11 +83,12 @@ func updateNode(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
+        defer conn.Close()
 }
 
 func deleteNode(ctx *gin.Context) {
 	logger.Log.Info("deleteNode()")
-	client := grpcClient()
+	client, conn := grpcClient()
 	node_id := ctx.Param("node_id")
 	req := &proto.Request{NodeID: string(node_id)}
 	if response, err := client.Delete(ctx, req); err == nil {
@@ -90,11 +101,12 @@ func deleteNode(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
+        defer conn.Close()
 }
 
 func deployNode(ctx *gin.Context) {
 	logger.Log.Info("deployNode")
-	client := grpcClient()
+	client, conn := grpcClient()
 	node_id := ctx.Param("node_id")
 	req := &proto.Request{NodeID: string(node_id)}
 	if response, err := client.Deploy(ctx, req); err == nil {
@@ -107,11 +119,12 @@ func deployNode(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
+        defer conn.Close()
 }
 
 func listNodes(ctx *gin.Context) {
 	logger.Log.Info("listNodes()")
-	client := grpcClient()
+	client, conn := grpcClient()
 	req := &proto.Request{}
 	if response, err := client.List(ctx, req); err == nil {
 		ctx.JSON(http.StatusOK, gin.H{
@@ -123,12 +136,12 @@ func listNodes(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
-
+        defer conn.Close()
 }
 
 func getUUID(ctx *gin.Context) {
 	logger.Log.Info("getUUID")
-	client := grpcClient()
+	client, conn := grpcClient()
 	data, _ := ctx.GetRawData()
 	req := &proto.Request{NodeSpec: data}
 	if response, err := client.GetNodeUUID(ctx, req); err == nil {
@@ -141,12 +154,13 @@ func getUUID(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
+        defer conn.Close()
 
 }
 
 func getNodeHWStatus(ctx *gin.Context) {
 	logger.Log.Info("getNodeHWStatus()")
-	client := grpcClient()
+	client, conn := grpcClient()
 	node_id := ctx.Param("node_id")
 
 	req := &proto.Request{NodeID: string(node_id)}
@@ -158,11 +172,12 @@ func getNodeHWStatus(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
+        defer conn.Close()
 }
 
 func updateNodeHWStatus(ctx *gin.Context) {
 	logger.Log.Info("updateNodeHWStatus()")
-	client := grpcClient()
+	client, conn := grpcClient()
 	node_id := ctx.Param("node_id")
 	data, _ := ctx.GetRawData()
 	req := &proto.Request{NodeID: string(node_id), NodeSpec: data}
@@ -176,6 +191,7 @@ func updateNodeHWStatus(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
+        defer conn.Close()
 
 }
 
