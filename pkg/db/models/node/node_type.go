@@ -32,10 +32,6 @@ type Node struct {
 	IPMIPassword         string
 	Vendor               string
 	ServerModel          string
-	biosVersion          string
-	CPLDFirmwareVersion  string
-	RAIDFirmwareVersion  string
-	FirmwareVersion      string
 	VirtualDisks         []VirtualDisk
 	State                string `gorm:"DEFAULT:new"`
 	ProvisioningIP       string
@@ -47,9 +43,15 @@ type Node struct {
         RedfishManagerID     string
         RedfishSystemID      string
         RedfishVersion       string
-        Domain               string
+		Domain               string
+		FirmwareURLs         []FirmwareURL
   }
 
+  type FirmwareURL struct{
+	  gorm.Model
+	  NodeID uint
+	  FirmwareURL string
+  }
   type BootAction struct {
 	  gorm.Model
 	  NodeID     uint

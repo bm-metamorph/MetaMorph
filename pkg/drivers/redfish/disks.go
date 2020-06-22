@@ -91,7 +91,7 @@ func (bmhnode *BMHNode) CreateVirtualDisks() bool {
 		fmt.Printf("Job Id returned is %v\n", jobId)
 		//check Job Status to decide on return value
 		if jobId != "" {
-			result = redfishClient.CheckJobStatus(jobId)
+			result = redfishClient.CheckJobStatus(jobId,false)
 		} else {
 			result = false
 		}

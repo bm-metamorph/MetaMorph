@@ -107,4 +107,5 @@ d-i preseed/late_command string cp /cdrom/setup/install/init.sh  /target/root/ \
   && chmod u+x /target/root/init.sh \
   && in-target /usr/sbin/netplan apply \
   && in-target grub-mkconfig -o /boot/grub/grub.cfg \
-  && in-target /bin/systemctl enable  metamorph-client.service  
+  && in-target /bin/systemctl enable  metamorph-client.service \
+  && in-target echo '127.0.1.1 {{.Name}}.{{.Domain}} {{.Name}}'  | sudo tee -a /etc/hosts
