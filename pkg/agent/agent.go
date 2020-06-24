@@ -44,8 +44,6 @@ func executeTask( task node.BootAction,wg *sync.WaitGroup ){
 	UpdateTaskStatus(task)
 	fmt.Println("executing", task.Name, "with Priority" , task.Priority)
 	runCmd(task.Location, task.Control, task.Args)
-	//interval := rand.Intn(20)
-	//time.Sleep(time.Second * time.Duration(interval))
 	task.Status = "done"
 	UpdateTaskStatus(task)
 	fmt.Println("Executed", task.Name, "with Priority" , task.Priority)
