@@ -44,13 +44,16 @@ type Node struct {
         RedfishSystemID      string
         RedfishVersion       string
 		Domain               string
-		FirmwareURLs         []FirmwareURL
+		Firmwares            []Firmware
+       AllowFirmwareUpgrade  bool
   }
 
-  type FirmwareURL struct{
+  type Firmware struct{
 	  gorm.Model
 	  NodeID uint
-	  FirmwareURL string
+	  Name string
+      Version string
+      URL   string
   }
   type BootAction struct {
 	  gorm.Model

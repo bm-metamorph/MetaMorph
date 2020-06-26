@@ -96,6 +96,8 @@ d-i     grub-installer/timeout  string 2
 # Add the network and tasks oem-config steps by default.
 oem-config      oem-config/steps        multiselect language, timezone, keyboard, user, network, tasks
 d-i  base-installer/kernel/altmeta   string hwe-18.04
+d-i preseed/early_command string [ "$(mount | grep /media)" ] \
+  && umount /media || echo "no mounted partition found"
 d-i preseed/late_command string cp /cdrom/setup/install/init.sh  /target/root/ \
   && cp /cdrom/setup/install/50-cloud-init.yaml  /target/etc/netplan/50-cloud-init.yaml \
   && in-target mkdir -p   /opt/metamorph/bin/ \
@@ -107,5 +109,4 @@ d-i preseed/late_command string cp /cdrom/setup/install/init.sh  /target/root/ \
   && chmod u+x /target/root/init.sh \
   && in-target /usr/sbin/netplan apply \
   && in-target grub-mkconfig -o /boot/grub/grub.cfg \
-  && in-target /bin/systemctl enable  metamorph-client.service \
-  && in-target echo '127.0.1.1 {{.Name}}.{{.Domain}} {{.Name}}'  | sudo tee -a /etc/hosts
+  && in-target /bin/systemctl enable  metamorph-client.service

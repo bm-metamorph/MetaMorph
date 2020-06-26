@@ -31,7 +31,7 @@ func getDB() *gorm.DB {
 		&VirtualDisk{},
 		&PhysicalDisk{},
 		&BootAction{},
-		&FirmwareURL{},
+		&Firmware{},
 	)
 	return db
 }
@@ -112,16 +112,16 @@ func GetBondInterfaces(node_uuid string) ([]BondInterface, error) {
 		return nil, errors.New("No record Found")
 	}
 }
-func GetFirmwareURLs(node_uuid string) ([]FirmwareURL, error) {
+func GetFirmwares(node_uuid string) ([]Firmware, error) {
 	node := Node{}
-	firmwareURLs := []FirmwareURL{}
+	firmwares := []Firmware{}
 	db := getDB()
 	defer db.Close()
 	node_uuid1, _ := uuid.Parse(node_uuid)
 	db.Where("node_uuid = ?", node_uuid1).First(&node)
-	db.Model(&node).Related(&firmwareURLs)
-	if len(firmwareURLs) > 0 {
-		return firmwareURLs, nil
+	db.Model(&node).Related(&firmwares)
+	if len(firmwares) > 0 {
+		return firmwares, nil
 	} else {
 		return nil, errors.New("No record Found")
 	}

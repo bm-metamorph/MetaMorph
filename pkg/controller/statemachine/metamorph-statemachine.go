@@ -176,6 +176,10 @@ func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 	}
 	if res == true {
 		node_uuid, err = uuid.Parse(nodeuuidStringFromServer)
+		//check for firmware upgrade
+		if bmnode.AllowFirmwareUpgrade{
+			res = redfishClient.UpgradeFirmwareList()
+		}
 	}
 
 	node_uuid = bmnode.NodeUUID // to be removed once UUID = Server UUID is planned.
