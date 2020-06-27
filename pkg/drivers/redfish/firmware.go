@@ -29,8 +29,8 @@ func IsVersionHigher(providedVersion string, versionfromNode string) bool {
 		return false
 	}
 	if vfromNode.Equal(vprovided) {
-		fmt.Printf("Version provided is equal to one in the node")
-		return false
+		fmt.Printf("Version provided is equal to one in the node. Proceeding with installation..")
+		return  true
 	}
 	if vfromNode.LessThan(vprovided) {
 		fmt.Printf("Version provided is lower than one in the node")
