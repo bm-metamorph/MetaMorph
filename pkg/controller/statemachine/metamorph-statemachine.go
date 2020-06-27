@@ -190,7 +190,7 @@ func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
 	}
 	//Update the DB Now
-	err = node.Update(&node.Node{State: state, NodeUUID: node_uuid, RedfishManagerID: redfishManagerID, RedfishSystemID: redfishSystemID, RedfishVersion: redfishVersion,})
+	err = node.Update(&node.Node{State: state, NodeUUID: node_uuid, RedfishManagerID: redfishManagerID, RedfishSystemID: redfishSystemID, RedfishVersion: redfishVersion})
 	if err != nil {
 		logger.Log.Error("Failed to update Node to READYWAIT state", zap.String("Node Name", bmnode.Name))
 		state = FAILED
@@ -211,14 +211,21 @@ func SetupreadyHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 	err = node.Update(&node.Node{State: INTRANSITION})
 
 	fmt.Println(nodeuuidString)
+	//check for firmware upgrade
+	var res bool = true
+	if bmnode.AllowFirmwareUpgrade {
+		redfishClient := &redfish.BMHNode{bmnode.Node}
+		res = redfishClient.UpgradeFirmwareList()
+	}
+
 	isogenClient := &isogen.BMHNode{bmnode.Node}
 
 	//Create iSO
 	err = isogenClient.PrepareISO()
 
 	var state string
-	if err != nil {
-		logger.Log.Error("Failed to create ISO file", zap.String("Node Name", bmnode.Name))
+	if (err != nil) || (res == false) {
+		logger.Log.Error("Failed to create ISO file or Failed to upgrade Firmware", zap.String("Node Name", bmnode.Name))
 		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: false}
 		state = FAILED
 

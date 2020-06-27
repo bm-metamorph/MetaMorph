@@ -7,9 +7,7 @@ import (
 //	"os"
 )
 
-// For Testing Purpose only !!!
-
-func main() {
+func checkISOFuntionality(){
         var res bool
 
 	bmhnode := &redfish.BMHNode{node.CreateTestNode()}
@@ -61,5 +59,24 @@ func main() {
 
 	}
 */
+}
 
+func TestFirmwareUpdate(){
+ var  filepath string
+ var res bool
+ fmt.Println("Provide the absolute path of the firmware file")
+ fmt.Scanln(&filepath)
+ fmt.Println(filepath)
+ bmhnode := &redfish.BMHNode{node.CreateTestNode()}
+ res = bmhnode.UpgradeFirmware(filepath)
+ if res == false{
+	 fmt.Println("Failed to upgrade")
+ }
+
+}
+
+// For Testing Purpose only !!!
+
+func main() {
+	TestFirmwareUpdate()
 }
