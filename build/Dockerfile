@@ -3,8 +3,8 @@ WORKDIR /go/src/bitbucket.com/metamorph
 COPY . .
 
 #temp fix to resolve dependencies
-COPY tmp/go-redfish-api-wrapper /Users/aneesh/go/src/github.com/manojkva/go-redfish-api-wrapper
-COPY tmp/go-redfish /Users/aneesh/go/src/opendev.org/airship/go-redfish
+COPY tmp/go-redfish-api-wrapper /root/go/src/github.com/manojkva/go-redfish-api-wrapper
+COPY tmp/go-redfish /root/go/src/opendev.org/airship/go-redfish
 
 
 ENV GOFLAGS=""
