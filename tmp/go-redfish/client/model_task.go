@@ -24,7 +24,7 @@ type Task struct {
 	// description
 	Description *string `json:"Description,omitempty"`
 	// The date-time stamp that the task was last completed.
-	EndTime time.Time `json:"EndTime,omitempty"`
+	EndTime string `json:"EndTime,omitempty"`
 	// Indicates that the contents of the Payload should be hidden from view after the Task has been created.  When set to True, the Payload object will not be returned on GET.
 	HidePayload bool `json:"HidePayload,omitempty"`
 	// The name of the resource.

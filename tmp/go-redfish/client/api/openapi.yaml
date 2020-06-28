@@ -324,6 +324,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/RedfishError'
           description: Error condition
+  /redfish/v1/UpdateService/FirmwareInventory/{softwareId}:
+    get:
+      operationId: get_software_inventory
+      parameters:
+      - description: ID of resource
+        explode: false
+        in: path
+        name: softwareId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SoftwareInventory'
+          description: Get Software Inventory
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedfishError'
+          description: Error condition
   /redfish/v1/UpdateService/FirmwareInventory:
     get:
       operationId: Firmware_Inventory
@@ -338,6 +363,19 @@ paths:
       operationId: FirmwareInventory_Download_Image
       requestBody:
         $ref: '#/components/requestBodies/inline_object'
+        content:
+          multipart/formdata:
+            encoding:
+              softwareImage:
+                contentType: application/octet-stream
+                style: form
+            schema:
+              properties:
+                softwareImage:
+                  format: binary
+                  type: string
+              type: object
+        required: true
       responses:
         200:
           content:
@@ -1583,7 +1621,6 @@ components:
           type: string
         EndTime:
           description: The date-time stamp that the task was last completed.
-          format: date-time
           readOnly: true
           type: string
           x-longDescription: The value of this property shall indicate the time the
@@ -1690,11 +1727,105 @@ components:
       - Name
       - VolumeType
       type: object
-    inline_object:
+    SoftwareInventory:
+      additionalProperties: false
+      description: This schema defines an inventory of software components.
+      example:
+        Status: {}
+        SoftwareId: SoftwareId
+        RelatedItem:
+        - '@odata.id': '@odata.id'
+        - '@odata.id': '@odata.id'
+        Description: Description
+        '@odata.type': '@odata.type'
+        UefiDevicePaths:
+        - UefiDevicePaths
+        - UefiDevicePaths
+        '@odata.etag': '@odata.etag'
+        '@odata.context': '@odata.context'
+        LowestSupportedVersion: LowestSupportedVersion
+        ReleaseDate: 2000-01-23T04:56:07.000+00:00
+        Name: Name
+        '@odata.id': '@odata.id'
+        Version: Version
+        Updateable: true
+        Manufacturer: Manufacturer
+        Id: Id
+        RelatedItem@odata.count: 0
       properties:
-        softwareImage:
-          format: binary
+        '@odata.type':
+          readOnly: true
           type: string
+        '@odata.id':
+          format: uri-reference
+          readOnly: true
+          type: string
+        '@odata.context':
+          format: uri-reference
+          readOnly: true
+          type: string
+        '@odata.etag':
+          readOnly: true
+          type: string
+        Description:
+          nullable: true
+          readOnly: true
+          type: string
+        Id:
+          readOnly: true
+          type: string
+        LowestSupportedVersion:
+          nullable: true
+          readOnly: true
+          type: string
+        Manufacturer:
+          nullable: true
+          readOnly: true
+          type: string
+        Name:
+          readOnly: true
+          type: string
+        RelatedItem:
+          items:
+            $ref: '#/components/schemas/idRef'
+          readOnly: true
+          type: array
+        RelatedItem@odata.count:
+          minimum: 0
+          nullable: true
+          readOnly: true
+          type: integer
+        ReleaseDate:
+          format: date-time
+          nullable: true
+          readOnly: true
+          type: string
+        SoftwareId:
+          readOnly: true
+          type: string
+        Status:
+          $ref: '#/components/schemas/Status'
+        UefiDevicePaths:
+          items:
+            nullable: true
+            type: string
+          readOnly: true
+          type: array
+        Updateable:
+          nullable: true
+          readOnly: true
+          type: boolean
+        Version:
+          nullable: true
+          readOnly: true
+          type: string
+      required:
+      - '@odata.id'
+      - '@odata.type'
+      - Id
+      - Name
+      - Updateable
+      - Version
       type: object
     RedfishError_error:
       example:
@@ -1776,3 +1907,9 @@ components:
           $ref: '#/components/schemas/VirtualMedia_Actions__VirtualMedia_EjectMedia'
         '#UpdateService.StartUpdate':
           $ref: '#/components/schemas/VirtualMedia_Actions__VirtualMedia_EjectMedia'
+    inline_object:
+      properties:
+        softwareImage:
+          format: binary
+          type: string
+      type: object

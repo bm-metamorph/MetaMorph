@@ -131,18 +131,18 @@ func (_m *RedfishAPI) FirmwareInventory(_a0 context.Context) (client.Collection,
 }
 
 // FirmwareInventoryDownloadImage provides a mock function with given fields: _a0, _a1
-func (_m *RedfishAPI) FirmwareInventoryDownloadImage(_a0 context.Context, _a1 client.InlineObject) (client.RedfishError, *http.Response, error) {
+func (_m *RedfishAPI) FirmwareInventoryDownloadImage(_a0 context.Context, _a1 *client.FirmwareInventoryDownloadImageOpts) (client.RedfishError, *http.Response, error) {
 	ret := _m.Called(_a0, _a1)
 
 	var r0 client.RedfishError
-	if rf, ok := ret.Get(0).(func(context.Context, client.InlineObject) client.RedfishError); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *client.FirmwareInventoryDownloadImageOpts) client.RedfishError); ok {
 		r0 = rf(_a0, _a1)
 	} else {
 		r0 = ret.Get(0).(client.RedfishError)
 	}
 
 	var r1 *http.Response
-	if rf, ok := ret.Get(1).(func(context.Context, client.InlineObject) *http.Response); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *client.FirmwareInventoryDownloadImageOpts) *http.Response); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		if ret.Get(1) != nil {
@@ -151,7 +151,7 @@ func (_m *RedfishAPI) FirmwareInventoryDownloadImage(_a0 context.Context, _a1 cl
 	}
 
 	var r2 error
-	if rf, ok := ret.Get(2).(func(context.Context, client.InlineObject) error); ok {
+	if rf, ok := ret.Get(2).(func(context.Context, *client.FirmwareInventoryDownloadImageOpts) error); ok {
 		r2 = rf(_a0, _a1)
 	} else {
 		r2 = ret.Error(2)
@@ -243,6 +243,36 @@ func (_m *RedfishAPI) GetRoot(_a0 context.Context) (client.Root, *http.Response,
 	var r2 error
 	if rf, ok := ret.Get(2).(func(context.Context) error); ok {
 		r2 = rf(_a0)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
+// GetSoftwareInventory provides a mock function with given fields: _a0, _a1
+func (_m *RedfishAPI) GetSoftwareInventory(_a0 context.Context, _a1 string) (client.SoftwareInventory, *http.Response, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 client.SoftwareInventory
+	if rf, ok := ret.Get(0).(func(context.Context, string) client.SoftwareInventory); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		r0 = ret.Get(0).(client.SoftwareInventory)
+	}
+
+	var r1 *http.Response
+	if rf, ok := ret.Get(1).(func(context.Context, string) *http.Response); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*http.Response)
+		}
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func(context.Context, string) error); ok {
+		r2 = rf(_a0, _a1)
 	} else {
 		r2 = ret.Error(2)
 	}

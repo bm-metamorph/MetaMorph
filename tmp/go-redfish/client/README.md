@@ -40,6 +40,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**GetManager**](docs/DefaultApi.md#getmanager) | **Get** /redfish/v1/Managers/{managerId} | 
 *DefaultApi* | [**GetManagerVirtualMedia**](docs/DefaultApi.md#getmanagervirtualmedia) | **Get** /redfish/v1/Managers/{managerId}/VirtualMedia/{virtualMediaId} | 
 *DefaultApi* | [**GetRoot**](docs/DefaultApi.md#getroot) | **Get** /redfish/v1 | 
+*DefaultApi* | [**GetSoftwareInventory**](docs/DefaultApi.md#getsoftwareinventory) | **Get** /redfish/v1/UpdateService/FirmwareInventory/{softwareId} | 
 *DefaultApi* | [**GetSystem**](docs/DefaultApi.md#getsystem) | **Get** /redfish/v1/Systems/{systemId} | 
 *DefaultApi* | [**GetTask**](docs/DefaultApi.md#gettask) | **Get** /redfish/v1/TaskService/Tasks/{taskId} | 
 *DefaultApi* | [**GetTaskList**](docs/DefaultApi.md#gettasklist) | **Get** /redfish/v1/TaskService/Tasks | 
@@ -85,6 +86,7 @@ Class | Method | HTTP request | Description
  - [ResetType](docs/ResetType.md)
  - [Root](docs/Root.md)
  - [SimpleUpdateRequestBody](docs/SimpleUpdateRequestBody.md)
+ - [SoftwareInventory](docs/SoftwareInventory.md)
  - [State](docs/State.md)
  - [Status](docs/Status.md)
  - [SystemLinks](docs/SystemLinks.md)

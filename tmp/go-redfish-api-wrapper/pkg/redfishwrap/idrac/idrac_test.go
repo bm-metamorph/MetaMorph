@@ -14,15 +14,20 @@ var client = &IdracRedfishClient{
 	HostIP:   "",
 }
 
+func TestGetFirmwareDetails(t *testing.T) {
+	name, version, updateable := client.GetFirmwareDetails("Life")
+	fmt.Printf("%+v,%+v,%+v", name, version, updateable)
+}
+
 func TestUpgradeFirmware(t *testing.T) {
-	filelocation := "/home/test/workspace/iDRAC-with-Lifecycle-Controller_Firmware_NKGJW_WN64_3.31.31.31_A00.EXE"
+	filelocation := "/tmp/BIOS_R6HXJ_WN64_2.6.4.EXE"
 	client.UpgradeFirmware(filelocation)
 
 }
 
 func TestCheckJobStatus(t *testing.T) {
 	jobId := ""
-	client.CheckJobStatus(jobId)
+	client.CheckJobStatus(jobId, false)
 }
 
 func TestGetPendingTasks(t *testing.T) {
@@ -51,7 +56,7 @@ func TestDeleteVirtualDisk(t *testing.T) {
 	storageID := "Disk.Virtual.1:RAID.Slot.6-1"
 	jobid := client.DeletVirtualDisk(systemID, storageID)
 	t.Logf("Job ID %v", jobid)
-	res := client.CheckJobStatus(jobid)
+	res := client.CheckJobStatus(jobid, false)
 	assert.Equal(t, res, true)
 }
 
@@ -79,7 +84,7 @@ func TestCreateVirtualDisk(t *testing.T) {
 		"Disk.Bay.9:Enclosure.Internal.0-1:RAID.Slot.6-1"}
 	jobid := client.CreateVirtualDisk(systemID, controllerID, volumeType, name, drives)
 	t.Logf("Job ID %v", jobid)
-	res := client.CheckJobStatus(jobid)
+	res := client.CheckJobStatus(jobid, false)
 	t.Logf("%v", res)
 	assert.Equal(t, res, true)
 

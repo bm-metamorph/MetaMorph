@@ -16,6 +16,8 @@ import (
 	_neturl "net/url"
 	"fmt"
 	"strings"
+	"os"
+	"github.com/antihax/optional"
 )
 
 // Linger please
@@ -384,13 +386,19 @@ func (a *DefaultApiService) FirmwareInventory(ctx _context.Context) (Collection,
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+// FirmwareInventoryDownloadImageOpts Optional parameters for the method 'FirmwareInventoryDownloadImage'
+type FirmwareInventoryDownloadImageOpts struct {
+    SoftwareImage optional.Interface
+}
+
 /*
 FirmwareInventoryDownloadImage Method for FirmwareInventoryDownloadImage
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param inlineObject
+ * @param optional nil or *FirmwareInventoryDownloadImageOpts - Optional Parameters:
+ * @param "SoftwareImage" (optional.Interface of *os.File) - 
 @return RedfishError
 */
-func (a *DefaultApiService) FirmwareInventoryDownloadImage(ctx _context.Context, inlineObject InlineObject) (RedfishError, *_nethttp.Response, error) {
+func (a *DefaultApiService) FirmwareInventoryDownloadImage(ctx _context.Context, localVarOptionals *FirmwareInventoryDownloadImageOpts) (RedfishError, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -424,8 +432,21 @@ func (a *DefaultApiService) FirmwareInventoryDownloadImage(ctx _context.Context,
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	// body params
-	localVarPostBody = &inlineObject
+	localVarFormFileName = "softwareImage"
+	var localVarFile *os.File
+	if localVarOptionals != nil && localVarOptionals.SoftwareImage.IsSet() {
+		localVarFileOk := false
+		localVarFile, localVarFileOk = localVarOptionals.SoftwareImage.Value().(*os.File)
+		if !localVarFileOk {
+				return localVarReturnValue, nil, reportError("softwareImage should be *os.File")
+		}
+	}
+	if localVarFile != nil {
+		fbs, _ := _ioutil.ReadAll(localVarFile)
+		localVarFileBytes = fbs
+		localVarFileName = localVarFile.Name()
+		localVarFile.Close()
+	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -738,6 +759,100 @@ func (a *DefaultApiService) GetRoot(ctx _context.Context) (Root, *_nethttp.Respo
 			}
 			newErr.model = v
 		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+/*
+GetSoftwareInventory Method for GetSoftwareInventory
+ * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param softwareId ID of resource
+@return SoftwareInventory
+*/
+func (a *DefaultApiService) GetSoftwareInventory(ctx _context.Context, softwareId string) (SoftwareInventory, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  SoftwareInventory
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/redfish/v1/UpdateService/FirmwareInventory/{softwareId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"softwareId"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", softwareId)), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 200 {
+			var v SoftwareInventory
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+			var v RedfishError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 

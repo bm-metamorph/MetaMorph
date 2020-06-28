@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 **OdataId** | **string** | The name of the resource. | [readonly] 
 **OdataType** | **string** | The type of a resource. | [readonly] 
 **Description** | Pointer to **string** | description | [optional] [readonly] 
-**EndTime** | [**time.Time**](time.Time.md) | The date-time stamp that the task was last completed. | [optional] [readonly] 
+**EndTime** | **string** | The date-time stamp that the task was last completed. | [optional] [readonly] 
 **HidePayload** | **bool** | Indicates that the contents of the Payload should be hidden from view after the Task has been created.  When set to True, the Payload object will not be returned on GET. | [optional] [readonly] 
 **Id** | **string** | The name of the resource. | [readonly] 
 **Messages** | [**[]Message**](Message.md) | This is an array of messages associated with the task. | [optional] 

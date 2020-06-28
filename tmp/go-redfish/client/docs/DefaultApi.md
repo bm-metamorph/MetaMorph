@@ -12,6 +12,7 @@ Method | HTTP request | Description
 [**GetManager**](DefaultApi.md#GetManager) | **Get** /redfish/v1/Managers/{managerId} | 
 [**GetManagerVirtualMedia**](DefaultApi.md#GetManagerVirtualMedia) | **Get** /redfish/v1/Managers/{managerId}/VirtualMedia/{virtualMediaId} | 
 [**GetRoot**](DefaultApi.md#GetRoot) | **Get** /redfish/v1 | 
+[**GetSoftwareInventory**](DefaultApi.md#GetSoftwareInventory) | **Get** /redfish/v1/UpdateService/FirmwareInventory/{softwareId} | 
 [**GetSystem**](DefaultApi.md#GetSystem) | **Get** /redfish/v1/Systems/{systemId} | 
 [**GetTask**](DefaultApi.md#GetTask) | **Get** /redfish/v1/TaskService/Tasks/{taskId} | 
 [**GetTaskList**](DefaultApi.md#GetTaskList) | **Get** /redfish/v1/TaskService/Tasks | 
@@ -158,7 +159,7 @@ No authorization required
 
 ## FirmwareInventoryDownloadImage
 
-> RedfishError FirmwareInventoryDownloadImage(ctx, inlineObject)
+> RedfishError FirmwareInventoryDownloadImage(ctx, optional)
 
 
 
@@ -168,7 +169,16 @@ No authorization required
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**inlineObject** | [**InlineObject**](InlineObject.md)|  | 
+ **optional** | ***FirmwareInventoryDownloadImageOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a FirmwareInventoryDownloadImageOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **softwareImage** | **optional.Interface of *os.File****optional.*os.File**|  | 
 
 ### Return type
 
@@ -266,6 +276,38 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**Root**](Root.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## GetSoftwareInventory
+
+> SoftwareInventory GetSoftwareInventory(ctx, softwareId)
+
+
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**softwareId** | **string**| ID of resource | 
+
+### Return type
+
+[**SoftwareInventory**](SoftwareInventory.md)
 
 ### Authorization
 
