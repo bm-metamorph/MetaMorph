@@ -41,7 +41,7 @@ type RedfishAPI interface {
 	)
 
 	FirmwareInventoryDownloadImage(context.Context,
-		client.InlineObject,
+		*client.FirmwareInventoryDownloadImageOpts,
 	) (client.RedfishError,
 		*http.Response,
 		error,
@@ -64,6 +64,13 @@ type RedfishAPI interface {
 
 	GetRoot(context.Context,
 	) (client.Root,
+		*http.Response,
+		error,
+	)
+
+	GetSoftwareInventory(context.Context,
+		string,
+	) (client.SoftwareInventory,
 		*http.Response,
 		error,
 	)
