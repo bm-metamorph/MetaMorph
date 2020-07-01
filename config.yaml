@@ -50,7 +50,7 @@ http:
   rootpath: /tmp/http_root
 
 provisioning:
-    ip : "32.68.220.23"
+    ip : "32.xx.xx.13"
     port:  3190
     httpport: 31180
 
