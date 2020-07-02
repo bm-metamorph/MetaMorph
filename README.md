@@ -34,4 +34,11 @@ cd MetaMorph
 3. To Run the API
     `go run main.go api`
 
+## Resources
+
+* [Usage Documentation](https://metamorph.readthedocs.io/en/latest/usageGuide)
+* [API References](https://metamorph.readthedocs.io/en/latest/references)
+
+
+
 	
