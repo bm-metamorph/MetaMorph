@@ -1,5 +1,5 @@
 FROM registry.svc.ci.openshift.org/openshift/release:golang-1.13 AS builder
-WORKDIR /go/src/bitbucket.com/metamorph
+WORKDIR /go/src/github.com/bm-metamorph/Metamorph
 COPY . .
 
 #temp fix to resolve dependencies
@@ -25,9 +25,9 @@ RUN pushd /opt/metamorph/kustomize/plugin/metamorph.io/v1/userdata && \
 
 FROM ubuntu:18.04 as exporter
 
-COPY --from=builder /go/src/bitbucket.com/metamorph/build/_output/bin/metamorph /usr/local/bin/
-COPY --from=builder /go/src/bitbucket.com/metamorph/build/_output/bin/metamorph_agent /opt/metamorph/assets/files/metamorph_agent
-COPY --from=builder /go/src/bitbucket.com/metamorph/configs /opt/metamorph/configs
+COPY --from=builder /go/src/github.com/bm-metamorph/Metamorph/build/_output/bin/metamorph /usr/local/bin/
+COPY --from=builder /go/src/github.com/bm-metamorph/Metamorph/build/_output/bin/metamorph_agent /opt/metamorph/assets/files/metamorph_agent
+COPY --from=builder /go/src/github.com/bm-metamorph/Metamorph/configs /opt/metamorph/configs
 COPY --from=kustomize-builder /go/bin/kustomize /opt/metamorph/kustomize/bin/kustomize
 COPY --from=kustomize-builder /opt/metamorph/kustomize/plugin/metamorph.io/v1/userdata  /opt/metamorph/kustomize/plugin/metamorph.io/v1/userdata
 COPY kustomize/setup_kustomize.sh /usr/local/bin/setup_kustomize.sh

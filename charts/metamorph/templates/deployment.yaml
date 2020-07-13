@@ -74,7 +74,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: metamorph-config-vol
-              mountPath: "/src/bitbucket.com/metamorph/config.yaml"
+              mountPath: "/src/github.com/bm-metamorph/Metamorph/config.yaml"
               subPath: "config.yaml"
             - name: db-data-dir
               mountPath: "/opt/metamorph/db"

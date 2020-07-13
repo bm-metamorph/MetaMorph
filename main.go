@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "bitbucket.com/metamorph/cmd"
+import "github.com/bm-metamorph/Metamorph/cmd"
 
 func main() {
 	cmd.Execute()

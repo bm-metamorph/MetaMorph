@@ -10,8 +10,8 @@ import (
 	"strconv"
         "io/ioutil"
 
-	config "bitbucket.com/metamorph/pkg/config"
-	"bitbucket.com/metamorph/pkg/db/models/node"
+	config "github.com/bm-metamorph/Metamorph/pkg/config"
+	"github.com/bm-metamorph/Metamorph/pkg/db/models/node"
 	"encoding/base64"
 )
 

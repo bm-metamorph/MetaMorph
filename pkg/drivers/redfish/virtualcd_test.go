@@ -3,7 +3,7 @@ package redfish
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"bitbucket.com/metamorph/pkg/db/models/node"
+	"github.com/bm-metamorph/Metamorph/pkg/db/models/node"
 )
 
 func TestReboot(t *testing.T) {

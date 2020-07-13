@@ -6,10 +6,10 @@ import (
 	"sync"
 	"time"
 
-	"bitbucket.com/metamorph/pkg/db/models/node"
-	"bitbucket.com/metamorph/pkg/drivers/redfish"
-	"bitbucket.com/metamorph/pkg/logger"
-	"bitbucket.com/metamorph/pkg/util/isogen"
+	"github.com/bm-metamorph/Metamorph/pkg/db/models/node"
+	"github.com/bm-metamorph/Metamorph/pkg/drivers/redfish"
+	"github.com/bm-metamorph/Metamorph/pkg/logger"
+	"github.com/bm-metamorph/Metamorph/pkg/util/isogen"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )

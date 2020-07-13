@@ -66,4 +66,4 @@ data:
         httpport: 31180
     
     testing:
-        inputfile: "/home/ekuamaj/go/src/bitbucket.com/metamorph/examples/input.json"
+        inputfile: "/home/ekuamaj/go/src/github.com/bm-metamorph/Metamorph/examples/input.json"

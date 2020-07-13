@@ -19,9 +19,9 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	config "bitbucket.com/metamorph/pkg/config"
-	ctrlgRPCServer "bitbucket.com/metamorph/pkg/controller/grpc"
-	ctrlgFSMServer "bitbucket.com/metamorph/pkg/controller/statemachine"
+	config "github.com/bm-metamorph/Metamorph/pkg/config"
+	ctrlgRPCServer "github.com/bm-metamorph/Metamorph/pkg/controller/grpc"
+	ctrlgFSMServer "github.com/bm-metamorph/Metamorph/pkg/controller/statemachine"
 )
 
 // controllerCmd represents the controller command

@@ -3,7 +3,7 @@
 package controller
 
 import (
-	node "bitbucket.com/metamorph/pkg/db/models/node"
+	node "github.com/bm-metamorph/Metamorph/pkg/db/models/node"
 	mock "github.com/stretchr/testify/mock"
 )
 

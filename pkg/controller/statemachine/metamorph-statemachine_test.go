@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"bitbucket.com/metamorph/pkg/db/models/node"
+	"github.com/bm-metamorph/Metamorph/pkg/db/models/node"
 	"fmt"
 	"github.com/google/uuid"
 	//	"github.com/stretchr/testify/assert"
