@@ -17,9 +17,9 @@ import (
 	"path"
 	"strings"
 
-	config "bitbucket.com/metamorph/pkg/config"
-	"bitbucket.com/metamorph/pkg/db/models/node"
-	"bitbucket.com/metamorph/pkg/logger"
+	config "github.com/bm-metamorph/MetaMorph/pkg/config"
+	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
+	"github.com/bm-metamorph/MetaMorph/pkg/logger"
 	"go.uber.org/zap"
 	//"google.golang.org/protobuf/internal/errors"
 )

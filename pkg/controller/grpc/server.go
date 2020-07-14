@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"net"
 
-	"bitbucket.com/metamorph/pkg/db/models/node"
-	"bitbucket.com/metamorph/pkg/drivers/redfish"
-	"bitbucket.com/metamorph/proto"
+	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
+	"github.com/bm-metamorph/MetaMorph/pkg/drivers/redfish"
+	"github.com/bm-metamorph/MetaMorph/proto"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

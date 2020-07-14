@@ -1,7 +1,7 @@
 package isogen
 
 import (
-	"bitbucket.com/metamorph/pkg/db/models/node"
+	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"

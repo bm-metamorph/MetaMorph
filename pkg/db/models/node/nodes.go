@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"bitbucket.com/metamorph/pkg/config"
-//	"bitbucket.com/metamorph/pkg/drivers/redfish"
+	"github.com/bm-metamorph/MetaMorph/pkg/config"
+//	"github.com/bm-metamorph/MetaMorph/pkg/drivers/redfish"
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"

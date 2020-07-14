@@ -1,8 +1,8 @@
 package api
 
 import (
-	"bitbucket.com/metamorph/pkg/logger"
-	"bitbucket.com/metamorph/proto"
+	"github.com/bm-metamorph/MetaMorph/pkg/logger"
+	"github.com/bm-metamorph/MetaMorph/proto"
 	"fmt"
 	"github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"

@@ -19,8 +19,8 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	api "bitbucket.com/metamorph/pkg/apis"
-	config "bitbucket.com/metamorph/pkg/config"
+	api "github.com/bm-metamorph/MetaMorph/pkg/apis"
+	config "github.com/bm-metamorph/MetaMorph/pkg/config"
 )
 
 // apiCmd represents the api command

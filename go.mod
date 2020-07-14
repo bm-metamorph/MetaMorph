@@ -1,4 +1,4 @@
-module bitbucket.com/metamorph
+module github.com/bm-metamorph/MetaMorph
 
 go 1.13
 
@@ -26,6 +26,7 @@ require (
 	google.golang.org/protobuf v1.23.0
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	k8s.io/api v0.18.1 // indirect
+	opendev.org/airship/go-redfish/client v0.0.0-0
 )
 
 replace opendev.org/airship/go-redfish/client => /root/go/src/opendev.org/airship/go-redfish/client // Use opendev/org/airship/go-redfish refs/changes/77/737177/3

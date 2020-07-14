@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bitbucket.com/metamorph/pkg/db/models/node"
-	"bitbucket.com/metamorph/pkg/drivers/redfish"
+	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
+	"github.com/bm-metamorph/MetaMorph/pkg/drivers/redfish"
 	"fmt"
 //	"os"
 )

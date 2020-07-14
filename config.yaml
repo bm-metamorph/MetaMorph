@@ -13,7 +13,7 @@ logger:
     controllerpath: /tmp/metamorph_controller.log
 
 templates:
-    rootdir: /home/ekuamaj/go/src/bitbucket.com/metamorph
+    rootdir: /root/go/src/github.com/bm-metamorph/MetaMorph
     preseed:
         config:  configs/templates/preseed.tmpl
         filepath: preseed/hwe-ubuntu-server.seed
@@ -36,7 +36,7 @@ templates:
         filepath: agent_config.yaml
 
 assets:
-   rootdir: /home/ekuamaj/go/src/bitbucket.com/metamorph/assets
+   rootdir: /root/go/src/github.com/bm-metamorph/MetaMorph/assets
    agent_binary:
           src:  files/metamorph_agent
           dest: metamorph_agent
@@ -56,7 +56,7 @@ provisioning:
 
 
 testing:
-    inputfile: "/home/ekuamaj/go/src/bitbucket.com/metamorph/examples/mtn52r07c001_input.json"
+    inputfile: "/root/go/src/github.com/bm-metamorph/MetaMorph/examples/node1_input.json"
 
 agent:
     node_id: "e415bbbe-be68-4705-aa05-16350e0c8151"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 	"path"
-	"bitbucket.com/metamorph/pkg/logger"
+	"github.com/bm-metamorph/MetaMorph/pkg/logger"
 )
 
 var Config string
@@ -16,7 +16,7 @@ func init() {
 
 	if configPath == "" {
 		gopathenv := viper.GetString("GOPATH")
-		configPath = path.Join(gopathenv,"src/bitbucket.com/metamorph")
+		configPath = path.Join(gopathenv,"src/github.com/bm-metamorph/MetaMorph")
 		viper.BindEnv("METAMORPH_CONFIGPATH",configPath)
 	}
 	
