@@ -63,3 +63,11 @@ agent:
     cntrl_endpoint: "localhost:4040"
     logdir : "/tmp/metamorph"
     temp_dir : "/tmp/metamorph/.tmp"
+
+plugins:
+    pluginlocation: "/root/go/src/gihub.com/bm-metamorph/MetaMorph/assets/files"
+    createISO: "metamorph-isogen-plugin"
+    updateFirmware: "metamorph-redfish-plugin"
+    deployISO: "metamorph-redfish-plugin"
+    configRAID: "metamorph-redfish-plugin"
+

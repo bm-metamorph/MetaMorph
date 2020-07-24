@@ -10,7 +10,7 @@ import (
 var Config string
 
 func init() {
-	fmt.Println("Init Func")
+//	fmt.Println("Init Func")
 	viper.AutomaticEnv()
 	configPath := viper.GetString("METAMORPH_CONFIGPATH")
 

@@ -46,6 +46,11 @@ type Node struct {
 		Domain               string
 		Firmwares            []Firmware
        AllowFirmwareUpgrade  bool
+       PlugInLocation       string
+       CreateISO            string
+       UpdateFirmware       string
+       ConfigureRAID        string
+       DeployISO            string
   }
 
   type Firmware struct{
