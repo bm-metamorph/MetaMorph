@@ -28,3 +28,12 @@ func TestGetFilesystem(t *testing.T) {
 	}
 	fmt.Printf("%v", partitions[0].Filesystem)
 }
+
+func  TestGetPlugins(t * testing.T){
+	node := CreateTestNode()
+	plugins, _ := GetPlugins(node.NodeUUID.String())
+	for _,plugin := range plugins {
+		apis,_ := GetAPIs(plugin.ID)
+		fmt.Printf("%+v\n,%+v\n",plugin, apis )
+	}
+}

@@ -155,7 +155,7 @@ func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 	var state string
 	logger.Log.Info("ReadystateHandler()", zap.String("Node Name", bmnode.Name), zap.String("Node UUID", bmnode.NodeUUID.String()))
 	//Update the DB Now
-	err = node.Update(&node.Node{State: INTRANSITION})
+	err = node.Update(&node.Node{State: INTRANSITION, NodeUUID: bmnode.NodeUUID})
 	var nodestatus NodeStatus
 
 	// Check if we could extract UUID from the Node using Redfish
@@ -208,7 +208,7 @@ func SetupreadyHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 
 	//Update the DB Now
 	nodeuuidString := bmnode.Node.NodeUUID.String()
-	err = node.Update(&node.Node{State: INTRANSITION})
+	err = node.Update(&node.Node{State: INTRANSITION,NodeUUID: bmnode.NodeUUID})
 
 	fmt.Println(nodeuuidString)
 	//check for firmware upgrade
@@ -234,11 +234,11 @@ func SetupreadyHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
 		state = SETUPREADYWAIT
 	}
-	err = node.Update(&node.Node{State: state})
+	err = node.Update(&node.Node{State: state,NodeUUID: bmnode.NodeUUID})
 	if err != nil {
 		logger.Log.Error("Failed to update to SETUPREADYWAIT state", zap.String("Node Name", bmnode.Name))
 		state = FAILED
-		node.Update(&node.Node{State: state})
+		node.Update(&node.Node{State: state,NodeUUID: bmnode.NodeUUID})
 	}
 	nodeStatusChan <- nodestatus
 	wg.Done()
@@ -248,7 +248,7 @@ func DeployedHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.W
 	var nodestatus NodeStatus
 	var result bool
 	//Update the DB Now
-	err := node.Update(&node.Node{State: INTRANSITION})
+	err := node.Update(&node.Node{State: INTRANSITION,NodeUUID: bmnode.NodeUUID})
 	fmt.Println(bmnode.NodeUUID)
 	redfishClient := &redfish.BMHNode{bmnode.Node}
 
@@ -265,11 +265,11 @@ func DeployedHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.W
 		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
 		state = DEPLOYING
 	}
-	err = node.Update(&node.Node{State: state})
+	err = node.Update(&node.Node{State: state,NodeUUID: bmnode.NodeUUID})
 	if err != nil {
 		logger.Log.Error("Failed to update to DEPLOYING state", zap.String("Node Name", bmnode.Name))
 		state = FAILED
-		node.Update(&node.Node{State: state})
+		node.Update(&node.Node{State: state,NodeUUID: bmnode.NodeUUID})
 	}
 	nodeStatusChan <- nodestatus
 	wg.Done()

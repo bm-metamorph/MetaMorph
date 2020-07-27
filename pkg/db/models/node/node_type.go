@@ -46,11 +46,22 @@ type Node struct {
 		Domain               string
 		Firmwares            []Firmware
        AllowFirmwareUpgrade  bool
-       PlugInLocation       string
-       CreateISO            string
-       UpdateFirmware       string
-       ConfigureRAID        string
-       DeployISO            string
+       Plugins              []Plugin
+  }
+
+  type Plugin struct{
+	  gorm.Model
+	  NodeID uint
+	  Module  string
+	  Name    string
+	  Location string
+	  APIs  []API
+  }
+
+  type API struct{
+	  gorm.Model
+	  PluginID  uint
+	  Name string
   }
 
   type Firmware struct{

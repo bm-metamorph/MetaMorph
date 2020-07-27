@@ -32,6 +32,8 @@ func getDB() *gorm.DB {
 		&PhysicalDisk{},
 		&BootAction{},
 		&Firmware{},
+		&Plugin{},
+		&API{},
 	)
 	return db
 }
@@ -126,7 +128,36 @@ func GetFirmwares(node_uuid string) ([]Firmware, error) {
 		return nil, errors.New("No record Found")
 	}
 }
+//Plugins
 
+func GetPlugins(node_uuid string) ([]Plugin, error) {
+	node := Node{}
+	plugins := []Plugin{}
+	db := getDB()
+	defer db.Close()
+	node_uuid1, _ := uuid.Parse(node_uuid)
+	db.Where("node_uuid = ?", node_uuid1).First(&node)
+	db.Model(&node).Related(&plugins)
+	if len(plugins) > 0 {
+		return plugins, nil
+	} else {
+		return nil, errors.New("No record Found")
+	}
+}
+func GetAPIs(pluginID uint) ([]API, error) {
+
+	plugin := Plugin{}
+	apis := []API{}
+	db := getDB()
+	defer db.Close()
+	db.Where("id = ?", pluginID).First(&plugin)
+	db.Model(&plugin).Related(&apis)
+	if len(apis) > 0 {
+		return apis, nil
+	} else {
+		return nil, errors.New(" No record Found")
+	}
+}
 //VirtualDisk
 
 func GetVirtualDisks(node_uuid string) ([]VirtualDisk, error) {
@@ -326,13 +357,15 @@ func Create(data []byte) (string, error) {
 // For Testing purpose only
 func CreateTestNode() *Node {
 	data, _ := ioutil.ReadFile(config.Get("testing.inputfile").(string))
-	Create(data)
+	uuid, _ := Create(data)
 	nodelist, err := GetNodes()
 	if err != nil {
 		return nil
 	}
 	for _, node := range nodelist {
-		return &node
+		if node.NodeUUID.String() == uuid {
+			return &node
+		}
 	}
 
 	return nil

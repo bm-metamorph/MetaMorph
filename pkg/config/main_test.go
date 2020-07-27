@@ -8,7 +8,9 @@ import (
 
 
 func TestConfig(t * testing.T){
-	x := Get( "idrac.systemID" )
-	fmt.Println(x)
+	x := GetStringMapString( "plugins" )
+	fmt.Printf("%v\n",x)
+    z := GetStringSlice("plugins.bmh.apis")
+	fmt.Printf("%+v\n",z)
 
 }

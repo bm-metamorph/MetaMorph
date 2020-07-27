@@ -65,9 +65,16 @@ agent:
     temp_dir : "/tmp/metamorph/.tmp"
 
 plugins:
-    pluginlocation: "/root/go/src/gihub.com/bm-metamorph/MetaMorph/assets/files"
-    createISO: "metamorph-isogen-plugin"
-    updateFirmware: "metamorph-redfish-plugin"
-    deployISO: "metamorph-redfish-plugin"
-    configRAID: "metamorph-redfish-plugin"
+    bmh:
+      location: "/root/go/src/gihub.com/bm-metamorph/MetaMorph/assets/files"
+      name: "metamorph-redfish-plugin"
+      apis:
+        - UpdateFirmware
+        - ConfigureRAID
+        - DeployISO
+    isogen:
+      name: "metamorph-isogen-plugin"
+      location: "/root/go/src/gihub.com/bm-metamorph/MetaMorph/assets/files"
+      apis:
+        - CreateISO
 

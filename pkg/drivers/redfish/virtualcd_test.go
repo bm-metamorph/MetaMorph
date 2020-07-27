@@ -20,7 +20,7 @@ func TestISOInstallation(t *testing.T) {
 	res = bmhnode.EjectISO()
 	if res != false {
 		//Step 2 Insert Ubuntu ISO
-		bmhnode.ImageURL = "http://32.68.220.23:31180/4c4c4544-004a-5910-804d-c2c04f435032-ubuntu.iso"
+		bmhnode.ImageURL = "http://12.168.220.23:31180/4c4c4544-004a-5910-804d-c2c04f435032-ubuntu.iso"
 		res = bmhnode.InsertISO()
 		if res != false {
 			//Step 3 Set Onetime boot to CD ROM
@@ -39,7 +39,7 @@ func TestISOInstallation(t *testing.T) {
 func TestISODeploy(t *testing.T){
 	var res bool
 	bmhnode := &BMHNode { node.CreateTestNode()}
-	bmhnode.ImageURL = "http://32.68.220.23:31180/4c4c4544-004a-5910-804d-c2c04f435032-ubuntu.iso"
+	bmhnode.ImageURL = "http://12.168.220.23:31180/4c4c4544-004a-5910-804d-c2c04f435032-ubuntu.iso"
 
 	res = bmhnode.DeployISO()
 	assert.Equal(t,res,true)
