@@ -11,6 +11,7 @@ controller:
 logger:
     apipath: /tmp/metamorph_api.log
     controllerpath: /tmp/metamorph_controller.log
+    pluginpath: /tmp/plugin.log
 
 templates:
     rootdir: /root/go/src/github.com/bm-metamorph/MetaMorph
@@ -55,8 +56,10 @@ provisioning:
     httpport: 31180
 
 
+pluginlocation: "/root/go/src/github.com/manojkva/MetaMorph/assets/files"
+
 testing:
-    inputfile: "/root/go/src/github.com/bm-metamorph/MetaMorph/examples/node1_input.json"
+    inputfile: "/root/go/src/github.com/manojkva/MetaMorph/examples/node1_input.json"
 
 agent:
     node_id: "e415bbbe-be68-4705-aa05-16350e0c8151"
@@ -65,16 +68,10 @@ agent:
     temp_dir : "/tmp/metamorph/.tmp"
 
 plugins:
-    bmh:
-      location: "/root/go/src/gihub.com/bm-metamorph/MetaMorph/assets/files"
-      name: "metamorph-redfish-plugin"
-      apis:
-        - UpdateFirmware
-        - ConfigureRAID
-        - DeployISO
-    isogen:
-      name: "metamorph-isogen-plugin"
-      location: "/root/go/src/gihub.com/bm-metamorph/MetaMorph/assets/files"
-      apis:
-        - CreateISO
+    UpdateFirmware: "metamorph-redfish-plugin"
+    ConfigureRAID: "metamorph-redfish-plugin"
+    DeployISO: "metamorph-redfish-plugin"
+    GetGUUID: "metamorph-redfish-plugin"
+    CreateISO: "metamorph-isogen-plugin"
+
 

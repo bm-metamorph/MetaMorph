@@ -6,13 +6,14 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 
 	hclog "github.com/hashicorp/go-hclog"
 
 	config "github.com/bm-metamorph/MetaMorph/pkg/config"
 	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
 	"github.com/hashicorp/go-plugin"
-	"github.com/manojkva/metamorph-plugin/plugins/bmh"
+	"github.com/manojkva/metamorph-plugin/common/bmh"
 )
 
 type BMHNode struct {
@@ -32,62 +33,78 @@ type BMHNode struct {
 */
 func (bmhnode *BMHNode) ReadConfigFile() error {
 
-	var pluginslist []node.Plugin
+	var err error
+	var plugins node.Plugins
 	var pluginskeyname string = "plugins"
 
-	plugins := config.GetStringMapString(pluginskeyname)
+	pluginsConfig := config.GetStringMapString(pluginskeyname)
 
-	if plugins != nil {
+	if pluginsConfig != nil {
 
-		for k, _ := range plugins {
-			keyvalue := pluginskeyname + "." + k
-			var plugin node.Plugin
-			plugin.Module = k
-			plugin.Name = config.Get(keyvalue + ".name").(string)
-			plugin.Location = config.Get(keyvalue + ".location").(string)
-			apis := config.GetStringSlice(keyvalue + ".apis")
-			fmt.Printf("%+v", apis)
-			for _, api := range apis {
-				var api_node node.API
-				api_node.Name = api
-				plugin.APIs = append(plugin.APIs, api_node)
-			}
-			pluginslist = append(pluginslist, plugin)
-
+		pluginsNode, err := node.GetPlugins(bmhnode.NodeUUID.String())
+		if err != nil {
+			return err
 		}
-		fmt.Printf("%+v", pluginslist)
+		apisNode, err := node.GetPluginAPIs(pluginsNode.ID)
+		if err != nil {
+			return err
+		}
+
+		for key, value := range pluginsConfig {
+			var api node.API
+			api.Name = key
+			valueFromNode := node.GetPluginForAPI(apisNode, key)
+			if valueFromNode == "" {
+				api.Plugin = value
+			} else {
+				api.Plugin = valueFromNode
+			}
+
+			plugins.APIs = append(plugins.APIs, api)
+		}
+		err = node.Update(&node.Node{NodeUUID: bmhnode.NodeUUID, Plugins: plugins})
+	} else {
+		err = fmt.Errorf("Failed to retrieve Plugins information from config file")
 	}
 
-	//now check against the  plugins already present in DB
-
-	// Add if plugin in not present.
-	return nil
+	return err
 }
 
-func (bmhnode *BMHNode) ComparePluginData(pluginData node.Plugin) {
+func (bmhnode *BMHNode) CreateClientRequest(apiname string) (*interface{}, error) {
 
+	pluginLocation := config.Get("pluginlocation").(string)
 
-}
+	if pluginLocation == "" {
+		return nil, fmt.Errorf("Failed to retrieve pluginlocation from config file")
+	}
+	pluginsNode, err := node.GetPlugins(bmhnode.NodeUUID.String())
+	if err != nil {
+		return nil, err
+	}
+	apisNode, err := node.GetPluginAPIs(pluginsNode.ID)
+	if err != nil {
+		return nil, err
+	}
 
-
-
-func (bmhnode *BMHNode) CreateClientRequest() error {
+	pluginName := node.GetPluginForAPI(apisNode, apiname)
 
 	data, err := json.Marshal(bmhnode)
+
 	if err != nil {
 		fmt.Printf("Error %v\n", err)
-		return err
+		return nil, err
 	}
 	inputConfig := base64.StdEncoding.EncodeToString(data)
 
 	logger := hclog.New(&hclog.LoggerOptions{
 		Name:   "plugin",
 		Output: os.Stdout,
-		Level:  hclog.Debug})
+		Level:  hclog.Trace})
+
 	client := plugin.NewClient(&plugin.ClientConfig{
 		HandshakeConfig:  bmh.Handshake,
-		Plugins:          bmh.PluginMap,
-		Cmd:              exec.Command("sh", "-c", "../metamorph-redfish-plugin "+string(inputConfig)),
+		Plugins:          map[string]plugin.Plugin{pluginName: &bmh.BmhPlugin{}},
+		Cmd:              exec.Command("sh", "-c", pluginLocation+"/"+pluginName+" "+string(inputConfig)),
 		AllowedProtocols: []plugin.Protocol{plugin.ProtocolGRPC},
 		Logger:           logger})
 	defer client.Kill()
@@ -96,17 +113,34 @@ func (bmhnode *BMHNode) CreateClientRequest() error {
 
 	if err != nil {
 		fmt.Printf("Error %v\n", err)
-		return err
+		return nil, err
 	}
 
-	raw, err := rpcClient.Dispense("bmh")
+	raw, err := rpcClient.Dispense(pluginName)
 	if err != nil {
 		fmt.Printf("Error %v\n", err)
-		return err
+		return nil, err
 
 	}
-	service := raw.(bmh.Bmh)
-	x, err := service.GetGUUID()
-	fmt.Printf("%v\n", string(x))
-	return nil
+	return &raw, err
+}
+
+func (bmhnode *BMHNode) Dispense(apiName string) error {
+
+	raw, err := bmhnode.CreateClientRequest(apiName)
+
+	if err != nil {
+		return err
+	}
+
+	if strings.ToLower(apiName) == "getguuid" {
+		var x []byte
+		service := (*raw).(bmh.Bmh)
+		x, err  = service.GetGUUID()
+		fmt.Printf("%v\n", string(x))
+
+	}
+
+	return err
+
 }

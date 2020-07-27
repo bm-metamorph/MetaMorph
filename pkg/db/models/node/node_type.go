@@ -46,22 +46,21 @@ type Node struct {
 		Domain               string
 		Firmwares            []Firmware
        AllowFirmwareUpgrade  bool
-       Plugins              []Plugin
+       Plugins              Plugins
   }
 
-  type Plugin struct{
+  type Plugins struct{
 	  gorm.Model
 	  NodeID uint
-	  Module  string
-	  Name    string
-	  Location string
 	  APIs  []API
   }
 
   type API struct{
 	  gorm.Model
-	  PluginID  uint
-	  Name string
+	  PluginsID uint
+	  Name  string
+	  Plugin string
+
   }
 
   type Firmware struct{

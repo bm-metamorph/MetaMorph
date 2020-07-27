@@ -32,8 +32,7 @@ func TestGetFilesystem(t *testing.T) {
 func  TestGetPlugins(t * testing.T){
 	node := CreateTestNode()
 	plugins, _ := GetPlugins(node.NodeUUID.String())
-	for _,plugin := range plugins {
-		apis,_ := GetAPIs(plugin.ID)
-		fmt.Printf("%+v\n,%+v\n",plugin, apis )
-	}
+	fmt.Printf("%+v", plugins)
+	apis,_ := GetPluginAPIs(plugins.ID)
+	fmt.Printf("%+v", apis)
 }
