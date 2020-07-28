@@ -8,7 +8,7 @@ import (
 	"net"
 
 	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
-	"github.com/bm-metamorph/MetaMorph/pkg/drivers/redfish"
+	"github.com/bm-metamorph/MetaMorph/pkg/plugins"
 	"github.com/bm-metamorph/MetaMorph/proto"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
@@ -152,18 +152,14 @@ func (s *server) List(ctx context.Context, request *proto.Request) (*proto.Respo
 
 func (s *server) GetNodeUUID(ctx context.Context, request *proto.Request) (*proto.Response, error) {
 
-	nodeInfo := new(struct {
-		IPMIIP       string
-		IPMIUser     string
-		IPMIPassword string
-	})
+	nodeInfo := plugin.node.Node{}
 
 	var result string
 	data := request.GetNodeSpec()
 
 	err := json.Unmarshal(data, &nodeInfo)
 	if err == nil {
-		if uuid, _ := redfish.GetUUID(nodeInfo.IPMIIP, nodeInfo.IPMIUser, nodeInfo.IPMIPassword); uuid != "" {
+		if uuid, _ := .GetUUID(nodeInfo.IPMIIP, nodeInfo.IPMIUser, nodeInfo.IPMIPassword); uuid != "" {
 			result = uuid
 		} else {
 			err = errors.New(fmt.Sprintf("Failed to retrieve UUID from node for IPMI IP : %v", nodeInfo.IPMIIP))

@@ -12,9 +12,9 @@ func TestReadConfigFile(t *testing.T) {
 
 }
 
-func TestDispense(t *testing.T) {
+func TestDispenseClientRequest(t *testing.T) {
 	bmhnode := &BMHNode{node.CreateTestNode()}
 	bmhnode.ReadConfigFile()
-	bmhnode.Dispense("getguuid")
+	bmhnode.DispenseClientRequest("getguuid")
 
 }

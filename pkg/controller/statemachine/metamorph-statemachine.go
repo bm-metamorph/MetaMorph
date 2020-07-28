@@ -7,9 +7,10 @@ import (
 	"time"
 
 	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
-	"github.com/bm-metamorph/MetaMorph/pkg/drivers/redfish"
+//	"github.com/bm-metamorph/MetaMorph/pkg/drivers/redfish"
 	"github.com/bm-metamorph/MetaMorph/pkg/logger"
-	"github.com/bm-metamorph/MetaMorph/pkg/util/isogen"
+//	"github.com/bm-metamorph/MetaMorph/pkg/util/isogen"
+	"github.com/bm-metamorph/MetaMorph/pkg/plugin"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
@@ -164,7 +165,7 @@ func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 	// - working credentials
 	// - Redfish API availability(though ver is not compared yet)
 	var node_uuid uuid.UUID // to be removed once UUID = Server UUID is planned.
-	redfishClient := &redfish.BMHNode{bmnode.Node}
+	redfishClient := &plugin.BMHNode{bmnode.Node}
 	redfishManagerID := redfishClient.GetManagerID()
 	redfishSystemID := redfishClient.GetSystemID()
 	redfishVersion := redfishClient.GetRedfishVersion()
@@ -172,9 +173,9 @@ func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 	var res bool = false
 	var nodeuuidStringFromServer string
 	if redfishSystemID != "" {
-		nodeuuidStringFromServer, res = redfish.GetUUID(bmnode.Node.IPMIIP, bmnode.IPMIUser, bmnode.IPMIPassword)
+		nodeuuidStringFromServer, err = redfish.GetGUUID()
 	}
-	if res == true {
+	if err == nil {
 		node_uuid, err = uuid.Parse(nodeuuidStringFromServer)
 	}
 
@@ -212,10 +213,9 @@ func SetupreadyHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 
 	fmt.Println(nodeuuidString)
 	//check for firmware upgrade
-	var res bool = true
 	if bmnode.AllowFirmwareUpgrade {
-		redfishClient := &redfish.BMHNode{bmnode.Node}
-		res = redfishClient.UpgradeFirmwareList()
+		redfishClient := &plugin.BMHNode{bmnode.Node}
+		err = redfishClient.UpdateFirmware()
 	}
 
 	isogenClient := &isogen.BMHNode{bmnode.Node}
@@ -224,7 +224,7 @@ func SetupreadyHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 	err = isogenClient.PrepareISO()
 
 	var state string
-	if (err != nil) || (res == false) {
+	if (err != nil)  {
 		logger.Log.Error("Failed to create ISO file or Failed to upgrade Firmware", zap.String("Node Name", bmnode.Name))
 		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: false}
 		state = FAILED
@@ -250,9 +250,9 @@ func DeployedHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.W
 	//Update the DB Now
 	err := node.Update(&node.Node{State: INTRANSITION,NodeUUID: bmnode.NodeUUID})
 	fmt.Println(bmnode.NodeUUID)
-	redfishClient := &redfish.BMHNode{bmnode.Node}
+	redfishClient := &plugin.BMHNode{bmnode.Node}
 
-	result = redfishClient.DeployISO()
+	err = redfishClient.DeployISO()
 
 	var state string
 

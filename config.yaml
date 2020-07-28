@@ -14,7 +14,7 @@ logger:
     pluginpath: /tmp/plugin.log
 
 templates:
-    rootdir: /root/go/src/github.com/bm-metamorph/MetaMorph
+    rootdir: /root/go/src/github.com/manojkva/MetaMorph
     preseed:
         config:  configs/templates/preseed.tmpl
         filepath: preseed/hwe-ubuntu-server.seed
@@ -37,7 +37,7 @@ templates:
         filepath: agent_config.yaml
 
 assets:
-   rootdir: /root/go/src/github.com/bm-metamorph/MetaMorph/assets
+   rootdir: /root/go/src/github.com/manojkva/MetaMorph/assets
    agent_binary:
           src:  files/metamorph_agent
           dest: metamorph_agent

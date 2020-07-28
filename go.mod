@@ -6,18 +6,17 @@ require (
 	github.com/gin-contrib/zap v0.0.1
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.3.0 // indirect
-	github.com/go-resty/resty/v2 v2.0.0
+	github.com/go-resty/resty/v2 v2.0.0 // indirect
 	github.com/golang/protobuf v1.4.2
 	github.com/google/uuid v1.1.1
 	github.com/hashicorp/go-hclog v0.14.1
 	github.com/hashicorp/go-plugin v1.3.0
-	github.com/hashicorp/go-version v1.2.1
+	github.com/hashicorp/go-version v1.2.1 // indirect
 	github.com/jinzhu/gorm v1.9.12
-	github.com/manojkva/go-redfish-api-wrapper v1.0.6
+	github.com/manojkva/go-redfish-api-wrapper v1.0.6 // indirect
 	github.com/manojkva/metamorph-plugin v0.0.0-00010101000000-000000000000
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/natefinch/lumberjack v2.0.0+incompatible
-	github.com/pkg/errors v0.8.1
 	github.com/spf13/cobra v0.0.7
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/testify v1.4.0

@@ -14,23 +14,13 @@ import (
 	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
 	"github.com/hashicorp/go-plugin"
 	"github.com/manojkva/metamorph-plugin/common/bmh"
+	"github.com/manojkva/metamorph-plugin/common/isogen"
 )
 
 type BMHNode struct {
 	*node.Node
 }
 
-/*
-- function to read the config files and set the info in  node structure right. The Contents of node structure to
-  override the condig info
-- Allow for adding a new entry overiding the current API support
-- if there are multiple definition for the API, the first one will be chosen.
-- To what level should the input json file be allowed to override the config files plugin details.
-- Save it to DB.
-- Use the node info for all actions.
-
-
-*/
 func (bmhnode *BMHNode) ReadConfigFile() error {
 
 	var err error
@@ -70,29 +60,29 @@ func (bmhnode *BMHNode) ReadConfigFile() error {
 	return err
 }
 
-func (bmhnode *BMHNode) CreateClientRequest(apiname string) (*interface{}, error) {
+func (bmhnode *BMHNode) DispenseClientRequest(apiName string) error {
 
 	pluginLocation := config.Get("pluginlocation").(string)
 
 	if pluginLocation == "" {
-		return nil, fmt.Errorf("Failed to retrieve pluginlocation from config file")
+		return fmt.Errorf("Failed to retrieve pluginlocation from config file")
 	}
 	pluginsNode, err := node.GetPlugins(bmhnode.NodeUUID.String())
 	if err != nil {
-		return nil, err
+		return err
 	}
 	apisNode, err := node.GetPluginAPIs(pluginsNode.ID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	pluginName := node.GetPluginForAPI(apisNode, apiname)
+	pluginName := node.GetPluginForAPI(apisNode, apiName)
 
 	data, err := json.Marshal(bmhnode)
 
 	if err != nil {
 		fmt.Printf("Error %v\n", err)
-		return nil, err
+		return err
 	}
 	inputConfig := base64.StdEncoding.EncodeToString(data)
 
@@ -113,34 +103,35 @@ func (bmhnode *BMHNode) CreateClientRequest(apiname string) (*interface{}, error
 
 	if err != nil {
 		fmt.Printf("Error %v\n", err)
-		return nil, err
+		return err
 	}
 
 	raw, err := rpcClient.Dispense(pluginName)
 	if err != nil {
 		fmt.Printf("Error %v\n", err)
-		return nil, err
-
-	}
-	return &raw, err
-}
-
-func (bmhnode *BMHNode) Dispense(apiName string) error {
-
-	raw, err := bmhnode.CreateClientRequest(apiName)
-
-	if err != nil {
 		return err
-	}
 
-	if strings.ToLower(apiName) == "getguuid" {
+	}
+	switch apiNameLowerCase := strings.ToLower(apiName); apiNameLowerCase {
+	case "getguuid":
+		service := raw.(bmh.Bmh)
 		var x []byte
-		service := (*raw).(bmh.Bmh)
-		x, err  = service.GetGUUID()
+		x, err = service.GetGUUID()
 		fmt.Printf("%v\n", string(x))
-
+	case "deployiso":
+		service := raw.(bmh.Bmh)
+		err = service.DeployISO()
+	case "updatefirmware":
+		service := raw.(bmh.Bmh)
+		err = service.UpdateFirmware()
+	case "configureraid":
+		service := raw.(bmh.Bmh)
+		err = service.ConfigureRAID()
+	case "createiso":
+		service := raw.(isogen.ISOgen)
+		err = service.CreateISO()
+	default:
+		err = fmt.Errorf("%v not supported.", apiName)
 	}
-
 	return err
-
 }
