@@ -73,5 +73,10 @@ plugins:
     DeployISO: "metamorph-redfish-plugin"
     GetGUUID: "metamorph-redfish-plugin"
     CreateISO: "metamorph-isogen-plugin"
+    GetHWInventory: "metamorph-redfish-plugin"
+    PowerOff: "metamorph-redfish-plugin"
+    PowerOn: "metamorph-redfish-plugin"
+    GetPowerStatus: "metamorph-redfish-plugin"
+ 
 
 

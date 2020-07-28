@@ -60,20 +60,22 @@ func (bmhnode *BMHNode) ReadConfigFile() error {
 	return err
 }
 
-func (bmhnode *BMHNode) DispenseClientRequest(apiName string) error {
+func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{},error) {
+
+	var  resultIntf interface{}
 
 	pluginLocation := config.Get("pluginlocation").(string)
 
 	if pluginLocation == "" {
-		return fmt.Errorf("Failed to retrieve pluginlocation from config file")
+		return nil, fmt.Errorf("Failed to retrieve pluginlocation from config file")
 	}
 	pluginsNode, err := node.GetPlugins(bmhnode.NodeUUID.String())
 	if err != nil {
-		return err
+		return nil,err
 	}
 	apisNode, err := node.GetPluginAPIs(pluginsNode.ID)
 	if err != nil {
-		return err
+		return nil,err
 	}
 
 	pluginName := node.GetPluginForAPI(apisNode, apiName)
@@ -82,7 +84,7 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) error {
 
 	if err != nil {
 		fmt.Printf("Error %v\n", err)
-		return err
+		return nil,err
 	}
 	inputConfig := base64.StdEncoding.EncodeToString(data)
 
@@ -103,35 +105,58 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) error {
 
 	if err != nil {
 		fmt.Printf("Error %v\n", err)
-		return err
+		return nil,err
 	}
 
 	raw, err := rpcClient.Dispense(pluginName)
 	if err != nil {
 		fmt.Printf("Error %v\n", err)
-		return err
+		return nil,err
 
 	}
 	switch apiNameLowerCase := strings.ToLower(apiName); apiNameLowerCase {
 	case "getguuid":
 		service := raw.(bmh.Bmh)
-		var x []byte
-		x, err = service.GetGUUID()
-		fmt.Printf("%v\n", string(x))
+		resultIntf, err = service.GetGUUID()
+		fmt.Printf("%v\n", resultIntf.([]byte))
 	case "deployiso":
 		service := raw.(bmh.Bmh)
 		err = service.DeployISO()
+                resultIntf = nil
 	case "updatefirmware":
 		service := raw.(bmh.Bmh)
 		err = service.UpdateFirmware()
+                resultIntf = nil
 	case "configureraid":
 		service := raw.(bmh.Bmh)
 		err = service.ConfigureRAID()
+                resultIntf = nil
 	case "createiso":
 		service := raw.(isogen.ISOgen)
 		err = service.CreateISO()
+                resultIntf = nil
+	case "gethwinventory":
+		service :=  raw.(bmh.Bmh)
+		resultIntf,err = service.GetHWInventory()
+	case "poweron":
+		service :=  raw.(bmh.Bmh)
+		err = service.PowerOn()
+                resultIntf = nil
+	case "poweroff":
+		service :=  raw.(bmh.Bmh)
+		err = service.PowerOff()
+                resultIntf = nil
+	case "getpowerstatus":
+		service :=  raw.(bmh.Bmh)
+		status := service.GetPowerStatus()
+		if status == true {
+			resultIntf = "On"
+		}else{
+			resultIntf = "Off"
+		}
+		err = nil
 	default:
 		err = fmt.Errorf("%v not supported.", apiName)
 	}
-	return err
+	return resultIntf,err
 }

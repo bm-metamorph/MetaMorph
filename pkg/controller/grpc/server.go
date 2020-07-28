@@ -8,7 +8,7 @@ import (
 	"net"
 
 	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
-	"github.com/bm-metamorph/MetaMorph/pkg/plugins"
+	"github.com/bm-metamorph/MetaMorph/pkg/plugin"
 	"github.com/bm-metamorph/MetaMorph/proto"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
@@ -152,17 +152,17 @@ func (s *server) List(ctx context.Context, request *proto.Request) (*proto.Respo
 
 func (s *server) GetNodeUUID(ctx context.Context, request *proto.Request) (*proto.Response, error) {
 
-	nodeInfo := plugin.node.Node{}
+	redfishClient := plugin.BMHNode{&node.Node{}}
 
 	var result string
 	data := request.GetNodeSpec()
 
-	err := json.Unmarshal(data, &nodeInfo)
+	err := json.Unmarshal(data, &redfishClient)
 	if err == nil {
-		if uuid, _ := .GetUUID(nodeInfo.IPMIIP, nodeInfo.IPMIUser, nodeInfo.IPMIPassword); uuid != "" {
-			result = uuid
+		if uuid, _ := redfishClient.DispenseClientRequest("getguuid"); uuid.(string) != "" {
+			result = uuid.(string)
 		} else {
-			err = errors.New(fmt.Sprintf("Failed to retrieve UUID from node for IPMI IP : %v", nodeInfo.IPMIIP))
+			err = errors.New(fmt.Sprintf("Failed to retrieve UUID from node for IPMI IP : %v", redfishClient.IPMIIP))
 			result = ""
 		}
 	}
@@ -182,11 +182,10 @@ func (s *server) GetHWStatus(ctx context.Context, request *proto.Request) (*prot
 	if err != nil {
 		return &proto.Response{Result: result}, err
 	}
-	redfishClient := &redfish.BMHNode{&node}
-	status := redfishClient.GetPowerStatus()
-	if status == true {
-		result = "On"
-	}
+	redfishClient := &plugin.BMHNode{&node}
+	status, err := redfishClient.DispenseClientRequest("getpowerstatus")
+
+	result = status.(string)
 
 	return &proto.Response{Result: result}, nil
 
@@ -199,12 +198,11 @@ func (s *server) UpdateHWStatus(ctx context.Context, request *proto.Request) (*p
 		return &proto.Response{Result: ""}, err
 	}
 	var node node.Node
-	var status bool
 	err = json.Unmarshal(nodeInfoBytes, &node)
 	if err != nil {
 		return &proto.Response{Result: ""}, err
 	}
-	redfishClient := &redfish.BMHNode{&node}
+	redfishClient := &plugin.BMHNode{&node}
 
 	hwInfo := new(struct {
 		PowerState string
@@ -214,14 +212,14 @@ func (s *server) UpdateHWStatus(ctx context.Context, request *proto.Request) (*p
 		return &proto.Response{Result: ""}, err
 	}
 	if hwInfo.PowerState == "On" {
-		status = redfishClient.PowerOn()
-		if status == false {
-			return &proto.Response{Result: ""}, errors.New("Failed to Power On")
+		_, err = redfishClient.DispenseClientRequest("poweron")
+		if err  != nil {
+			return &proto.Response{Result: ""},err
 		}
 	} else if hwInfo.PowerState == "Off" {
-		status = redfishClient.PowerOff()
-		if status == false {
-			return &proto.Response{Result: ""}, errors.New("Failed to Power Off")
+		_, err = redfishClient.DispenseClientRequest("poweroff")
+		if err != nil {
+			return &proto.Response{Result: ""}, err 
 		}
 
 	}
