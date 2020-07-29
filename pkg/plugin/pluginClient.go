@@ -26,6 +26,7 @@ func (bmhnode *BMHNode) ReadConfigFile() error {
 	var err error
 	var plugins node.Plugins
 	var pluginskeyname string = "plugins"
+	var valueFromNode string
 
 	pluginsConfig := config.GetStringMapString(pluginskeyname)
 
@@ -36,14 +37,14 @@ func (bmhnode *BMHNode) ReadConfigFile() error {
 			return err
 		}
 		apisNode, err := node.GetPluginAPIs(pluginsNode.ID)
-		if err != nil {
-			return err
-		}
 
 		for key, value := range pluginsConfig {
 			var api node.API
 			api.Name = key
-			valueFromNode := node.GetPluginForAPI(apisNode, key)
+			if len(apisNode) > 0 {
+
+				valueFromNode = node.GetPluginForAPI(apisNode, key)
+			}
 			if valueFromNode == "" {
 				api.Plugin = value
 			} else {
@@ -51,8 +52,9 @@ func (bmhnode *BMHNode) ReadConfigFile() error {
 			}
 
 			plugins.APIs = append(plugins.APIs, api)
+			err = node.Update(&node.Node{NodeUUID: bmhnode.NodeUUID, Plugins: plugins})
+
 		}
-		err = node.Update(&node.Node{NodeUUID: bmhnode.NodeUUID, Plugins: plugins})
 	} else {
 		err = fmt.Errorf("Failed to retrieve Plugins information from config file")
 	}
@@ -60,9 +62,9 @@ func (bmhnode *BMHNode) ReadConfigFile() error {
 	return err
 }
 
-func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{},error) {
+func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{}, error) {
 
-	var  resultIntf interface{}
+	var resultIntf interface{}
 
 	pluginLocation := config.Get("pluginlocation").(string)
 
@@ -71,11 +73,11 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{},error
 	}
 	pluginsNode, err := node.GetPlugins(bmhnode.NodeUUID.String())
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	apisNode, err := node.GetPluginAPIs(pluginsNode.ID)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	pluginName := node.GetPluginForAPI(apisNode, apiName)
@@ -84,7 +86,7 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{},error
 
 	if err != nil {
 		fmt.Printf("Error %v\n", err)
-		return nil,err
+		return nil, err
 	}
 	inputConfig := base64.StdEncoding.EncodeToString(data)
 
@@ -105,13 +107,13 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{},error
 
 	if err != nil {
 		fmt.Printf("Error %v\n", err)
-		return nil,err
+		return nil, err
 	}
 
 	raw, err := rpcClient.Dispense(pluginName)
 	if err != nil {
 		fmt.Printf("Error %v\n", err)
-		return nil,err
+		return nil, err
 
 	}
 	switch apiNameLowerCase := strings.ToLower(apiName); apiNameLowerCase {
@@ -122,41 +124,41 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{},error
 	case "deployiso":
 		service := raw.(bmh.Bmh)
 		err = service.DeployISO()
-                resultIntf = nil
+		resultIntf = nil
 	case "updatefirmware":
 		service := raw.(bmh.Bmh)
 		err = service.UpdateFirmware()
-                resultIntf = nil
+		resultIntf = nil
 	case "configureraid":
 		service := raw.(bmh.Bmh)
 		err = service.ConfigureRAID()
-                resultIntf = nil
+		resultIntf = nil
 	case "createiso":
 		service := raw.(isogen.ISOgen)
 		err = service.CreateISO()
-                resultIntf = nil
+		resultIntf = nil
 	case "gethwinventory":
-		service :=  raw.(bmh.Bmh)
-		resultIntf,err = service.GetHWInventory()
+		service := raw.(bmh.Bmh)
+		resultIntf, err = service.GetHWInventory()
 	case "poweron":
-		service :=  raw.(bmh.Bmh)
+		service := raw.(bmh.Bmh)
 		err = service.PowerOn()
-                resultIntf = nil
+		resultIntf = nil
 	case "poweroff":
-		service :=  raw.(bmh.Bmh)
+		service := raw.(bmh.Bmh)
 		err = service.PowerOff()
-                resultIntf = nil
+		resultIntf = nil
 	case "getpowerstatus":
-		service :=  raw.(bmh.Bmh)
-		status := service.GetPowerStatus()
+		service := raw.(bmh.Bmh)
+		status,_ := service.GetPowerStatus()
 		if status == true {
 			resultIntf = "On"
-		}else{
+		} else {
 			resultIntf = "Off"
 		}
 		err = nil
 	default:
 		err = fmt.Errorf("%v not supported.", apiName)
 	}
-	return resultIntf,err
+	return resultIntf, err
 }

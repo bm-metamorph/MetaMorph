@@ -178,6 +178,11 @@ func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 	// - Network Connectivity
 	// - working credentials
 	// - Redfish API availability(though ver is not compared yet)
+        err = redfishClient.ReadConfigFile()
+	if  err  != nil{
+		logger.Log.Error("Failed to Read Plugin info from configuration file. Setting Node to FAILED State", zap.String("NodeName", bmnode.Name))
+		goto End
+	}
 	hwInventory, err = redfishClient.DispenseClientRequest("gethwinventory")
 	maphwInventory = hwInventory.(map[string]string)
 
