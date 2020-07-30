@@ -12,9 +12,11 @@ import (
 
 	config "github.com/bm-metamorph/MetaMorph/pkg/config"
 	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
+	"github.com/bm-metamorph/MetaMorph/pkg/logger"
 	"github.com/hashicorp/go-plugin"
 	"github.com/manojkva/metamorph-plugin/common/bmh"
 	"github.com/manojkva/metamorph-plugin/common/isogen"
+	"go.uber.org/zap"
 )
 
 type BMHNode struct {
@@ -27,16 +29,21 @@ func (bmhnode *BMHNode) ReadConfigFile() error {
 	var plugins node.Plugins
 	var pluginskeyname string = "plugins"
 	var valueFromNode string
+	var errorString string
+	var apisNode []node.API 
+
+	logger.Log.Info("ReadConfigFile()")
 
 	pluginsConfig := config.GetStringMapString(pluginskeyname)
 
 	if pluginsConfig != nil {
 
 		pluginsNode, err := node.GetPlugins(bmhnode.NodeUUID.String())
-		if err != nil {
-			return err
+		if err == nil {
+		        apisNode, err = node.GetPluginAPIs(pluginsNode.ID)
+		}else{
+			logger.Log.Info("Plugin details not found in input json file. Info in config files will be used")
 		}
-		apisNode, err := node.GetPluginAPIs(pluginsNode.ID)
 
 		for key, value := range pluginsConfig {
 			var api node.API
@@ -48,6 +55,7 @@ func (bmhnode *BMHNode) ReadConfigFile() error {
 			if valueFromNode == "" {
 				api.Plugin = value
 			} else {
+				logger.Log.Info(fmt.Sprintf("Value overridden for %v", key), zap.String("Old value", value), zap.String("New value", valueFromNode))
 				api.Plugin = valueFromNode
 			}
 
@@ -56,7 +64,9 @@ func (bmhnode *BMHNode) ReadConfigFile() error {
 
 		}
 	} else {
-		err = fmt.Errorf("Failed to retrieve Plugins information from config file")
+		errorString = "Failed to retrieve Plugins information from config file"
+		logger.Log.Error(errorString,zap.String("NodeName",bmhnode.Name))
+		err = fmt.Errorf(errorString)
 	}
 
 	return err

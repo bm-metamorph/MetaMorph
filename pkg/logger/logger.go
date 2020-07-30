@@ -5,6 +5,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"sync"
+	"os"
 )
 
 var (
@@ -52,8 +53,8 @@ func InitLogger(lvl int, filenamewithPath string) error {
 
 	var err error
 	onceInit.Do(func() {
-
-		writeSyncher := getLogWriter(filenamewithPath)
+                writeSyncher := zapcore.NewMultiWriteSyncer(getLogWriter(filenamewithPath), os.Stdout)
+//		writeSyncher := getLogWriter(filenamewithPath)
 
 		ecfg := getEncoder()
 

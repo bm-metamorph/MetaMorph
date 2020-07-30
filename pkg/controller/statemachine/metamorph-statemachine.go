@@ -201,7 +201,7 @@ func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 			logger.Log.Error("Failed to retrieve Node GUUID using Redfish Protocol Setting Node to FAILED State", zap.String("IPMIIP", bmnode.Node.IPMIIP), zap.String("IPMIUser", bmnode.IPMIUser))
 			goto End
 		}
-		nodeuuidStringFromServer = uuidasIntf.(string)
+		nodeuuidStringFromServer = string(uuidasIntf.([]byte))
 	}
 
 	node_uuid, err = uuid.Parse(nodeuuidStringFromServer)
