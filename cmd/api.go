@@ -20,7 +20,7 @@ import (
 
 	"github.com/spf13/cobra"
 	api "github.com/bm-metamorph/MetaMorph/pkg/apis"
-	config "github.com/bm-metamorph/MetaMorph/pkg/config"
+	config "github.com/manojkva/metamorph-plugin/pkg/config"
 )
 
 // apiCmd represents the api command

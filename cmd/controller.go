@@ -19,7 +19,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	config "github.com/bm-metamorph/MetaMorph/pkg/config"
+	config "github.com/manojkva/metamorph-plugin/pkg/config"
 	ctrlgRPCServer "github.com/bm-metamorph/MetaMorph/pkg/controller/grpc"
 	ctrlgFSMServer "github.com/bm-metamorph/MetaMorph/pkg/controller/statemachine"
 )

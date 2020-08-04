@@ -4,7 +4,7 @@ import(
 	"fmt"
 	//"time"
 	"github.com/bm-metamorph/MetaMorph/proto"
-	"github.com/bm-metamorph/MetaMorph/pkg/config"
+	"github.com/manojkva/metamorph-plugin/pkg/config"
 	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
 	"google.golang.org/grpc"
 	"context"

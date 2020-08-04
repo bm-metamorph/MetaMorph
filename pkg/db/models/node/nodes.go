@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/bm-metamorph/MetaMorph/pkg/config"
+	"github.com/manojkva/metamorph-plugin/pkg/config"
 	//	"github.com/bm-metamorph/MetaMorph/pkg/drivers/redfish"
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"

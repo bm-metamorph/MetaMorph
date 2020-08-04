@@ -2,7 +2,7 @@ package plugin
 
 import (
 	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
-	"github.com/bm-metamorph/MetaMorph/pkg/config"
+	"github.com/manojkva/metamorph-plugin/pkg/config"
 	//	"github.com/stretchr/testify/assert"
 	"fmt"
 	"testing"

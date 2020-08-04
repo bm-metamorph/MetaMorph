@@ -10,9 +10,9 @@ import (
 
 	hclog "github.com/hashicorp/go-hclog"
 
-	config "github.com/bm-metamorph/MetaMorph/pkg/config"
+	config "github.com/manojkva/metamorph-plugin/pkg/config"
 	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
-	"github.com/bm-metamorph/MetaMorph/pkg/logger"
+	"github.com/manojkva/metamorph-plugin/pkg/logger"
 	"github.com/hashicorp/go-plugin"
 	"github.com/manojkva/metamorph-plugin/common/bmh"
 	"github.com/manojkva/metamorph-plugin/common/isogen"

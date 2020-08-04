@@ -7,8 +7,7 @@ import (
 	"time"
 
 	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
-	"github.com/bm-metamorph/MetaMorph/pkg/logger"
-	//	"github.com/bm-metamorph/MetaMorph/pkg/util/isogen"
+	"github.com/manojkva/metamorph-plugin/pkg/logger"
 	"github.com/bm-metamorph/MetaMorph/pkg/plugin"
 	"github.com/google/uuid"
 	"go.uber.org/zap"

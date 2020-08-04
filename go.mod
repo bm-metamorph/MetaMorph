@@ -12,14 +12,12 @@ require (
 	github.com/jinzhu/gorm v1.9.12
 	github.com/manojkva/metamorph-plugin v0.0.0-00010101000000-000000000000
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/spf13/cobra v0.0.7
-	github.com/spf13/viper v1.6.2
+	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.4.0
 	go.uber.org/zap v1.15.0
 	google.golang.org/grpc v1.30.0
 	google.golang.org/protobuf v1.25.0
-	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	opendev.org/airship/go-redfish/client v0.0.0-0
 )
 

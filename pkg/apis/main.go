@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/bm-metamorph/MetaMorph/pkg/logger"
+	"github.com/manojkva/metamorph-plugin/pkg/logger"
 	"github.com/bm-metamorph/MetaMorph/proto"
 	"fmt"
 	"github.com/gin-contrib/zap"
