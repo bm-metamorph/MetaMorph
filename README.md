@@ -1,12 +1,12 @@
 # MetaMorph
 
-MetaMorph is a tool introduced to provision baremetal nodes in the kubernetes native way. MetaMorph uses native redfish APIs to provision the baremetal nodes thus eliminating complex traditional pre-requisties like DHCP, TFTP, PXE booting etc. ISO used to provision the OS will be mounted from an HTTP share using `VirtualMedia` feature of Redfish
+MetaMorph is a tool introduced to provision baremetal nodes in the kubernetes native way. It is fully compliant with Kubernetes Cluster API, its a Baremetal Provisioner.   MetaMorph uses native redfish APIs to provision the baremetal nodes thus eliminating complex traditional pre-requisties like DHCP, TFTP, PXE booting etc. ISO used to provision the OS will be mounted from an HTTP share using `VirtualMedia` feature of Redfish
 
 ## Features
 
 1. **Minimum Pre-requisties/Dependencies**  The only Pre-requisties Metamorph has is the Redfish Protocal support on the node to be provisioned.
 2. **Edge Node Deployment** Since Metamorph eliminates the complex pre-requisties like DHCP, TFTP, PXE booting etc, Its very easy and reliable to deploy edge nodes.
-3. **Vendor Indipendent** Servers manufactored by any vendor can be deployed (provided it supports Redfish protocol)
+3. **Vendor Independent** Servers manufactored by any vendor can be deployed (provided it supports Redfish protocol)
 4. **Boot Actions** Boot Actions are jobs that will be executed on the first boot of the deployed node. It can be used to deploy any kind of software on the target node. Boot Actions can be written in any languages.
 5. **Plugin Support**  Plugins can do variety of things. It can extend default features/functionlity, Add support for old hardware that doesn't support Redfish protocol (eg: HP iLO4 RAID Config), Integrate othe tools/services to MetaMorph \**coming soon*.
 	
