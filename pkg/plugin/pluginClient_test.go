@@ -15,7 +15,7 @@ func TestReadConfigFile(t *testing.T) {
 }
 
 func TestDispenseClientRequest(t *testing.T) {
-        config.SetLoggerConfig("logger.pluginpath")
+        config.SetLoggerConfig("logger.plugins.redfishpluginpath")
 	bmhnode := &BMHNode{node.CreateTestNode()}
 	err := bmhnode.ReadConfigFile()
 	if err == nil{

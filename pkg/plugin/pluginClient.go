@@ -10,15 +10,20 @@ import (
 
 	hclog "github.com/hashicorp/go-hclog"
 
-	config "github.com/manojkva/metamorph-plugin/pkg/config"
 	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
-	"github.com/manojkva/metamorph-plugin/pkg/logger"
 	"github.com/hashicorp/go-plugin"
 	"github.com/manojkva/metamorph-plugin/common/bmh"
 	"github.com/manojkva/metamorph-plugin/common/isogen"
+	config "github.com/manojkva/metamorph-plugin/pkg/config"
+	"github.com/manojkva/metamorph-plugin/pkg/logger"
 	"go.uber.org/zap"
 )
 
+var  HandShakeMap =  map[string]plugin.HandshakeConfig {
+	"metamorph-redfish-plugin": bmh.Handshake,
+	"metamorph-isogen-plugin": isogen.Handshake,
+
+}
 type BMHNode struct {
 	*node.Node
 }
@@ -30,7 +35,7 @@ func (bmhnode *BMHNode) ReadConfigFile() error {
 	var pluginskeyname string = "plugins"
 	var valueFromNode string
 	var errorString string
-	var apisNode []node.API 
+	var apisNode []node.API
 
 	logger.Log.Info("ReadConfigFile()")
 
@@ -40,8 +45,8 @@ func (bmhnode *BMHNode) ReadConfigFile() error {
 
 		pluginsNode, err := node.GetPlugins(bmhnode.NodeUUID.String())
 		if err == nil {
-		        apisNode, err = node.GetPluginAPIs(pluginsNode.ID)
-		}else{
+			apisNode, err = node.GetPluginAPIs(pluginsNode.ID)
+		} else {
 			logger.Log.Info("Plugin details not found in input json file. Info in config files will be used")
 		}
 
@@ -65,7 +70,7 @@ func (bmhnode *BMHNode) ReadConfigFile() error {
 		}
 	} else {
 		errorString = "Failed to retrieve Plugins information from config file"
-		logger.Log.Error(errorString,zap.String("NodeName",bmhnode.Name))
+		logger.Log.Error(errorString, zap.String("NodeName", bmhnode.Name))
 		err = fmt.Errorf(errorString)
 	}
 
@@ -106,8 +111,10 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{}, erro
 		Level:  hclog.Trace})
 
 	client := plugin.NewClient(&plugin.ClientConfig{
-		HandshakeConfig:  bmh.Handshake,
-		Plugins:          map[string]plugin.Plugin{pluginName: &bmh.BmhPlugin{}},
+		HandshakeConfig: HandShakeMap[pluginName],
+		Plugins: map[string]plugin.Plugin{
+			"metamorph-redfish-plugin": &bmh.BmhPlugin{},
+			"metamorph-isogen-plugin":  &isogen.ISOgenPlugin{}},
 		Cmd:              exec.Command("sh", "-c", pluginLocation+"/"+pluginName+" "+string(inputConfig)),
 		AllowedProtocols: []plugin.Protocol{plugin.ProtocolGRPC},
 		Logger:           logger})
@@ -160,7 +167,7 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{}, erro
 		resultIntf = nil
 	case "getpowerstatus":
 		service := raw.(bmh.Bmh)
-		status,_ := service.GetPowerStatus()
+		status, _ := service.GetPowerStatus()
 		if status == true {
 			resultIntf = "On"
 		} else {
