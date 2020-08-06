@@ -57,8 +57,8 @@ data:
       rootpath: /opt/metamorph/http_root
     
     image:
-        url: "http://32.68.220.23:31180/ubuntu-18.04.4-server-amd64.iso"
-        checksum: "http://32.68.220.23:31180/ubuntu-18.04.4-server-amd64.iso.md5sum"
+        url: "http://12.68.220.23:31180/ubuntu-18.04.4-server-amd64.iso"
+        checksum: "http://12.68.220.23:31180/ubuntu-18.04.4-server-amd64.iso.md5sum"
     
     provisioning:
         ip : "32.68.220.23"
@@ -66,4 +66,4 @@ data:
         httpport: 31180
     
     testing:
-        inputfile: "/home/ekuamaj/go/src/bitbucket.com/metamorph/examples/input.json"
+        inputfile: "/root/go/src/github.com/bm-metamorph/MetaMorph/examples/input.json"

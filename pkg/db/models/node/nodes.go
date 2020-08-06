@@ -5,9 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"strings"
 
-	"bitbucket.com/metamorph/pkg/config"
-//	"bitbucket.com/metamorph/pkg/drivers/redfish"
+	"github.com/manojkva/metamorph-plugin/pkg/config"
+	//	"github.com/bm-metamorph/MetaMorph/pkg/drivers/redfish"
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -32,6 +33,8 @@ func getDB() *gorm.DB {
 		&PhysicalDisk{},
 		&BootAction{},
 		&Firmware{},
+		&Plugins{},
+		&API{},
 	)
 	return db
 }
@@ -127,6 +130,48 @@ func GetFirmwares(node_uuid string) ([]Firmware, error) {
 	}
 }
 
+//Plugins
+
+func GetPlugins(node_uuid string) (*Plugins, error) {
+	node := Node{}
+	plugins := Plugins{}
+	db := getDB()
+	defer db.Close()
+	node_uuid1, _ := uuid.Parse(node_uuid)
+	db.Where("node_uuid = ?", node_uuid1).First(&node)
+	err := db.Model(&node).Related(&plugins).Error
+	if err == nil {
+		return &plugins, err
+	} else {
+		return nil, errors.New("No record Found")
+	}
+}
+
+func GetPluginAPIs(pluginID uint) ([]API, error) {
+	plugins := Plugins{}
+	apis := []API{}
+	db := getDB()
+	defer db.Close()
+	db.Where("id = ?", pluginID).First(&plugins)
+	db.Model(&plugins).Related(&apis)
+	if len(apis) > 0 {
+		return apis, nil
+	} else {
+		return nil, errors.New(" No record Found")
+	}
+
+}
+
+func GetPluginForAPI(apis []API, apiName string)string{
+	for _, api := range apis{
+		if strings.ToLower(api.Name) == strings.ToLower(apiName) {
+			return api.Plugin
+		}
+	}
+	return ""
+
+}
+
 //VirtualDisk
 
 func GetVirtualDisks(node_uuid string) ([]VirtualDisk, error) {
@@ -144,14 +189,13 @@ func GetVirtualDisks(node_uuid string) ([]VirtualDisk, error) {
 	}
 }
 
-
 func GetBootActions(node_uuid string) ([]byte, error) {
 	node := Node{}
 	bootactions := []BootAction{}
 
 	db := getDB()
 	defer db.Close()
-	node_uuid1,_ := uuid.Parse(node_uuid)
+	node_uuid1, _ := uuid.Parse(node_uuid)
 	db.Where("node_uuid = ?", node_uuid1).First(&node)
 	db.Model(&node).Where("status = ?", "new").Order("priority").Related(&bootactions)
 	if len(bootactions) > 0 {
@@ -237,21 +281,20 @@ func Describe(node_uuid string) ([]byte, error) {
 	}
 }
 
-func Delete(node_uuid string) (error){
+func Delete(node_uuid string) error {
 	node := Node{}
-	db  := getDB()
+	db := getDB()
 	defer db.Close()
 
 	node_uuid1, _ := uuid.Parse(node_uuid)
 	err := db.Where("node_uuid = ?", node_uuid1).First(&node).Error
-	if err == nil{
+	if err == nil {
 		err = db.Delete(&node).Error
 	}
 	return err
 
-
-
 }
+
 /*
 func Update(node *Node) error {
 	db := getDB()
@@ -271,7 +314,7 @@ func UpdateRaw(node_uuid string, data []byte )error{
 }
 
 */
-func Update(updateNode *Node) error{
+func Update(updateNode *Node) error {
 	node := Node{}
 	db := getDB()
 	defer db.Close()
@@ -282,7 +325,7 @@ func Update(updateNode *Node) error{
 
 }
 
-func UpdateTaskStatus(task *BootAction) error{
+func UpdateTaskStatus(task *BootAction) error {
 	db := getDB()
 	defer db.Close()
 	err := db.Save(task).Error
@@ -299,16 +342,16 @@ func Create(data []byte) (string, error) {
 	UUID, err := uuid.NewRandom()
 	err = json.Unmarshal(data, &node)
 	/*
-	//Get UUID using Redfish Library.
-	err := json.Unmarshal(data, &node)
-	if err == nil {
-		uuidString, _ := redfish.GetUUID(node.IPMIIP, node.IPMIUser, node.IPMIPassword)
-		if uuidString == "" {
+		//Get UUID using Redfish Library.
+		err := json.Unmarshal(data, &node)
+		if err == nil {
+			uuidString, _ := redfish.GetUUID(node.IPMIIP, node.IPMIUser, node.IPMIPassword)
+			if uuidString == "" {
 
-			err = errors.New(fmt.Sprintf("Failed to retreive Node UUID for nodename : %v", node.Name))
+				err = errors.New(fmt.Sprintf("Failed to retreive Node UUID for nodename : %v", node.Name))
+			}
 		}
-	}
-	UUID, err := uuid.Parse(uuidString)
+		UUID, err := uuid.Parse(uuidString)
 	*/
 
 	if err == nil {
@@ -326,13 +369,15 @@ func Create(data []byte) (string, error) {
 // For Testing purpose only
 func CreateTestNode() *Node {
 	data, _ := ioutil.ReadFile(config.Get("testing.inputfile").(string))
-	Create(data)
+	uuid, _ := Create(data)
 	nodelist, err := GetNodes()
 	if err != nil {
 		return nil
 	}
 	for _, node := range nodelist {
-		return &node
+		if node.NodeUUID.String() == uuid {
+			return &node
+		}
 	}
 
 	return nil
