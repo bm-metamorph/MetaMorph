@@ -8,10 +8,12 @@ import (
 	"strings"
 
 	"github.com/manojkva/metamorph-plugin/pkg/config"
+	"github.com/manojkva/metamorph-plugin/pkg/logger"
 	//	"github.com/bm-metamorph/MetaMorph/pkg/drivers/redfish"
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"go.uber.org/zap"
 )
 
 func getDB() *gorm.DB {
@@ -44,6 +46,8 @@ func getDB() *gorm.DB {
 //About node. Including Credentials
 func GetNodes() ([]Node, error) {
 
+	logger.Log.Info("GetNodes()")
+
 	nodes := []Node{}
 	db := getDB()
 	defer db.Close()
@@ -52,11 +56,13 @@ func GetNodes() ([]Node, error) {
 	if len(nodes) > 0 {
 		return nodes, nil
 	} else {
+		logger.Log.Error("Nodes not found")
 		return nil, errors.New("Nodes not found")
 	}
 }
 
 func GetNameServers(node_uuid string) ([]NameServer, error) {
+	logger.Log.Info("GetNameServers()")
 	node := Node{}
 	nameservers := []NameServer{}
 	db := getDB()
@@ -67,11 +73,13 @@ func GetNameServers(node_uuid string) ([]NameServer, error) {
 	if len(nameservers) > 0 {
 		return nameservers, nil
 	} else {
+		logger.Log.Error("No record found")
 		return nil, errors.New(" No record Found")
 	}
 }
 
 func GetPartitions(node_uuid string) ([]Partition, error) {
+	logger.Log.Info("GetPartitions()")
 	node := Node{}
 	partitions := []Partition{}
 	db := getDB()
@@ -82,11 +90,13 @@ func GetPartitions(node_uuid string) ([]Partition, error) {
 	if len(partitions) > 0 {
 		return partitions, nil
 	} else {
+		logger.Log.Error("No record found")
 		return nil, errors.New(" No record Found")
 	}
 }
 
 func GetSSHPubKeys(node_uuid string) ([]SSHPubKey, error) {
+	logger.Log.Info("GetSSHPubKeys()")
 	node := Node{}
 	sshPubKeys := []SSHPubKey{}
 	db := getDB()
@@ -97,11 +107,13 @@ func GetSSHPubKeys(node_uuid string) ([]SSHPubKey, error) {
 	if len(sshPubKeys) > 0 {
 		return sshPubKeys, nil
 	} else {
+		logger.Log.Error("No record found")
 		return nil, errors.New(" No record Found")
 	}
 }
 
 func GetBondInterfaces(node_uuid string) ([]BondInterface, error) {
+	logger.Log.Info("GetBondInterfaces()")
 	node := Node{}
 	bondInterfaces := []BondInterface{}
 	db := getDB()
@@ -112,10 +124,12 @@ func GetBondInterfaces(node_uuid string) ([]BondInterface, error) {
 	if len(bondInterfaces) > 0 {
 		return bondInterfaces, nil
 	} else {
+		logger.Log.Error("No record found")
 		return nil, errors.New("No record Found")
 	}
 }
 func GetFirmwares(node_uuid string) ([]Firmware, error) {
+	logger.Log.Info("GetFirmwares()")
 	node := Node{}
 	firmwares := []Firmware{}
 	db := getDB()
@@ -126,6 +140,7 @@ func GetFirmwares(node_uuid string) ([]Firmware, error) {
 	if len(firmwares) > 0 {
 		return firmwares, nil
 	} else {
+		logger.Log.Error("No record found")
 		return nil, errors.New("No record Found")
 	}
 }
@@ -133,6 +148,7 @@ func GetFirmwares(node_uuid string) ([]Firmware, error) {
 //Plugins
 
 func GetPlugins(node_uuid string) (*Plugins, error) {
+	logger.Log.Info("GetPlugins()")
 	node := Node{}
 	plugins := Plugins{}
 	db := getDB()
@@ -143,11 +159,13 @@ func GetPlugins(node_uuid string) (*Plugins, error) {
 	if err == nil {
 		return &plugins, err
 	} else {
+		logger.Log.Error("No record found", zap.Error(err))
 		return nil, errors.New("No record Found")
 	}
 }
 
 func GetPluginAPIs(pluginID uint) ([]API, error) {
+	logger.Log.Info("GetPluginAPIs()")
 	plugins := Plugins{}
 	apis := []API{}
 	db := getDB()
@@ -157,12 +175,14 @@ func GetPluginAPIs(pluginID uint) ([]API, error) {
 	if len(apis) > 0 {
 		return apis, nil
 	} else {
+		logger.Log.Error("No record found")
 		return nil, errors.New(" No record Found")
 	}
 
 }
 
 func GetPluginForAPI(apis []API, apiName string)string{
+	logger.Log.Info("GetPluginForAPI()")
 	for _, api := range apis{
 		if strings.ToLower(api.Name) == strings.ToLower(apiName) {
 			return api.Plugin
@@ -175,6 +195,7 @@ func GetPluginForAPI(apis []API, apiName string)string{
 //VirtualDisk
 
 func GetVirtualDisks(node_uuid string) ([]VirtualDisk, error) {
+	logger.Log.Info("GetVirtualDisks()")
 	node := Node{}
 	virtualdisks := []VirtualDisk{}
 	db := getDB()
@@ -185,11 +206,13 @@ func GetVirtualDisks(node_uuid string) ([]VirtualDisk, error) {
 	if len(virtualdisks) > 0 {
 		return virtualdisks, nil
 	} else {
+		logger.Log.Error("No record found")
 		return nil, errors.New(" No record Found")
 	}
 }
 
 func GetBootActions(node_uuid string) ([]byte, error) {
+	logger.Log.Info("GetBootActions()")
 	node := Node{}
 	bootactions := []BootAction{}
 
@@ -202,11 +225,13 @@ func GetBootActions(node_uuid string) ([]byte, error) {
 		res, _ := json.Marshal(bootactions)
 		return res, nil
 	} else {
+		logger.Log.Error("No record found")
 		return nil, errors.New("No Record Found")
 	}
 }
 
 func GetPhysicalDisks(virtualDiskID uint) ([]PhysicalDisk, error) {
+	logger.Log.Info("GetPhysicalDisks()")
 
 	vdisk := VirtualDisk{}
 	physcical_disks := []PhysicalDisk{}
@@ -217,11 +242,13 @@ func GetPhysicalDisks(virtualDiskID uint) ([]PhysicalDisk, error) {
 	if len(physcical_disks) > 0 {
 		return physcical_disks, nil
 	} else {
+		logger.Log.Error("No record found")
 		return nil, errors.New(" No record Found")
 	}
 }
 
 func GetBondParameters(node_uuid string) ([]BondParameter, error) {
+	logger.Log.Info("GetBondParameters()")
 	node := Node{}
 	bondParameters := []BondParameter{}
 	db := getDB()
@@ -230,6 +257,7 @@ func GetBondParameters(node_uuid string) ([]BondParameter, error) {
 	db.Where("node_uuid = ?", node_uuid1).First(&node)
 	db.Model(&node).Related(&bondParameters)
 	if len(bondParameters) == 0 {
+		logger.Log.Error("No record found")
 		return nil, errors.New(" No record Found")
 	} else {
 		return bondParameters, nil
@@ -237,6 +265,7 @@ func GetBondParameters(node_uuid string) ([]BondParameter, error) {
 }
 
 func GetKvmPolicy(node_uuid string) (*KvmPolicy, error) {
+	logger.Log.Info("GetKvmPolicy()")
 	node := Node{}
 	kvmPolicy := KvmPolicy{}
 	db := getDB()
@@ -245,6 +274,7 @@ func GetKvmPolicy(node_uuid string) (*KvmPolicy, error) {
 	db.Where("node_uuid = ?", node_uuid1).First(&node)
 	db.Model(&node).Related(&kvmPolicy)
 	if kvmPolicy == (KvmPolicy{}) {
+		logger.Log.Error("No record found")
 		return nil, errors.New(" No record Found")
 	} else {
 		return &kvmPolicy, nil
@@ -252,6 +282,7 @@ func GetKvmPolicy(node_uuid string) (*KvmPolicy, error) {
 }
 
 func GetFilesystem(partitionId uint) (*Filesystem, error) {
+	logger.Log.Info("GetFilesystem()")
 	partition := Partition{}
 	filesystem := Filesystem{}
 	db := getDB()
@@ -259,6 +290,7 @@ func GetFilesystem(partitionId uint) (*Filesystem, error) {
 	db.Where("id = ?", partitionId).First(&partition)
 	db.Model(&partition).Related(&filesystem)
 	if filesystem == (Filesystem{}) {
+		logger.Log.Error("No record found")
 		return nil, errors.New(" No record Found")
 	} else {
 		return &filesystem, nil
@@ -266,6 +298,7 @@ func GetFilesystem(partitionId uint) (*Filesystem, error) {
 }
 
 func Describe(node_uuid string) ([]byte, error) {
+	logger.Log.Info("Describe()")
 	node := Node{}
 	db := getDB()
 	defer db.Close()
@@ -277,11 +310,13 @@ func Describe(node_uuid string) ([]byte, error) {
 		res, _ := json.Marshal(node)
 		return res, nil
 	} else {
+		logger.Log.Error("Node not found", zap.String("NodeUUID",node_uuid))
 		return nil, errors.New("Node not found")
 	}
 }
 
 func Delete(node_uuid string) error {
+	logger.Log.Info("Delete()")
 	node := Node{}
 	db := getDB()
 	defer db.Close()
@@ -315,6 +350,7 @@ func UpdateRaw(node_uuid string, data []byte )error{
 
 */
 func Update(updateNode *Node) error {
+	logger.Log.Info("Update()")
 	node := Node{}
 	db := getDB()
 	defer db.Close()
@@ -326,6 +362,7 @@ func Update(updateNode *Node) error {
 }
 
 func UpdateTaskStatus(task *BootAction) error {
+	logger.Log.Info("UpdateTaskStatus()")
 	db := getDB()
 	defer db.Close()
 	err := db.Save(task).Error
@@ -333,6 +370,7 @@ func UpdateTaskStatus(task *BootAction) error {
 }
 
 func Create(data []byte) (string, error) {
+	logger.Log.Info("Create()")
 	db := getDB()
 	defer db.Close()
 
@@ -360,6 +398,7 @@ func Create(data []byte) (string, error) {
 		err = db.Create(&node).Error
 	}
 	if err != nil {
+		logger.Log.Error("Failed to create Node", zap.Error(err))
 		return "", err
 	} else {
 		return node.NodeUUID.String(), nil

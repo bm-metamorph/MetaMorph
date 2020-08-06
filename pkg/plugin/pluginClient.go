@@ -79,19 +79,24 @@ func (bmhnode *BMHNode) ReadConfigFile() error {
 
 func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{}, error) {
 
+	logger.Log.Info("DispenseClientRequest")
+
 	var resultIntf interface{}
 
 	pluginLocation := config.Get("pluginlocation").(string)
 
 	if pluginLocation == "" {
+		logger.Log.Error("Failed to retrieve pluginlocation from config file")
 		return nil, fmt.Errorf("Failed to retrieve pluginlocation from config file")
 	}
 	pluginsNode, err := node.GetPlugins(bmhnode.NodeUUID.String())
 	if err != nil {
+		logger.Log.Error("Failed to retreive Plugins information from config file")
 		return nil, err
 	}
 	apisNode, err := node.GetPluginAPIs(pluginsNode.ID)
 	if err != nil {
+		logger.Log.Error("Failed to retrieve supported APIS for plugin.", zap.String( "PluginID", fmt.Sprintf("%v",pluginsNode.ID)))
 		return nil, err
 	}
 
@@ -100,12 +105,12 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{}, erro
 	data, err := json.Marshal(bmhnode)
 
 	if err != nil {
-		fmt.Printf("Error %v\n", err)
+		logger.Log.Error("Failed to Marshal JSON info", zap.Error(err))
 		return nil, err
 	}
 	inputConfig := base64.StdEncoding.EncodeToString(data)
 
-	logger := hclog.New(&hclog.LoggerOptions{
+	hclogger := hclog.New(&hclog.LoggerOptions{
 		Name:   "plugin",
 		Output: os.Stdout,
 		Level:  hclog.Trace})
@@ -117,19 +122,19 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{}, erro
 			"metamorph-isogen-plugin":  &isogen.ISOgenPlugin{}},
 		Cmd:              exec.Command("sh", "-c", pluginLocation+"/"+pluginName+" "+string(inputConfig)),
 		AllowedProtocols: []plugin.Protocol{plugin.ProtocolGRPC},
-		Logger:           logger})
+		Logger:           hclogger})
 	defer client.Kill()
 
 	rpcClient, err := client.Client()
 
 	if err != nil {
-		fmt.Printf("Error %v\n", err)
+		logger.Log.Error("Failed to retrieve RPC Client", zap.Error(err))
 		return nil, err
 	}
 
 	raw, err := rpcClient.Dispense(pluginName)
 	if err != nil {
-		fmt.Printf("Error %v\n", err)
+		logger.Log.Error("Failed to Dispense plugin", zap.Error(err), zap.String("PluginName", pluginName))
 		return nil, err
 
 	}
@@ -137,7 +142,7 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{}, erro
 	case "getguuid":
 		service := raw.(bmh.Bmh)
 		resultIntf, err = service.GetGUUID()
-		fmt.Printf("%v\n", resultIntf.([]byte))
+		logger.Log.Debug("GetGUUID() ", zap.String("result",fmt.Sprintf("%v\n", resultIntf.([]byte))))
 	case "deployiso":
 		service := raw.(bmh.Bmh)
 		err = service.DeployISO()
@@ -175,6 +180,7 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{}, erro
 		}
 		err = nil
 	default:
+		logger.Log.Error("Unsupported API", zap.String("API Name", apiName))
 		err = fmt.Errorf("%v not supported.", apiName)
 	}
 	return resultIntf, err
