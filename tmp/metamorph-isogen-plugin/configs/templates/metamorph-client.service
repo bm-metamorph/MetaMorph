@@ -1,0 +1,14 @@
+[Unit]
+Description=MetaMorph Agent Service Service
+Wants=network-online.target
+After=network-online.target
+#ConditionPathExists=!/var/install/metamorph-bootactions.lock
+
+[Service]
+Environment="HOME=/root"
+Environment="METAMORPH_CONFIGPATH=/opt/metamorph/"
+Type=simple
+ExecStart=/opt/metamorph/bin/metamorph_agent &
+
+[Install]
+WantedBy=multi-user.target
