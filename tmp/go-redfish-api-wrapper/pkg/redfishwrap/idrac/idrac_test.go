@@ -6,13 +6,17 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap"
 )
+
 
 var client = &IdracRedfishClient{
 	Username: "root",
 	Password: "Abc.1234",
 	HostIP:   "",
+	Logger: zap.NewExample(),
 }
+
 
 func TestGetFirmwareDetails(t *testing.T) {
 	name, version, updateable := client.GetFirmwareDetails("Life")

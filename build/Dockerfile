@@ -5,11 +5,18 @@ COPY . .
 #temp fix to resolve dependencies
 COPY tmp/go-redfish-api-wrapper /root/go/src/github.com/manojkva/go-redfish-api-wrapper
 COPY tmp/go-redfish /root/go/src/opendev.org/airship/go-redfish
+COPY tmp/metamorph-plugin /root/go/src/github.com/manojkva/metamorph-plugin
+COPY tmp/metamorph-redfish-plugin /root/go/src/github.com/manojkva/metamorph-redfish-plugin
+COPY tmp/metamorph-isogen-plugin /root/go/src/github.com/manojkva/metamorph-isogen-plugin
 
 
 ENV GOFLAGS=""
 RUN go build -o build/_output/bin/metamorph main.go
 RUN go build -o build/_output/bin/metamorph_agent pkg/agent/agent.go
+RUN pushd /root/go/src/github.com/manojkva/metamorph-redfish-plugin && \
+    go build -o /go/src/github.com/bm-metamorph/MetaMorph/build/_output/bin/metamorph-redfish-plugin main.go 
+RUN pushd /root/go/src/github.com/manojkva/metamorph-isogen-plugin && \
+    go build -o /go/src/github.com/bm-metamorph/MetaMorph/build/_output/bin/metamorph-isogen-plugin main.go 
 
 
 FROM registry.svc.ci.openshift.org/openshift/release:golang-1.13 AS kustomize-builder
@@ -27,6 +34,8 @@ FROM ubuntu:18.04 as exporter
 
 COPY --from=builder /go/src/github.com/bm-metamorph/MetaMorph/build/_output/bin/metamorph /usr/local/bin/
 COPY --from=builder /go/src/github.com/bm-metamorph/MetaMorph/build/_output/bin/metamorph_agent /opt/metamorph/assets/files/metamorph_agent
+COPY --from=builder /go/src/github.com/bm-metamorph/MetaMorph/build/_output/bin/metamorph-redfish-plugin /opt/metamorph/assets/files/metamorph-redfish-plugin
+COPY --from=builder /go/src/github.com/bm-metamorph/MetaMorph/build/_output/bin/metamorph-isogen-plugin /opt/metamorph/assets/files/metamorph-isogen-plugin
 COPY --from=builder /go/src/github.com/bm-metamorph/MetaMorph/configs /opt/metamorph/configs
 COPY --from=kustomize-builder /go/bin/kustomize /opt/metamorph/kustomize/bin/kustomize
 COPY --from=kustomize-builder /opt/metamorph/kustomize/plugin/metamorph.io/v1/userdata  /opt/metamorph/kustomize/plugin/metamorph.io/v1/userdata
