@@ -106,11 +106,13 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{}, erro
 
 	if err != nil {
 		logger.Log.Error("Failed to Marshal JSON info", zap.Error(err))
+		fmt.Printf("Error %v\n", err)
 		return nil, err
 	}
 	inputConfig := base64.StdEncoding.EncodeToString(data)
 
 	hclogger := hclog.New(&hclog.LoggerOptions{
+	logger := hclog.New(&hclog.LoggerOptions{
 		Name:   "plugin",
 		Output: os.Stdout,
 		Level:  hclog.Trace})
@@ -123,18 +125,21 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{}, erro
 		Cmd:              exec.Command("sh", "-c", pluginLocation+"/"+pluginName+" "+string(inputConfig)),
 		AllowedProtocols: []plugin.Protocol{plugin.ProtocolGRPC},
 		Logger:           hclogger})
+		Logger:           logger})
 	defer client.Kill()
 
 	rpcClient, err := client.Client()
 
 	if err != nil {
 		logger.Log.Error("Failed to retrieve RPC Client", zap.Error(err))
+		fmt.Printf("Error %v\n", err)
 		return nil, err
 	}
 
 	raw, err := rpcClient.Dispense(pluginName)
 	if err != nil {
 		logger.Log.Error("Failed to Dispense plugin", zap.Error(err), zap.String("PluginName", pluginName))
+		fmt.Printf("Error %v\n", err)
 		return nil, err
 
 	}
@@ -143,6 +148,7 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{}, erro
 		service := raw.(bmh.Bmh)
 		resultIntf, err = service.GetGUUID()
 		logger.Log.Debug("GetGUUID() ", zap.String("result",fmt.Sprintf("%v\n", resultIntf.([]byte))))
+		fmt.Printf("%v\n", resultIntf.([]byte))
 	case "deployiso":
 		service := raw.(bmh.Bmh)
 		err = service.DeployISO()

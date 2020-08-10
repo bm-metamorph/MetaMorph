@@ -198,6 +198,7 @@ func (s *server) GetNodeUUID(ctx context.Context, request *proto.Request) (*prot
 			errString := fmt.Sprintf("Failed to retrieve UUID from node for IPMI IP : %v", redfishClient.IPMIIP)
 			logger.Log.Error(errString)
 			err = errors.New(errString)
+			err = errors.New(fmt.Sprintf("Failed to retrieve UUID from node for IPMI IP : %v", redfishClient.IPMIIP))
 			result = ""
 		}
 	}else {

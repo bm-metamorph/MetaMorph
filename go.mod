@@ -23,5 +23,6 @@ require (
 
 replace opendev.org/airship/go-redfish/client => /root/go/src/opendev.org/airship/go-redfish/client // Use opendev/org/airship/go-redfish refs/changes/77/737177/3
 
+replace github.com/bm-metamorph/MetaMorph => /root/go/src/github.com/manojkva/MetaMorph
 
 replace github.com/manojkva/metamorph-plugin => /root/go/src/github.com/manojkva/metamorph-plugin
