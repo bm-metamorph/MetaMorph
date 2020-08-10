@@ -1,0 +1,29 @@
+network:
+  version: 2
+  renderer: networkd 
+  ethernets:
+    eno4:
+      dhcp4: true
+      match:
+        name: "en04{{range .BondInterfaces}}"
+    {{.BondInterface}}:
+      mtu: 9214
+      match:
+        name: {{.BondInterface}}{{end}}
+  bonds:
+    bond0:
+      mtu: 9214
+      interfaces: {{range .BondInterfaces}}
+      - {{.BondInterface}}{{end }}
+      parameters: {{range .BondParameters}}
+        {{.Key}}: {{.Value}}{{end}}
+  vlans:
+    oam:
+      id: 41
+      link: bond0
+      dhcp4: no
+      mtu: 9214
+      addresses: [{{.OamIP}}/26, ]
+      gateway4: {{.OamGateway}}
+      nameservers:
+        addresses: [{{range .NameServers}}{{.NameServer}}, {{end -}} ]

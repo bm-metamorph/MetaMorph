@@ -15,11 +15,9 @@ data:
     logger:
         apipath: /opt/metamorph/metamorph_api.log
         controllerpath: /opt/metamorph/metamorph_controller.log
-    
-    idrac:
-        systemID: "System.Embedded.1"
-        managerID: "iDRAC.Embedded.1"
-        controllerID: "RAID.Slot.6-1"
+        plugins:
+          redfishpluginpath: /opt/metamorph/metamorph_redfishplugin.log
+          isogenpluginpath:  /opt/metamorph/metamorph_isogenplugin.log
     
     templates:
         rootdir: /opt/metamorph
@@ -64,6 +62,20 @@ data:
         ip : "32.68.220.23"
         port:  3190
         httpport: 31180
+
+    pluginlocation: /opt/metamorph/assets/files
+
+
+    plugins:
+        UpdateFirmware: "metamorph-redfish-plugin"
+        ConfigureRAID: "metamorph-redfish-plugin"
+        DeployISO: "metamorph-redfish-plugin"
+        GetGUUID: "metamorph-redfish-plugin"
+        CreateISO: "metamorph-isogen-plugin"
+        GetHWInventory: "metamorph-redfish-plugin"
+        PowerOff: "metamorph-redfish-plugin"
+        PowerOn: "metamorph-redfish-plugin"
+        GetPowerStatus: "metamorph-redfish-plugin"
     
     testing:
         inputfile: "/root/go/src/github.com/bm-metamorph/MetaMorph/examples/input.json"

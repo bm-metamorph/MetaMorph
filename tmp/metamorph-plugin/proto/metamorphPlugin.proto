@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package proto;
+
+message Empty {}
+
+message ResponseByte {
+    bytes value = 1;
+
+}
+
+message ResponseBool{
+    bool status = 1;
+}
+
+
+message ResponseMap {
+    map<string, string> mapInfo = 1;
+}
+
+service bmh {
+  rpc DeployISO(Empty) returns (Empty);
+  rpc UpdateFirmware(Empty) returns (Empty);
+  rpc ConfigureRAID(Empty) returns (Empty);
+  rpc GetGUUID(Empty) returns (ResponseByte);
+  rpc GetHWInventory(Empty) returns (ResponseMap);
+  rpc PowerOff(Empty) returns (Empty);
+  rpc PowerOn(Empty) returns (Empty);
+  rpc GetPowerStatus(Empty) returns (ResponseBool);
+
+}
+
+service isogen {
+  rpc CreateISO(Empty) returns (Empty);
+}

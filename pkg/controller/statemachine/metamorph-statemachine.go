@@ -48,7 +48,7 @@ type NodeStatus struct {
 }
 
 func StartMetamorphFSM(runOnce bool) {
-	logger.Log.Info("Starting Metamorph FSM")
+	logger.Log.Info("StartMetamorphFSM()")
 	dbHandler := new(DBHandler)
 	dbHandler.startFSM(runOnce)
 
@@ -82,7 +82,7 @@ func (h *DBHandler) startFSM(runOnce bool) {
 
 			for _, bmnode := range nodelist {
 				// What about nodes that are already in transistions.. should there be a transition state.
-				fmt.Printf("[%v] - Starting Processing\n", bmnode.Name)
+				logger.Log.Debug(fmt.Sprintf("[%v] - Starting Processing\n", bmnode.Name))
 				requestsChan <- BMNode{&bmnode}
 
 			}
