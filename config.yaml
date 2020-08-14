@@ -61,7 +61,7 @@ provisioning:
 pluginlocation: "/root/go/src/github.com/manojkva/MetaMorph/assets/files"
 
 testing:
-    inputfile: "/root/go/src/github.com/manojkva/MetaMorph/examples/node1_input.json"
+    inputfile: "/root/shashi/MetaMorph/examples/node1_input.json"
 
 agent:
     node_id: "e415bbbe-be68-4705-aa05-16350e0c8151"
