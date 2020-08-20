@@ -1,8 +1,8 @@
 package api
 
 import (
-	"bitbucket.com/metamorph/pkg/logger"
-	"bitbucket.com/metamorph/proto"
+	"github.com/manojkva/metamorph-plugin/pkg/logger"
+	"github.com/bm-metamorph/MetaMorph/proto"
 	"fmt"
 	"github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
@@ -19,7 +19,7 @@ func grpcClient() (proto.NodeServiceClient, *grpc.ClientConn) {
         if gs := os.Getenv("METMORPH_CONTROLLER_HOST"); gs != "" {
             grpcServer = gs
         }
- 
+
 	logger.Log.Info("grpcClient()")
 	conn, err := grpc.Dial(fmt.Sprintf("%s:4040", grpcServer), grpc.WithInsecure())
 	if err != nil {
@@ -27,7 +27,6 @@ func grpcClient() (proto.NodeServiceClient, *grpc.ClientConn) {
 		panic(err)
 	}
 	client := proto.NewNodeServiceClient(conn)
-        
 	return client, conn
 }
 
@@ -54,7 +53,7 @@ func describeNode(ctx *gin.Context) {
 	logger.Log.Info("describeNode()")
 	client, conn := grpcClient()
 	node_id := ctx.Param("node_id")
-	fmt.Println(node_id)
+	logger.Log.Debug("Node info from Request", zap.String("NodeID", string(node_id)))
 	req := &proto.Request{NodeID: string(node_id)}
 	if response, err := client.Describe(ctx, req); err == nil {
 		ctx.Data(http.StatusOK, gin.MIMEJSON, response.Res)

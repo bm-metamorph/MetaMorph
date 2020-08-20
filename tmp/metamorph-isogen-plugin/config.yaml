@@ -1,0 +1,54 @@
+---
+
+controller:
+    port : 8080
+
+logger:
+    apipath: /tmp/metamorph_api.log
+    controllerpath: /tmp/metamorph_controller.log
+    plugins:
+      redfishpluginpath: /tmp/redfish-plugin.log
+      isogenpluginpath: /tmp/isogen-plugin.log
+
+templates:
+    rootdir: /home/ekuamaj/go/src/github.com/manojkva/metamorph-isogen-plugin
+    preseed:
+        config:  configs/templates/preseed.tmpl
+        filepath: preseed/hwe-ubuntu-server.seed
+    grub:
+        config:  configs/templates/grub.tmpl
+        filepath: grub.conf
+    isolinux:
+        config: configs/templates/hwe_kernel/isolinux_txt.cfg
+    init:
+        config: configs/templates/init.sh
+        filepath: init.sh
+    service:
+        config: configs/templates/metamorph-client.service
+        filepath: metamorph-client.service
+    netplan:
+        config: configs/templates/netplan.tmpl
+        filepath: 50-cloud-init.yaml
+    agent_config:
+        config:  configs/templates/agent_config.tmpl
+        filepath: agent_config.yaml
+
+assets:
+   rootdir: /home/ekuamaj/go/src/github.com/manojkva/metamorph-isogen-plugin/assets
+   agent_binary:
+          src:  files/metamorph_agent
+          dest: metamorph_agent
+
+iso:
+  rootpath: /media/sf_Downloads/iso_root
+  tempdir: /media/sf_Downloads/iso_root/isos
+
+
+http:
+  rootpath: /media/sf_Downloads/http_root
+
+provisioning:
+    ip : "12.168.220.23"
+    port:  3190
+    httpport: 31180
+

@@ -1,0 +1,6 @@
+---
+
+logger:
+    plugins:
+       redfishpluginpath: /tmp/redfish_plugin.log
+       isogenpluginpath: /tmp/isogen_plugin.log

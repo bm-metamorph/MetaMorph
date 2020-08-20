@@ -3,9 +3,9 @@ package main
 import(
 	"fmt"
 	//"time"
-	"bitbucket.com/metamorph/proto"
-	"bitbucket.com/metamorph/pkg/config"
-	"bitbucket.com/metamorph/pkg/db/models/node"
+	"github.com/bm-metamorph/MetaMorph/proto"
+	"github.com/manojkva/metamorph-plugin/pkg/config"
+	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
 	"google.golang.org/grpc"
 	"context"
 	"encoding/json"

@@ -14,6 +14,7 @@ import (
 
 	RFWrap "github.com/manojkva/go-redfish-api-wrapper/pkg/redfishwrap"
 	redfish "opendev.org/airship/go-redfish/client"
+	"go.uber.org/zap"
 )
 
 var RedfishSleepTimeSeconds int = 0
@@ -33,6 +34,7 @@ type IdracRedfishClient struct {
 	Password  string
 	HostIP    string
 	IDRAC_ver string
+	Logger    *zap.Logger
 }
 
 func (a *IdracRedfishClient) createContext() context.Context {
@@ -41,10 +43,12 @@ func (a *IdracRedfishClient) createContext() context.Context {
 		Password: a.Password,
 	}
 	ctx := context.WithValue(context.Background(), redfish.ContextBasicAuth, auth)
+	ctx = context.WithValue(ctx, "logger", a.Logger)
 	return ctx
 }
 
 func (a *IdracRedfishClient) UpgradeFirmware(filelocation string) bool {
+	a.Logger.Info("UpgradeFirmware()")
 	var imageURI string
 	var err error
 	var result bool = false
@@ -53,30 +57,30 @@ func (a *IdracRedfishClient) UpgradeFirmware(filelocation string) bool {
 
 	httpPushURI := RFWrap.UpdateService(ctx, a.HostIP)
 
-	fmt.Printf("%v", httpPushURI)
+	a.Logger.Debug("HTTPURI retrieved :", zap.String("httpPushUri",fmt.Sprintf("%v", httpPushURI)))
 
 	etag := RFWrap.GetETagHttpURI(ctx, a.HostIP)
-	fmt.Printf("%v", etag)
+	a.Logger.Debug("Etag revtreived :", zap.String("eTag",fmt.Sprintf("%v", etag)))
 	if etag == "" {
-		fmt.Printf("Failed to extract ETAG..\n")
+		a.Logger.Error(fmt.Sprintf("Failed to extract ETAG..\n"))
 		return false
 	}
 	if joblistEmpty, _ := a.IsJobListEmpty(); joblistEmpty == false {
-		fmt.Printf("Pending Jobs not empty.Hence returning/n")
+		a.Logger.Error(fmt.Sprintf("Pending Jobs not empty.Hence returning\n"))
 		return false
 	}
 
 	imageURI, err = RFWrap.HTTPUriDownload(ctx, a.HostIP, filelocation, etag)
-	fmt.Printf("%v", imageURI)
 
 	if (imageURI == "") || (err != nil) {
-		fmt.Printf("Failed to retrive ImageURI\n")
+		a.Logger.Error(fmt.Sprintf("Failed to retrive ImageURI\n"))
 		return false
 	}
+	a.Logger.Debug("ImageURI retrieved.", zap.String("imageURI",fmt.Sprintf("%v", imageURI)))
 
 	jobID := RFWrap.SimpleUpdateRequest(ctx, a.HostIP, imageURI)
 
-	fmt.Printf("%v", jobID)
+	a.Logger.Debug("JobId retreived", zap.String("JobID", fmt.Sprintf("%v", jobID)))
     //Check if Update succeeded. A scheduledl Job too is fine.
 	result = a.CheckJobStatus(jobID, true)
 
@@ -89,22 +93,25 @@ func (a *IdracRedfishClient) UpgradeFirmware(filelocation string) bool {
 }
 
 func (a *IdracRedfishClient) GetPendingJobs() int {
+	a.Logger.Info("GetPendingJobs()")
 	ctx := a.createContext()
 	statusCode, pendingJobCount := RFWrap.GetTaskList(ctx, a.HostIP)
 
 	if statusCode == http.StatusOK {
+		a.Logger.Debug("Pending Job count", zap.Int("Pending Job", pendingJobCount))
 		return pendingJobCount
 	}
 	return 0
 }
 
 func (a *IdracRedfishClient) CheckJobStatus(jobId string, setScheduledasTrue bool) bool {
+	a.Logger.Info("CheckJobStatus()")
 	ctx := a.createContext()
 	start := time.Now()
 	var result bool = false
 
 	if jobId == "" {
-		fmt.Println("Job ID is null. Returing Failed Job Status")
+		a.Logger.Error("Job ID is null. Returing Failed Job Status")
 		return false
 	}
 
@@ -115,33 +122,34 @@ func (a *IdracRedfishClient) CheckJobStatus(jobId string, setScheduledasTrue boo
 		timeelapsedInMinutes := time.Since(start).Minutes()
 
 		if (statusCode == 202) || (statusCode == 200) {
-			fmt.Printf("HTTP  status OK")
+			a.Logger.Debug(fmt.Sprintf("HTTP  status OK"))
 
 		} else {
-			fmt.Printf("Failed to check the status")
+			a.Logger.Error("HTTP Request Failed ",zap.String("JobID", jobId), zap.Int("HTTP Status", statusCode))
 			return false
 		}
 
 		if timeelapsedInMinutes >= float64(JobCheckTimeoutMinutes) {
-			fmt.Printf("\n- FAIL: Timeout of %v minute has been hit, update job should of already been marked completed. Check the iDRAC job queue and LC logs to debug the issue\n",JobCheckTimeoutMinutes)
+			a.Logger.Error(fmt.Sprintf("\n- FAIL: Timeout of %v minute has been hit, update job should of already been marked completed. Check the iDRAC job queue and LC logs to debug the issue\n",JobCheckTimeoutMinutes))
 			return false
 		} else if jobInfo.Messages != nil {
 			if strings.Contains(jobInfo.Messages[0].Message, "Failed") {
-				fmt.Println("FAIL")
+				a.Logger.Error("Job Failed", zap.String("JobID", jobId))
 				return false
 
 			} else if strings.Contains(jobInfo.Messages[0].Message, "scheduled") && (setScheduledasTrue) {
-				//	fmt.Prinln("\n- PASS, job ID %s successfully marked as scheduled, powering on or rebooting the server to apply the update" % data[u"Id"] ")
+				a.Logger.Debug(fmt.Sprintf("\n- PASS, job ID %s successfully marked as scheduled, powering on or rebooting the server to apply the update",jobId ))
 				result = true
 				break
 
 			} else if strings.Contains(jobInfo.Messages[0].Message, "completed successfully") {
 				//		fmt.Prinln("\n- PASS, job ID %s successfully marked as scheduled, powering on or rebooting the server to apply the update" % data[u"Id"] ")
-				fmt.Println("Success")
+				a.Logger.Debug(fmt.Sprintf("Job successfully marked as scheduled."), zap.String("JobID", jobId))
 				result = true
 				break
 			}
 		} else {
+			a.Logger.Debug("Sleeping for 5 Secs", zap.String("JobID", jobId))
 			time.Sleep(time.Second * 5)
 			continue
 		}
@@ -150,6 +158,7 @@ func (a *IdracRedfishClient) CheckJobStatus(jobId string, setScheduledasTrue boo
 }
 
 func (a *IdracRedfishClient) RebootServer(systemID string) bool {
+	a.Logger.Info("RebootServer()")
 
 	ctx := a.createContext()
 
@@ -161,6 +170,7 @@ func (a *IdracRedfishClient) RebootServer(systemID string) bool {
 }
 
 func (a *IdracRedfishClient) PowerOn(systemID string) bool {
+	a.Logger.Info("PowerOn()")
 	ctx := a.createContext()
 	resetRequestBody := redfish.ResetRequestBody{ResetType: redfish.RESETTYPE_ON}
 
@@ -169,6 +179,7 @@ func (a *IdracRedfishClient) PowerOn(systemID string) bool {
 }
 
 func (a *IdracRedfishClient) PowerOff(systemID string) bool {
+	a.Logger.Info("PowerOff()")
 	ctx := a.createContext()
 	resetRequestBody := redfish.ResetRequestBody{ResetType: redfish.RESETTYPE_GRACEFUL_SHUTDOWN}
 
@@ -176,16 +187,19 @@ func (a *IdracRedfishClient) PowerOff(systemID string) bool {
 }
 
 func (a *IdracRedfishClient) GetVirtualMediaStatus(managerID string, media string) bool {
+	a.Logger.Info("GetVirtualMediaStatus()")
 	ctx := a.createContext()
 	return RFWrap.GetVirtualMediaConnectedStatus(ctx, a.HostIP, managerID, media)
 }
 
 func (a *IdracRedfishClient) EjectISO(managerID string, media string) bool {
+	a.Logger.Info("EjectISO()")
 	ctx := a.createContext()
 	return RFWrap.EjectVirtualMedia(ctx, a.HostIP, managerID, media)
 }
 
 func (a *IdracRedfishClient) SetOneTimeBoot(systemID string) bool {
+	a.Logger.Info("SetOneTimeBoot()")
 	ctx := a.createContext()
 	computeSystem := redfish.ComputerSystem{Boot: redfish.Boot{BootSourceOverrideEnabled: redfish.BOOTSOURCEOVERRIDEENABLED_ONCE,
 		BootSourceOverrideTarget: redfish.BOOTSOURCE_CD}}
@@ -195,11 +209,12 @@ func (a *IdracRedfishClient) SetOneTimeBoot(systemID string) bool {
 }
 
 func (a *IdracRedfishClient) InsertISO(managerID string, mediaID string, imageURL string) bool {
+	a.Logger.Info("InsertISO()")
 
 	ctx := a.createContext()
 
 	if a.GetVirtualMediaStatus(managerID, mediaID) {
-		fmt.Println("Exiting .. Already connected")
+		a.Logger.Error(fmt.Sprintf("Exiting .. Already connected"),zap.String("ImageURL", imageURL))
 		return false
 	}
 	insertMediaReqBody := redfish.InsertMediaRequestBody{
@@ -210,6 +225,7 @@ func (a *IdracRedfishClient) InsertISO(managerID string, mediaID string, imageUR
 }
 
 func (a *IdracRedfishClient) GetVirtualDisks(systemID string, controllerID string) []string {
+	a.Logger.Info("GetVirtualDisks()")
 
 	ctx := a.createContext()
 	idrefs := RFWrap.GetVolumes(ctx, a.HostIP, systemID, controllerID)
@@ -219,7 +235,7 @@ func (a *IdracRedfishClient) GetVirtualDisks(systemID string, controllerID strin
 	virtualDisks := []string{}
 	for _, id := range idrefs {
 
-		fmt.Printf("VirtualDisk Info %v\n", id.OdataId)
+		a.Logger.Debug(fmt.Sprintf("VirtualDisk Info %v\n", id.OdataId))
 		vd := strings.Split(id.OdataId, "/")
 		if vd != nil {
 			virtualDisks = append(virtualDisks, vd[len(vd)-1])
@@ -230,6 +246,7 @@ func (a *IdracRedfishClient) GetVirtualDisks(systemID string, controllerID strin
 }
 
 func (a *IdracRedfishClient) DeletVirtualDisk(systemID string, storageID string) string {
+	a.Logger.Info("DeleteVirtualDisk()")
 
 	if joblistEmpty, _ := a.IsJobListEmpty(); joblistEmpty != false {
 		ctx := a.createContext()
@@ -239,6 +256,7 @@ func (a *IdracRedfishClient) DeletVirtualDisk(systemID string, storageID string)
 }
 
 func (a *IdracRedfishClient) CreateVirtualDisk(systemID string, controllerID string, volumeType string, name string, urilist []string) string {
+	a.Logger.Info("CreateVirtualDisk()")
 	if joblistEmpty, _ := a.IsJobListEmpty(); joblistEmpty != false {
 		ctx := a.createContext()
 
@@ -257,10 +275,12 @@ func (a *IdracRedfishClient) CreateVirtualDisk(systemID string, controllerID str
 
 		return RFWrap.CreateVirtualDisk(ctx, a.HostIP, systemID, controllerID, createvirtualBodyReq)
 	}
+	a.Logger.Error("Failed to Create Virtual Disks")
 	return "" // failure send JobID  = ""
 }
 
 func (a *IdracRedfishClient) IsJobListEmpty() (bool, error) {
+	a.Logger.Info("IsJobListEmpty()")
 
 	if RedfishSleepTimeSeconds == 0 {
 		RedfishSleepTimeSeconds = 100 // if environment variable is not set
@@ -274,7 +294,7 @@ func (a *IdracRedfishClient) IsJobListEmpty() (bool, error) {
 			ticker.Stop()
 			return false, errors.New("Getting Pending Jobs timed out")
 		case <-ticker.C:
-			fmt.Println("Checking Pending Jobs ..")
+			a.Logger.Debug(fmt.Sprintf("Checking Pending Jobs .."))
 			pendingJobs := a.GetPendingJobs()
 			if pendingJobs == 0 {
 				timeout.Stop()
@@ -285,11 +305,13 @@ func (a *IdracRedfishClient) IsJobListEmpty() (bool, error) {
 	}
 	timeout.Stop()
 	ticker.Stop()
+	a.Logger.Error("Failed to Get Pending Jobs")
 	return false, errors.New("Failed to Get Pending Jobs")
 
 }
 
 func (a *IdracRedfishClient) CleanVirtualDisksIfAny(systemID string, controllerID string) bool {
+	a.Logger.Info("CleanVirtualDisksIfAny()")
 
 	var result bool = false
 
@@ -300,16 +322,16 @@ func (a *IdracRedfishClient) CleanVirtualDisksIfAny(systemID string, controllerI
 	// for testing skip the OS Disk
 	//virtualDisks = virtualDisks[1:]
 	if totalvirtualDisks == 0 {
-		fmt.Printf("No existing RAID disks found")
+		a.Logger.Debug(fmt.Sprintf("No existing RAID disks found"))
 		result = true
 	} else {
 		for _, vd := range virtualDisks {
 			jobid := a.DeletVirtualDisk(systemID, vd)
-			fmt.Printf("Delete Job ID %v\n", jobid)
+			a.Logger.Debug(fmt.Sprintf("Delete Job ID %v\n", jobid))
 			result = a.CheckJobStatus(jobid,false)
 
 			if result == false {
-				fmt.Printf("Failed to delete virtual disk %v\n", vd)
+				a.Logger.Error(fmt.Sprintf("Failed to delete virtual disk %v\n", vd))
 				return result
 			}
 			//	time.Sleep(time.Second * time.Duration(RedfishSleepTimeSeconds)) //Sleep in between calls
@@ -318,6 +340,7 @@ func (a *IdracRedfishClient) CleanVirtualDisksIfAny(systemID string, controllerI
 		}
 	}
 	if countofVDdeleted != totalvirtualDisks {
+		a.Logger.Error("Number of VirtualDisk deleted is not equal to Total Virtual Disks")
 		result = false
 	}
 
@@ -325,6 +348,7 @@ func (a *IdracRedfishClient) CleanVirtualDisksIfAny(systemID string, controllerI
 }
 
 func (a *IdracRedfishClient) GetNodeUUID(systemID string) (string, bool) {
+	a.Logger.Info("GetNodeUUID()")
 
 	ctx := a.createContext()
 	computerSystem, _ := RFWrap.GetSystem(ctx, a.HostIP, systemID)
@@ -332,10 +356,12 @@ func (a *IdracRedfishClient) GetNodeUUID(systemID string) (string, bool) {
 	if computerSystem != nil {
 		return computerSystem.UUID, true
 	}
+	a.Logger.Error("Failed to retrieve Node UUID")
 	return "", false
 }
 
 func (a *IdracRedfishClient) GetPowerStatus(systemID string) bool {
+	a.Logger.Info("GetPowerStatus()")
 
 	ctx := a.createContext()
 	computerSystem, _ := RFWrap.GetSystem(ctx, a.HostIP, systemID)
@@ -345,67 +371,72 @@ func (a *IdracRedfishClient) GetPowerStatus(systemID string) bool {
 			return true
 		}
 	}
+	a.Logger.Error("Failed to get Power Status")
 	return false
 }
 
 func (a *IdracRedfishClient) GetManagerID() string {
+	a.Logger.Info("GetManagerID()")
 	ctx := a.createContext()
 	managerList := RFWrap.ListManagers(ctx, a.HostIP)
 	if managerList == nil {
-		fmt.Printf("Failed to retreive manager ID")
+		a.Logger.Error(fmt.Sprintf("Failed to retreive manager ID"))
 		return ""
 	}
-	fmt.Printf("%+v", managerList)
+	a.Logger.Debug(fmt.Sprintf("%+v", managerList))
 	return managerList[0]
 }
 func (a *IdracRedfishClient) GetSystemID() string {
+	a.Logger.Info("GetSystemID()")
 	ctx := a.createContext()
 	systemList := RFWrap.ListSystems(ctx, a.HostIP)
 	if systemList == nil {
-		fmt.Printf("Failed to retreive system ID")
+		a.Logger.Error(fmt.Sprintf("Failed to retreive system ID"))
 		return ""
 	}
-	fmt.Printf("%+v", systemList)
+	a.Logger.Debug(fmt.Sprintf("%+v", systemList))
 	return systemList[0]
 }
 
 func (a *IdracRedfishClient) GetRedfishVer() string {
+	a.Logger.Info("GetRedfishVer()")
 	ctx := a.createContext()
 	root := RFWrap.GetRoot(ctx, a.HostIP)
 	if root == nil {
-		fmt.Printf("Failed to retreive RedfishVersion")
+		a.Logger.Error(fmt.Sprintf("Failed to retreive RedfishVersion"))
 		return ""
 	}
 	redfishVersion := root.RedfishVersion
-	fmt.Printf("Redfish Version : %+v", redfishVersion)
+	a.Logger.Debug(fmt.Sprintf("Redfish Version : %+v", redfishVersion))
 	return redfishVersion
 }
 
 func (a *IdracRedfishClient) GetFirmwareDetails(firmwarename string) (name string, version string, updateable bool) {
+	a.Logger.Info("GetFirmwareDetails()")
 
 
 	ctx := a.createContext()
 
 	firmwareInv := RFWrap.GetFirwareInventory(ctx, a.HostIP)
 	if firmwareInv == nil {
-		fmt.Printf("Failed to retreive FirmwareInventory")
+		a.Logger.Error(fmt.Sprintf("Failed to retreive FirmwareInventory"))
 		return "", "", false
 	}
 	for _, id := range firmwareInv.Members{
 		var softwareId string
 
-		fmt.Printf("%v", id.OdataId)
+		a.Logger.Debug("OdataId ", zap.String("OdataID",fmt.Sprintf("%v", id.OdataId)))
 		fd := strings.Split(id.OdataId, "/")
 		if fd != nil {
 			softwareId = fd[len(fd)-1]
-			fmt.Printf("Software Id %v\n",softwareId)
+			fmt.Sprintf("Software Id %v\n",softwareId)
 
 			softwareInv  := RFWrap.GetSoftwareInventory(ctx,a.HostIP,softwareId)
-			fmt.Printf("Software  Inv : %+v\n",softwareInv)
+			a.Logger.Debug(fmt.Sprintf("Software  Inv : %+v\n",softwareInv))
 			name = softwareInv.Name
 			version = *softwareInv.Version
 			updateable = *softwareInv.Updateable
-			fmt.Printf("%+v,%+v, %+v", name,version,updateable)
+			a.Logger.Debug(fmt.Sprintf("%+v,%+v, %+v", name,version,updateable))
 
 			if strings.Contains( strings.ToLower(name), strings.ToLower(firmwarename)){
 				return name,version,updateable
@@ -413,6 +444,7 @@ func (a *IdracRedfishClient) GetFirmwareDetails(firmwarename string) (name strin
 
 		}
 	}
+	a.Logger.Error("Failed to retrieve Firmware Inventory")
 	return "", "", false
 
 }

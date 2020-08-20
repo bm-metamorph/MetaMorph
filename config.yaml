@@ -11,9 +11,12 @@ controller:
 logger:
     apipath: /tmp/metamorph_api.log
     controllerpath: /tmp/metamorph_controller.log
+    plugins:
+      redfishpluginpath: /tmp/redfish-plugin.log
+      isogenpluginpath: /tmp/isogen-plugin.log
 
 templates:
-    rootdir: /home/ekuamaj/go/src/bitbucket.com/metamorph
+    rootdir: /root/go/src/github.com/manojkva/MetaMorph
     preseed:
         config:  configs/templates/preseed.tmpl
         filepath: preseed/hwe-ubuntu-server.seed
@@ -36,7 +39,7 @@ templates:
         filepath: agent_config.yaml
 
 assets:
-   rootdir: /home/ekuamaj/go/src/bitbucket.com/metamorph/assets
+   rootdir: /root/go/src/github.com/manojkva/MetaMorph/assets
    agent_binary:
           src:  files/metamorph_agent
           dest: metamorph_agent
@@ -55,11 +58,27 @@ provisioning:
     httpport: 31180
 
 
+pluginlocation: "/root/go/src/github.com/manojkva/MetaMorph/assets/files"
+
 testing:
-    inputfile: "/home/ekuamaj/go/src/bitbucket.com/metamorph/examples/mtn52r07c001_input.json"
+    inputfile: "/root/go/src/github.com/manojkva/MetaMorph/examples/node1_input.json"
 
 agent:
     node_id: "e415bbbe-be68-4705-aa05-16350e0c8151"
     cntrl_endpoint: "localhost:4040"
     logdir : "/tmp/metamorph"
     temp_dir : "/tmp/metamorph/.tmp"
+
+plugins:
+    UpdateFirmware: "metamorph-redfish-plugin"
+    ConfigureRAID: "metamorph-redfish-plugin"
+    DeployISO: "metamorph-redfish-plugin"
+    GetGUUID: "metamorph-redfish-plugin"
+    CreateISO: "metamorph-isogen-plugin"
+    GetHWInventory: "metamorph-redfish-plugin"
+    PowerOff: "metamorph-redfish-plugin"
+    PowerOn: "metamorph-redfish-plugin"
+    GetPowerStatus: "metamorph-redfish-plugin"
+ 
+
+
