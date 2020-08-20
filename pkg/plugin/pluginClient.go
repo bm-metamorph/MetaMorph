@@ -112,7 +112,6 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{}, erro
 	inputConfig := base64.StdEncoding.EncodeToString(data)
 
 	hclogger := hclog.New(&hclog.LoggerOptions{
-	logger := hclog.New(&hclog.LoggerOptions{
 		Name:   "plugin",
 		Output: os.Stdout,
 		Level:  hclog.Trace})
@@ -125,7 +124,6 @@ func (bmhnode *BMHNode) DispenseClientRequest(apiName string) (interface{}, erro
 		Cmd:              exec.Command("sh", "-c", pluginLocation+"/"+pluginName+" "+string(inputConfig)),
 		AllowedProtocols: []plugin.Protocol{plugin.ProtocolGRPC},
 		Logger:           hclogger})
-		Logger:           logger})
 	defer client.Kill()
 
 	rpcClient, err := client.Client()
