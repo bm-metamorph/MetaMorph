@@ -34,6 +34,8 @@ templates:
     netplan:
         config: configs/templates/netplan.tmpl
         filepath: 50-cloud-init.yaml
+    cloudinit:
+        filepath: 70-metamorph-cloud-init.yaml
     agent_config:
         config:  configs/templates/agent_config.tmpl
         filepath: agent_config.yaml
