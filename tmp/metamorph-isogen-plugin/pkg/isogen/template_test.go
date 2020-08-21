@@ -1,11 +1,18 @@
 package isogen
 
 import (
-	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
+	config "github.com/manojkva/metamorph-plugin/pkg/config"
+	"github.com/stretchr/testify/assert"
 )
+
+func init() {
+	config.SetLoggerConfig("logger.plugins.isogenpluginpath")
+
+}
 
 func TestGetDiskSpaceinMB(t *testing.T) {
 	dspace, maxdspace, _ := getDiskSpaceinMB(">300g")
@@ -31,10 +38,16 @@ func TestCreateNetplanfile(t *testing.T) {
 	assert.FileExists(t, "/tmp/50-cloud-init.yaml")
 }
 
-func TestCreateNetplanFileFromString(t *testing.T){
-       bmhnode := &BMHNode{node.CreateTestNode()}
-       bmhnode.CreateNetplanFileFromString("/tmp","netplan")
-        assert.FileExists(t, "/tmp/50-cloud-init.yaml")
+func TestCreateNetplanFileFromString(t *testing.T) {
+	bmhnode := &BMHNode{node.CreateTestNode()}
+	bmhnode.CreateFileFromString(bmhnode.NetworkConfig, "/tmp", "netplan")
+	assert.FileExists(t, "/tmp/50-cloud-init.yaml")
+
+}
+func TestCreateCloudInitFileFromString(t *testing.T) {
+	bmhnode := &BMHNode{node.CreateTestNode()}
+	bmhnode.CreateFileFromString(bmhnode.CloudInit, "/tmp", "cloudinit")
+	assert.FileExists(t, "/tmp/70-metamorph-cloud-init.yaml")
 
 }
 func TestCreateInitfile(t *testing.T) {
