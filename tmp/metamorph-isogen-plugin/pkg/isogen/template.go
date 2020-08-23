@@ -5,15 +5,16 @@ import (
 	"html/template"
 	"os"
 
+	"io/ioutil"
 	"path"
 	"regexp"
 	"strconv"
-        "io/ioutil"
 
+	"encoding/base64"
+
+	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
 	config "github.com/manojkva/metamorph-plugin/pkg/config"
 	"github.com/manojkva/metamorph-plugin/pkg/logger"
-	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
-	"encoding/base64"
 	"go.uber.org/zap"
 )
 
@@ -21,24 +22,23 @@ type BMHNode struct {
 	*node.Node
 }
 
-func (bmhnode *BMHNode) CreateNetplanFileFromString(outputdir string, modulename string) error {
-	logger.Log.Info("CreateNetplanFileFromString()")
-	var networkConfig = bmhnode.NetworkConfig
-	if networkConfig == "" {
-		logger.Log.Error("NetworkConfig is empty")
-		return  fmt.Errorf("NetworkConfig is empty")
+func (bmhnode *BMHNode) CreateFileFromString(inputString string, outputdir string, modulename string) error {
+	logger.Log.Info("CreateFileFromString()")
+	if inputString == "" {
+		logger.Log.Error("Input String empty")
+		return fmt.Errorf("Input String is empty")
 	}
-	decodedStringInBytes, result := IsBase64(networkConfig)
-	if result != true{
-		logger.Log.Error("NetworkConfig is not Base64 encoded")
-		return fmt.Errorf("NetworkConfig is not Base64 encoded")
+	decodedStringInBytes, result := IsBase64(inputString)
+	if result != true {
+		logger.Log.Error("Input String is not Base64 encoded")
+		return fmt.Errorf("Input String is not Base64 encoded")
 	}
 
 	filepath := config.Get("templates." + modulename + ".filepath").(string)
 	outputfilepathAbsolute := path.Join(outputdir, filepath)
 
 	//Write stirng to file
-	err := ioutil.WriteFile(outputfilepathAbsolute,decodedStringInBytes,0644)
+	err := ioutil.WriteFile(outputfilepathAbsolute, decodedStringInBytes, 0644)
 	return err
 
 }
@@ -57,17 +57,15 @@ func (bmhnode *BMHNode) CreateNetplanFileFromTemplate(outputdir string, modulena
 		return err
 	}
 
-	bondParameters,err := node.GetBondParameters(bmhnode.NodeUUID.String())
+	bondParameters, err := node.GetBondParameters(bmhnode.NodeUUID.String())
 	if err != nil {
 		logger.Log.Error("Failed to get Bond Parameters", zap.Error(err))
 		return err
 	}
 
-
 	bmhnode.BondInterfaces = interfacelist
 	bmhnode.NameServers = nameserverlist
 	bmhnode.BondParameters = bondParameters
-
 
 	err = bmhnode.CreateFileFromTemplate(outputdir, modulename)
 
@@ -83,9 +81,9 @@ func (bmhnode *BMHNode) CreatePressedFileFromTemplate(outputdir string, modulena
 	partitionlist, err := node.GetPartitions(bmhnode.NodeUUID.String())
 	var filesystem *node.Filesystem
 	if err == nil {
-		for index,part := range partitionlist{
+		for index, part := range partitionlist {
 			filesystem, err = node.GetFilesystem(part.ID)
-			if err != nil{
+			if err != nil {
 				logger.Log.Error("Failed to get FileSystem Info from preseed template", zap.Error(err))
 				return err
 			}
@@ -169,6 +167,6 @@ func getDiskSpaceinMB(diskspace string) (diskspaceinMB string, maxdiskSizeinMB s
 }
 
 func IsBase64(s string) ([]byte, bool) {
-	decodedString , err := base64.StdEncoding.DecodeString(s)
-	return decodedString , err == nil
+	decodedString, err := base64.StdEncoding.DecodeString(s)
+	return decodedString, err == nil
 }
