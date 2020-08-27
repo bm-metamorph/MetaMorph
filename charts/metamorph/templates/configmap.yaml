@@ -29,6 +29,8 @@ data:
             filepath: grub.conf
         isolinux:
             config: configs/templates/hwe_kernel/isolinux_txt.cfg
+        cloudinit:
+            filepath: 70-metamorph-cloud-init.yaml
         init:
             config: configs/templates/init.sh
             filepath: init.sh
