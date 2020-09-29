@@ -6,10 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"bitbucket.com/metamorph/pkg/db/models/node"
-	"bitbucket.com/metamorph/pkg/drivers/redfish"
-	"bitbucket.com/metamorph/pkg/logger"
-	"bitbucket.com/metamorph/pkg/util/isogen"
+	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
+	"github.com/manojkva/metamorph-plugin/pkg/logger"
+	"github.com/bm-metamorph/MetaMorph/pkg/plugin"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
@@ -49,7 +48,7 @@ type NodeStatus struct {
 }
 
 func StartMetamorphFSM(runOnce bool) {
-	logger.Log.Info("Starting Metamorph FSM")
+	logger.Log.Info("StartMetamorphFSM()")
 	dbHandler := new(DBHandler)
 	dbHandler.startFSM(runOnce)
 
@@ -83,7 +82,7 @@ func (h *DBHandler) startFSM(runOnce bool) {
 
 			for _, bmnode := range nodelist {
 				// What about nodes that are already in transistions.. should there be a transition state.
-				fmt.Printf("[%v] - Starting Processing\n", bmnode.Name)
+				logger.Log.Debug(fmt.Sprintf("[%v] - Starting Processing\n", bmnode.Name))
 				requestsChan <- BMNode{&bmnode}
 
 			}
@@ -153,46 +152,70 @@ func serviceRequest(requestsChan chan BMNode, nodeStatusChan chan<- NodeStatus, 
 func ReadystateHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
 	var err error
 	var state string
+	var nodestatus NodeStatus
+	var node_uuid uuid.UUID // to be removed once UUID = Server UUID is planned.
+	var nodeuuidStringFromServer string
+	var redfishManagerID string 
+	var redfishSystemID string
+	var redfishVersion string
+	var maphwInventory  map[string]string
+	var hwInventory  interface{}
+	redfishClient := &plugin.BMHNode{bmnode.Node}
 	logger.Log.Info("ReadystateHandler()", zap.String("Node Name", bmnode.Name), zap.String("Node UUID", bmnode.NodeUUID.String()))
 	//Update the DB Now
-	err = node.Update(&node.Node{State: INTRANSITION})
-	var nodestatus NodeStatus
+	err = node.Update(&node.Node{State: INTRANSITION, NodeUUID: bmnode.NodeUUID})
+
+	if err != nil {
+		logger.Log.Error(" Failed to update DB.Setting Node to FAILED State", zap.String("Node Name", bmnode.Name))
+		goto End
+
+	}
+
 
 	// Check if we could extract UUID from the Node using Redfish
 	//This call should satisfy the following requirements
 	// - Network Connectivity
 	// - working credentials
 	// - Redfish API availability(though ver is not compared yet)
-	var node_uuid uuid.UUID // to be removed once UUID = Server UUID is planned.
-	redfishClient := &redfish.BMHNode{bmnode.Node}
-	redfishManagerID := redfishClient.GetManagerID()
-	redfishSystemID := redfishClient.GetSystemID()
-	redfishVersion := redfishClient.GetRedfishVersion()
+        err = redfishClient.ReadConfigFile()
+	if  err  != nil{
+		logger.Log.Error("Failed to Read Plugin info from configuration file. Setting Node to FAILED State", zap.String("NodeName", bmnode.Name))
+		goto End
+	}
+	hwInventory, err = redfishClient.DispenseClientRequest("gethwinventory")
+	maphwInventory = hwInventory.(map[string]string)
 
-	var res bool = false
-	var nodeuuidStringFromServer string
+	if err != nil {
+		logger.Log.Error("Failed to retrieve HW Inventory using Redfish Protocol Setting Node to FAILED State", zap.String("IPMIIP", bmnode.Node.IPMIIP), zap.String("IPMIUser", bmnode.IPMIUser))
+		goto End
+	}
+
+	redfishManagerID = maphwInventory["RedfishManagerID"]
+	redfishSystemID = maphwInventory["RedfishSystemID"]
+	redfishVersion = maphwInventory["RedfishVersion"]
+
 	if redfishSystemID != "" {
-		nodeuuidStringFromServer, res = redfish.GetUUID(bmnode.Node.IPMIIP, bmnode.IPMIUser, bmnode.IPMIPassword)
+		uuidasIntf, err := redfishClient.DispenseClientRequest("getguuid")
+		if err != nil {
+			logger.Log.Error("Failed to retrieve Node GUUID using Redfish Protocol Setting Node to FAILED State", zap.String("IPMIIP", bmnode.Node.IPMIIP), zap.String("IPMIUser", bmnode.IPMIUser))
+			goto End
+		}
+		nodeuuidStringFromServer = string(uuidasIntf.([]byte))
 	}
-	if res == true {
-		node_uuid, err = uuid.Parse(nodeuuidStringFromServer)
-	}
+
+	node_uuid, err = uuid.Parse(nodeuuidStringFromServer)
 
 	node_uuid = bmnode.NodeUUID // to be removed once UUID = Server UUID is planned.
 
-	if (err != nil) || (res == false) || (redfishSystemID == "") || (redfishManagerID == "") || (redfishVersion == "") {
-		logger.Log.Error("Failed to connect to Node using Redfish Protocol or Failed to update DB.Setting Node to FAILED State", zap.String("IPMIIP", bmnode.Node.IPMIIP), zap.String("IPMIUser", bmnode.IPMIUser))
-		nodestatus = NodeStatus{NodeUUID: node_uuid, Status: false}
-		state = FAILED
-	} else {
-
-		state = READYWAIT
-		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
-	}
+	state = READYWAIT
+	nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
 	//Update the DB Now
 	err = node.Update(&node.Node{State: state, NodeUUID: node_uuid, RedfishManagerID: redfishManagerID, RedfishSystemID: redfishSystemID, RedfishVersion: redfishVersion})
+
+End:
 	if err != nil {
 		logger.Log.Error("Failed to update Node to READYWAIT state", zap.String("Node Name", bmnode.Name))
+		nodestatus = NodeStatus{NodeUUID: node_uuid, Status: false}
 		state = FAILED
 		node.Update(&node.Node{State: state, NodeUUID: node_uuid})
 	}
@@ -205,40 +228,47 @@ func SetupreadyHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 	logger.Log.Info("SetupreadyHandler()", zap.String("Node Name", bmnode.Name))
 	var nodestatus NodeStatus
 	var err error
+	var state string
+	isogenClient := &plugin.BMHNode{bmnode.Node}
 
 	//Update the DB Now
 	nodeuuidString := bmnode.Node.NodeUUID.String()
-	err = node.Update(&node.Node{State: INTRANSITION})
+	err = node.Update(&node.Node{State: INTRANSITION, NodeUUID: bmnode.NodeUUID})
+	if err != nil {
+		goto End
+	}
 
 	fmt.Println(nodeuuidString)
 	//check for firmware upgrade
-	var res bool = true
 	if bmnode.AllowFirmwareUpgrade {
-		redfishClient := &redfish.BMHNode{bmnode.Node}
-		res = redfishClient.UpgradeFirmwareList()
+		redfishClient := &plugin.BMHNode{bmnode.Node}
+		_, err = redfishClient.DispenseClientRequest("updatefirmware")
+		if err != nil {
+			logger.Log.Error("Failed to upgrade Firmware", zap.String("Node Name", bmnode.Name))
+			goto End
+		}
 	}
 
-	isogenClient := &isogen.BMHNode{bmnode.Node}
 
 	//Create iSO
-	err = isogenClient.PrepareISO()
+	_, err = isogenClient.DispenseClientRequest("createiso")
 
-	var state string
-	if (err != nil) || (res == false) {
-		logger.Log.Error("Failed to create ISO file or Failed to upgrade Firmware", zap.String("Node Name", bmnode.Name))
-		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: false}
-		state = FAILED
-
-	} else {
-
-		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
-		state = SETUPREADYWAIT
+	if err != nil {
+		logger.Log.Error("Failed to create ISO file ", zap.String("Node Name", bmnode.Name))
+		goto End
 	}
-	err = node.Update(&node.Node{State: state})
+
+
+	nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
+	state = SETUPREADYWAIT
+
+	err = node.Update(&node.Node{State: state, NodeUUID: bmnode.NodeUUID})
+End:
 	if err != nil {
 		logger.Log.Error("Failed to update to SETUPREADYWAIT state", zap.String("Node Name", bmnode.Name))
+		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: false}
 		state = FAILED
-		node.Update(&node.Node{State: state})
+		node.Update(&node.Node{State: state, NodeUUID: bmnode.NodeUUID})
 	}
 	nodeStatusChan <- nodestatus
 	wg.Done()
@@ -246,30 +276,35 @@ func SetupreadyHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync
 func DeployedHandler(bmnode BMNode, nodeStatusChan chan<- NodeStatus, wg *sync.WaitGroup) {
 	logger.Log.Info("DeployedHandler()", zap.String("Node Name", bmnode.Name))
 	var nodestatus NodeStatus
-	var result bool
-	//Update the DB Now
-	err := node.Update(&node.Node{State: INTRANSITION})
-	fmt.Println(bmnode.NodeUUID)
-	redfishClient := &redfish.BMHNode{bmnode.Node}
-
-	result = redfishClient.DeployISO()
-
 	var state string
+	redfishClient := &plugin.BMHNode{bmnode.Node}
+	//Update the DB Now
+	err := node.Update(&node.Node{State: INTRANSITION, NodeUUID: bmnode.NodeUUID})
 
-	if (result == false) || (err != nil) {
-		logger.Log.Error("Failed to Deply ISO", zap.String("Node Name", bmnode.Name))
-		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: false}
-		state = FAILED
-	} else {
-
-		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
-		state = DEPLOYING
+	if err != nil {
+		logger.Log.Error("Failed to update to TRANSITION state", zap.String("Node Name", bmnode.Name))
+		goto End
 	}
-	err = node.Update(&node.Node{State: state})
+
+	fmt.Println(bmnode.NodeUUID)
+
+	_, err = redfishClient.DispenseClientRequest("deployiso")
+
+	if err != nil {
+		logger.Log.Error("Failed to Deply ISO", zap.String("Node Name", bmnode.Name))
+		goto End
+	}
+
+
+	nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: true}
+	state = DEPLOYING
+	err = node.Update(&node.Node{State: state, NodeUUID: bmnode.NodeUUID})
+End:
 	if err != nil {
 		logger.Log.Error("Failed to update to DEPLOYING state", zap.String("Node Name", bmnode.Name))
+		nodestatus = NodeStatus{NodeUUID: bmnode.NodeUUID, Status: false}
 		state = FAILED
-		node.Update(&node.Node{State: state})
+		node.Update(&node.Node{State: state, NodeUUID: bmnode.NodeUUID})
 	}
 	nodeStatusChan <- nodestatus
 	wg.Done()

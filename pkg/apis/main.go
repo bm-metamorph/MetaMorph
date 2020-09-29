@@ -1,25 +1,29 @@
 package api
 
 import (
-	"bitbucket.com/metamorph/pkg/logger"
-	"bitbucket.com/metamorph/proto"
+	"github.com/manojkva/metamorph-plugin/pkg/logger"
+	"github.com/bm-metamorph/MetaMorph/proto"
 	"fmt"
 	"github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
+        ctrlgRPCServer "github.com/bm-metamorph/MetaMorph/pkg/controller/grpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"net/http"
 	"time"
         "os"
 )
+func run_controller() {
+  ctrlgRPCServer.Serve() 
 
+}
 func grpcClient() (proto.NodeServiceClient, *grpc.ClientConn) {
 
         grpcServer := "localhost"
         if gs := os.Getenv("METMORPH_CONTROLLER_HOST"); gs != "" {
             grpcServer = gs
         }
- 
+
 	logger.Log.Info("grpcClient()")
 	conn, err := grpc.Dial(fmt.Sprintf("%s:4040", grpcServer), grpc.WithInsecure())
 	if err != nil {
@@ -27,7 +31,6 @@ func grpcClient() (proto.NodeServiceClient, *grpc.ClientConn) {
 		panic(err)
 	}
 	client := proto.NewNodeServiceClient(conn)
-        
 	return client, conn
 }
 
@@ -37,6 +40,7 @@ func createNode(ctx *gin.Context) {
 	data, _ := ctx.GetRawData()
 	req := &proto.Request{NodeSpec: data}
 	if response, err := client.Create(ctx, req); err == nil {
+		fmt.Println(response)
 		ctx.JSON(http.StatusOK, gin.H{
 			"result": fmt.Sprint(response.Result),
 		})
@@ -54,7 +58,7 @@ func describeNode(ctx *gin.Context) {
 	logger.Log.Info("describeNode()")
 	client, conn := grpcClient()
 	node_id := ctx.Param("node_id")
-	fmt.Println(node_id)
+	logger.Log.Debug("Node info from Request", zap.String("NodeID", string(node_id)))
 	req := &proto.Request{NodeID: string(node_id)}
 	if response, err := client.Describe(ctx, req); err == nil {
 		ctx.Data(http.StatusOK, gin.MIMEJSON, response.Res)
@@ -195,7 +199,7 @@ func updateNodeHWStatus(ctx *gin.Context) {
 
 }
 
-func Serve() {
+func Serve() *gin.Engine {
 	logger.Log.Info("Serve()")
 
 	r := gin.Default()
@@ -214,10 +218,13 @@ func Serve() {
 		node.DELETE("/:node_id", deleteNode)
 		node.POST("/deploy/:node_id", deployNode)
 	}
+	return r
+}
 
-	if err := r.Run(":8080"); err != nil {
-		logger.Log.Fatal("Failed to Run Server", zap.Error(err))
-		//log.Fatalf("Failed to Run server: %v ", err)
-	}
+func api() {
+	        if err := Serve().Run(":8080"); err != nil {
+                logger.Log.Fatal("Failed to Run Server", zap.Error(err))
+                //log.Fatalf("Failed to Run server: %v ", err)
+        }
 
 }

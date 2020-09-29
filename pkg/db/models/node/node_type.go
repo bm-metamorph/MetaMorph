@@ -1,133 +1,147 @@
 package node
 
 import (
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"github.com/jinzhu/gorm"
 	"github.com/google/uuid"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
-
 
 type Node struct {
 	gorm.Model
-	NodeUUID             uuid.UUID
-	Name                 string
-        ISOURL               string
-        ISOChecksum          string
-	ImageURL             string
-	ChecksumURL          string
-    DisableCertVerification bool
-	ImageReadilyAvailable bool
-	OamIP                string
-	OamGateway           string
-	NameServers          []NameServer `json:"NameServers"`
-	OsDisk               string
-	Partitions           []Partition
-	GrubConfig           string
-	KvmPolicy            KvmPolicy
-	SSHPubKeys           []SSHPubKey
-	BondInterfaces       []BondInterface
-	BondParameters       []BondParameter
-	IPMIIP               string
-	IPMIUser             string
-	IPMIPassword         string
-	Vendor               string
-	ServerModel          string
-	VirtualDisks         []VirtualDisk
-	State                string `gorm:"DEFAULT:new"`
-	ProvisioningIP       string
-	ProvisionerPort      int
-	HTTPPort             int
-	BootActions          []BootAction
-	NetworkConfig        string
-        RAID_reset           bool
-        RedfishManagerID     string
-        RedfishSystemID      string
-        RedfishVersion       string
-		Domain               string
-		Firmwares            []Firmware
-       AllowFirmwareUpgrade  bool
-  }
+	NodeUUID                uuid.UUID
+	Name                    string
+	ISOURL                  string
+	ISOChecksum             string
+	ImageURL                string
+	ChecksumURL             string
+	DisableCertVerification bool
+	ImageReadilyAvailable   bool
+	OamIP                   string
+	OamGateway              string
+	NameServers             []NameServer `json:"NameServers"`
+	OsDisk                  string
+	Partitions              []Partition
+	GrubConfig              string
+	KvmPolicy               KvmPolicy
+	SSHPubKeys              []SSHPubKey
+	BondInterfaces          []BondInterface
+	BondParameters          []BondParameter
+	IPMIIP                  string
+	IPMIUser                string
+	IPMIPassword            string
+	Vendor                  string
+	ServerModel             string
+	VirtualDisks            []VirtualDisk
+	State                   string `gorm:"DEFAULT:new"`
+	ProvisioningIP          string
+	ProvisionerPort         int
+	HTTPPort                int
+	BootActions             []BootAction
+	NetworkConfig           string
+	RAID_reset              bool
+	RedfishManagerID        string
+	RedfishSystemID         string
+	RedfishVersion          string
+	Domain                  string
+	Firmwares               []Firmware
+	AllowFirmwareUpgrade    bool
+	Plugins                 Plugins
+	CloudInit               string
+}
 
-  type Firmware struct{
-	  gorm.Model
-	  NodeID uint
-	  Name string
-      Version string
-      URL   string
-  }
-  type BootAction struct {
-	  gorm.Model
-	  NodeID     uint
-	  Name       string
-	  Location   string
-	  Priority   uint
-	  Control    string
-	  Args       string
-	  Status     string  `gorm:"DEFAULT:new"`
-  }
+type Plugins struct {
+	gorm.Model
+	NodeID uint
+	APIs   []API
+}
 
-  type NameServer struct {
+type API struct {
 	gorm.Model
-	NodeID      uint
-	NameServer  string `json:"NameServer"`
-  }
-  
-  type Partition struct {
+	PluginsID uint
+	Name      string
+	Plugin    string
+}
+
+type Firmware struct {
 	gorm.Model
-	NodeID      uint
-	Name        string
-	Size        string
-	Bootable    bool
-	Primary     bool
-	Filesystem Filesystem
-  }
-  
-  type Filesystem struct {
+	NodeID  uint
+	Name    string
+	Version string
+	URL     string
+}
+type BootAction struct {
 	gorm.Model
-	PartitionID   uint
-	Mountpoint    string
-	Fstype        string
-	MountOptions  string
-  }
-  
-  type KvmPolicy struct {
-	gorm.Model
-	NodeID              uint
-	CpuAllocation       string
-	CpuPinning          string
-	CpuHyperthreading   string 
-  }
-  
-  type SSHPubKey struct {
+	NodeID   uint
+	Name     string
+	Location string
+	Priority uint
+	Control  string
+	Args     string
+	Status   string `gorm:"DEFAULT:new"`
+}
+
+type NameServer struct {
 	gorm.Model
 	NodeID     uint
-	SSHPubKey  string
-  }
-  
-  type BondInterface struct {
+	NameServer string `json:"NameServer"`
+}
+
+type Partition struct {
 	gorm.Model
-	NodeID         uint
-	BondInterface  string
-  }
-  
-  type BondParameter struct {
+	NodeID     uint
+	Name       string
+	Size       string
+	Bootable   bool
+	Primary    bool
+	Filesystem Filesystem
+}
+
+type Filesystem struct {
 	gorm.Model
-	NodeID         uint
-	Key           string
-	Value       string
-  }
-  
-  type VirtualDisk struct {
+	PartitionID  uint
+	Mountpoint   string
+	Fstype       string
+	MountOptions string
+}
+
+type KvmPolicy struct {
+	gorm.Model
+	NodeID            uint
+	CpuAllocation     string
+	CpuPinning        string
+	CpuHyperthreading string
+}
+
+type SSHPubKey struct {
+	gorm.Model
+	NodeID    uint
+	SSHPubKey string
+}
+
+type BondInterface struct {
+	gorm.Model
+	NodeID        uint
+	BondInterface string
+}
+
+type BondParameter struct {
+	gorm.Model
+	NodeID uint
+	Key    string
+	Value  string
+}
+
+type VirtualDisk struct {
 	gorm.Model
 	NodeID         uint
 	DiskName       string
-	RaidType        int
+	RaidType       int
 	RaidController string
-	PhysicalDisks []PhysicalDisk
-  }
-  
-  type PhysicalDisk struct {
+	PhysicalDisks  []PhysicalDisk
+}
+
+type PhysicalDisk struct {
 	gorm.Model
 	VirtualDiskID uint
 	PhysicalDisk  string
-  }
+}
