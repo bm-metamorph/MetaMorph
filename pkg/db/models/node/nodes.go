@@ -407,8 +407,14 @@ func Create(data []byte) (string, error) {
 
 // For Testing purpose only
 func CreateTestNode() *Node {
-	data, _ := ioutil.ReadFile(config.Get("testing.inputfile").(string))
-	uuid, _ := Create(data)
+	data, err := ioutil.ReadFile(config.Get("testing.inputfile").(string))
+        if err != nil {
+          fmt.Println(err)
+        }
+	uuid, err := Create(data)
+        if err != nil {
+          fmt.Println(err)
+        }
 	nodelist, err := GetNodes()
 	if err != nil {
 		return nil

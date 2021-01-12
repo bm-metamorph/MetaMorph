@@ -101,6 +101,7 @@ d-i preseed/early_command string [ "$(mount | grep /media)" ] \
 d-i preseed/late_command string cp /cdrom/setup/install/init.sh  /target/root/ \
   && cp /cdrom/setup/install/50-cloud-init.yaml  /target/etc/netplan/50-cloud-init.yaml \
   && in-target mkdir -p   /opt/metamorph/bin/ \
+  && cp /cdrom/setup/install/70-metamorph-cloud-init.yaml  /target/opt/metamorph/70-metamorph-cloud-init.yaml \
   && cp /cdrom/setup/install/agent_config.yaml  /target/opt/metamorph/config.yaml \
   && cp /cdrom/setup/install/metamorph_agent /target/opt/metamorph/bin/metamorph_agent \
   && in-target chmod u+x /opt/metamorph/bin/metamorph_agent \

@@ -1,5 +1,10 @@
 ---
 
+database:
+    type: sqlite
+    path: "/tmp/db/metamorph.db"
+
+
 controller:
     port : 8080
 
@@ -11,7 +16,7 @@ logger:
       isogenpluginpath: /tmp/isogen-plugin.log
 
 templates:
-    rootdir: /home/ekuamaj/go/src/github.com/manojkva/metamorph-isogen-plugin
+    rootdir: /root/go/src/github.com/manojkva/MetaMorph
     preseed:
         config:  configs/templates/preseed.tmpl
         filepath: preseed/hwe-ubuntu-server.seed
@@ -29,26 +34,53 @@ templates:
     netplan:
         config: configs/templates/netplan.tmpl
         filepath: 50-cloud-init.yaml
+    cloudinit:
+        filepath: 70-metamorph-cloud-init.yaml
     agent_config:
         config:  configs/templates/agent_config.tmpl
         filepath: agent_config.yaml
 
 assets:
-   rootdir: /home/ekuamaj/go/src/github.com/manojkva/metamorph-isogen-plugin/assets
+   rootdir: /root/go/src/github.com/manojkva/MetaMorph/assets
    agent_binary:
           src:  files/metamorph_agent
           dest: metamorph_agent
 
 iso:
-  rootpath: /media/sf_Downloads/iso_root
-  tempdir: /media/sf_Downloads/iso_root/isos
+  rootpath: /tmp/iso_root
+  tempdir: /tmp/iso_root/isos
 
 
 http:
-  rootpath: /media/sf_Downloads/http_root
+  rootpath: /tmp/http_root
 
 provisioning:
-    ip : "12.168.220.23"
+    ip : "32.xx.xx.13"
     port:  3190
     httpport: 31180
+
+
+pluginlocation: "/root/go/src/github.com/manojkva/MetaMorph/assets/files"
+
+testing:
+    inputfile: "/root/go/src/github.com/manojkva/MetaMorph/examples/node1_input.json"
+
+agent:
+    node_id: "e415bbbe-be68-4705-aa05-16350e0c8151"
+    cntrl_endpoint: "localhost:4040"
+    logdir : "/tmp/metamorph"
+    temp_dir : "/tmp/metamorph/.tmp"
+
+plugins:
+    UpdateFirmware: "metamorph-redfish-plugin"
+    ConfigureRAID: "metamorph-redfish-plugin"
+    DeployISO: "metamorph-redfish-plugin"
+    GetGUUID: "metamorph-redfish-plugin"
+    CreateISO: "metamorph-isogen-plugin"
+    GetHWInventory: "metamorph-redfish-plugin"
+    PowerOff: "metamorph-redfish-plugin"
+    PowerOn: "metamorph-redfish-plugin"
+    GetPowerStatus: "metamorph-redfish-plugin"
+ 
+
 

@@ -12,7 +12,7 @@ nginxImage:
   pullPolicy: IfNotPresent
 
 image:
-  repository: metamorph
+  repository: quay.io/metamorph/metamorph
   tag: latest
   pullPolicy: IfNotPresent
 
